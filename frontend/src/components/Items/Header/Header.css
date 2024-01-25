@@ -1,0 +1,29 @@
+#header{
+    height: 100px;
+    width: 100%;
+    background-color: #fff;
+}
+
+#header>.header-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10%;
+    height: 100%;
+    width: 80%;
+}
+
+#header>.header-container>.menu-container{
+    display: flex;
+}
+
+#header>.header-container>.menu-container>.menu-item{
+    padding: 12px 16px;
+    font-size: 1.3em;
+}
+
+.vertical-line {
+    border-left: 1px solid #676767;
+    height: auto; 
+    margin-right: 10px; 
+}

@@ -1,0 +1,34 @@
+#footer{
+    padding: 5% 10%;
+    position: relative;
+    bottom: 0px;
+    border-top: 1px solid #ccc;
+}
+
+#footer>.footer-about{
+    display: grid;
+    grid-template-columns: 30% 60%;
+    gap: 10%;
+    font: 16px
+}
+
+/* #footer>.footer-about>.footer-info{
+
+} */
+
+#footer>.footer-about>.footer-item{
+    display: grid;
+    grid-template-columns: 30% 30% 30%;
+    gap: 5%;
+    width: 100%;
+}
+#footer>.footer-about>.footer-item>.item>.main{
+    font-size: 1rem;
+    font-size: 1.2em;
+}
+
+#footer>.footer-about>.footer-item>.item>.sub-item>p{
+    color: #6f6f6f;
+    padding-bottom: 1rem;
+    font-size: 1.1em;
+}

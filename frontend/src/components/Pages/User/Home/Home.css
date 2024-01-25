@@ -1,0 +1,115 @@
+:root {
+    --border-radius: 25px; /* Set default border-radius value */
+    --background-color: #fff; /* Set default background-color value */
+  }
+
+#body{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#body>.banner-section{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: fit-content;
+    align-items: center;
+}
+
+#body>.banner-section>.banner-image {
+    /* Set your desired width */
+    width: 75vw; 
+    /* This ensures that the height scales proportionally with the width */
+    height: 80vh; 
+    border-radius: var(--border-radius);
+    filter: brightness(0.6); /* Adjust the value to make it darker */
+}
+
+#body>.banner-section>.search-option {
+    position: relative;
+    width: 55vw;
+    height: 15vh;
+    top: -70px;
+    background-color: var(--background-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 15px #949494;
+}
+
+#body>.banner-section>.search-option>.option {
+    display: grid;
+    grid-template-columns: 35% 1% 45% 19%;
+    height: 100%;
+}
+
+#body>.banner-section>.search-option>.option>.sub-option {
+    flex: 1; /* Distribute the space evenly among sub-options */
+    display: flex;
+    align-items: center; /* Center the content vertically within each sub-option */
+    padding: 10px 20px; 
+    font-size: 22px;
+}
+
+/* #body>.banner-section>.search-option>.option>.location {
+
+} */
+
+#body>.banner-section>.search-option>.option>.period {
+    padding: auto;
+}
+
+#body>.banner-section>.search-option>.option>.search-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#body>.membership-section{
+    width: 100%;
+    padding: 0 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    padding-bottom: 100px;
+}
+
+#body>.membership-section p{
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+
+#body>.membership-section>.membership-container{
+    display: flex;
+    width: 65%;
+    justify-content: space-evenly;
+}
+
+#body>.membership-section>.membership-container>.membership{
+    height: 35vh;
+    width: 30vw;
+}
+
+#body>.membership-section>.membership-container>.mem1{
+    background-color: red;
+    border-radius: var(--border-radius);
+}
+
+#body>.membership-section>.membership-container>.mem2{
+    background-color: cyan;
+    border-radius: var(--border-radius);
+}
+
+#body>.car-section{
+    padding: 0 10%;
+}
+
+.vertical-line {
+    border-left: 1px solid #676767;
+    height: auto; 
+    margin-right: 10px; 
+    margin: 35px 10px 35px 0;
+}
