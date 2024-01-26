@@ -1,6 +1,37 @@
 #item{
-    height: 400px;
+    height: fit-content ;
     width: 350px;
-    background-color: red;
+    background-color: #ffffff;
     border-radius: 25px;
+    border: #c7c7c7 1px solid;
+    font-family: Arial, Helvetica, sans-serif;
+    box-shadow: #c7c7c7 0 0 5px;
+}
+
+#item>.container{
+    padding: 20px;
+}
+
+#item>.container>.img{
+    height: auto;
+    width: 306px;
+    border: #c7c7c7;
+    border-radius: 25px;
+}
+
+#item>.container>.item-detail>.title{
+    font-weight: 600;
+    font-size: x-large;
+    padding-bottom: 20px;
+}
+
+#item>.container>.item-detail>.location{
+    padding-bottom: 20px;
+}
+
+#item>.container>.item-detail>.price-info{
+    display: flex;
+    justify-content: space-between;
+    font-size: larger;
+    padding: 20px 0 5px 0;
 }

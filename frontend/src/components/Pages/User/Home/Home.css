@@ -104,7 +104,76 @@
 }
 
 #body>.car-section{
-    padding: 0 10%;
+    width: 100%;
+    background-color: rgb(230, 255, 228);
+    padding: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#body>.car-section p{
+    text-align: center;
+    font-size: 3.5rem;
+    font-weight: bold;
+    padding-bottom: 40px;
+}
+
+#body>.car-section>.car-container{
+    width: 80%;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 10px;
+  }
+
+#body>.explorer-section{
+    height: 600px;
+    width: 80%;
+    padding: 100px;
+}
+
+#body>.explorer-section>.explorer-container{
+    display: flex;
+    height: 100%;
+    padding: 20px;
+    background-color: rgb(224, 249, 251);
+    border-radius: var(--border-radius);
+}
+
+#body>.explorer-section>.explorer-container>.content{
+    display: flex;
+    height: 100%;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#body>.explorer-section>.explorer-container>.content p{
+    font-size: 3.5rem;
+    font-weight: 600;
+    padding-bottom: 40px;
+}
+#body>.explorer-section>.explorer-container>.content{
+    display: flex;
+}
+
+#body>.explorer-section>.explorer-container>.content>.options{
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 20px;
+}
+
+#body>.explorer-section>.explorer-container>.image{
+    width: 45%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#body>.explorer-section>.explorer-container>.image img{
+    width: 100%;
 }
 
 .vertical-line {

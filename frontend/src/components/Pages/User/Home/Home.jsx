@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
+import Card from "../../../Items/Card/Card";
+import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
 import "./Home.css"
 
@@ -54,6 +56,33 @@ export default function Home() {
             <div className="membership-container">
               <div className="membership mem1"></div>
               <div className="membership mem2"></div>
+            </div>
+          </div>
+          <div className="car-section">
+            <p>Xe Dành Cho Bạn</p>
+            <div className="car-container">
+              <Card />
+              <Card />
+              <Card />
+              <Card />
+              <Card />
+              <Card />
+              <Card />
+              <Card />
+            </div>
+          </div>
+          <div className="explorer-section">
+            <div className="explorer-container">
+              <div className="content">
+                <p>Bạn muốn cho thuê xe?</p>
+                <div className="options">
+                  <Button variant="outlined" style={{height: "80px",width: "200px", borderColor: "#00BF54", color: "#00BF54", fontWeight: "bold", fontSize: "20px"}}>Tìm hiểu thêm</Button>
+                  <Button variant="contained" style={{height: "80px",width: "200px", color: "#ffffff", fontWeight: "bold", fontSize: "20px", backgroundColor: "#00BF54"}}>Đăng ký xe</Button>
+                </div>
+              </div>
+              <div className="image">
+                <img src={RentImg}/>
+              </div>
             </div>
           </div>
         </div>
