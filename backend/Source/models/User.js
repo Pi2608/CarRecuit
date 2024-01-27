@@ -26,6 +26,14 @@ const getUserIdByEmail= async(email) => {
     }
 }
 
+const getImgsUser = async(userId)=> {
+    try{
+
+    }catch(err){
+        
+    }
+}
+
 const createUser = async (email, password)=>{
     try{
         let poolConnection = await sql.connect(config);
@@ -174,7 +182,7 @@ const getMemberShipIdUserCurrent = async(userId)=>{
 
 const checkLogin = async (email, password)=>{
     try{
-        
+        let poolConnection = await sql.connect(config)
     }catch(err){
         
     }
@@ -182,7 +190,7 @@ const checkLogin = async (email, password)=>{
 
 const addVoucher = async (voucherCode, userId)=>{
     try{
-        
+        let poolConnection = await sql.connect(config)
     }catch(err){
         
     }
@@ -201,5 +209,6 @@ module.exports={
     getMemberShipIdUserCurrent,
     checkLogin,
     addVoucher,
+    getImgsUser
 }
 
