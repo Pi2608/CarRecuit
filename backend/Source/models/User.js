@@ -139,23 +139,34 @@ const sendNotification = async (userId, title, message, dateUp, senderId) =>{
 }
 
 
-const promotedMembership = async (userId, timeChanged)=>{
+const promotedMembership = async (userId)=>{
     try{
-        let poolConnection = await sql.connect(config)
-        const query2 = 'Insert into [memberShipUser] (userId, )'
+            const memberShipId = await getMemberShipIdUserCurrent(userId);
+            const newMemberShipId = memberShipId+1;
+            let poolConnection = await sql.connect(config)
+            const query = 'Insert into [memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
+            await poolConnection.request()
+            .input('UserId', sql.Int, userId)
+            .input('MemberShipId', sql.Int, newMemberShipId)
+            .input('TimeChanged', sql.DateTime, util.currentTime)
+            .query(query)
     }catch(err){
-        
+    
     }
 }
 
-const getMemberShipUserCurrent = async(userId)=>{
+const getMemberShipIdUserCurrent = async(userId)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'SELECT memberShipId FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
+        const query = 'SELECT memberShipId FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
         const result = await poolConnection.request()
         .input('UserId', sql.Int, userId)
-        .query(query1)
-        return result.recordset
+        .query(query)
+        if (result.recordset.length > 0) {
+            return result.recordset[0].memberShipId;
+        } else {
+            return null;
+        }
     }catch(err){
         
     }
@@ -171,7 +182,7 @@ const checkLogin = async (email, password)=>{
 
 const addVoucher = async (voucherCode, userId)=>{
     try{
-
+        
     }catch(err){
         
     }
@@ -187,7 +198,7 @@ module.exports={
     getNotification,
     sendNotification,
     promotedMembership,
-    getMemberShipUserCurrent,
+    getMemberShipIdUserCurrent,
     checkLogin,
     addVoucher,
 }
