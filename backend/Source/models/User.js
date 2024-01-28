@@ -1,6 +1,8 @@
 const sql = require("mssql/msnodesqlv8");
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
+var jwt = require('jsonwebtoken');
+
 
 const getAllUser = async()=>{
     try{
@@ -22,15 +24,20 @@ const getUserIdByEmail= async(email) => {
         .query(query);
         return result.recordset;
     }catch(err){
-
+        console.log(err);
     }
 }
 
-const getImgsUser = async(userId)=> {
+const getImgsUserById = async(userId)=> {
     try{
-
+        let poolConnection = await sql.connect(config);
+        const query = 'Select id, url From [dbo].[image] where userId= @UserId'
+        const result = await poolConnection.request()
+        .input('UserId',sql.id, userId)
+        .query(query);
+        return result.recordset
     }catch(err){
-        
+        console.log(err);
     }
 }
 
@@ -49,15 +56,16 @@ const createUser = async (email, password)=>{
         .input(timeChanged, sql.DateTime, util.currentTime)
         .query(query2);
     }catch(err){
-
+        console.log(err);
     }
 }
 
 
-const updateUser = async (name, phone, dateOfBirth, NID, NDL, email, images)=>{
+
+const updateUser = async (name, phone, dateOfBirth, NID, NDL, email, FNIDimg, BNIDimg, FNDLimg, BNDLimg)=>{
     try{
         let poolConnection = await sql.connect(config);
-        const query1 = 'UPDATE [dbo].[user] SET name = @Name, phone = @Phone, dateOfBirth = @DateOfBirth, NID = @NID, NDL = @NDL Where email = @Email';
+        const query = 'UPDATE [dbo].[user] SET name = @Name, phone = @Phone, dateOfBirth = @DateOfBirth, NID = @NID, NDL = @NDL Where email = @Email';
         await poolConnection.request()
         .input('Name', sql.NVarChar, name)
         .input('Phone', sql.NVarChar, phone)
@@ -65,18 +73,58 @@ const updateUser = async (name, phone, dateOfBirth, NID, NDL, email, images)=>{
         .input('NID', sql.NVarChar, NID)
         .input('NDL', sql.NVarChar, NDL)
         .input('Email', sql.NVarChar, email)
-        .query(query1);
-        for (const image of images) {
-            const query2 = 'INSERT INTO [dbo].[image] (url, userId) values (@URL, @UserId)';
-            await poolConnection.request()
-                .input('Url', sql.NVarChar, image)
-                .input('UserId', sql.Int, getUserIdByEmail(email))
-                .query(query2);
-        }
+        .query(query);
+        const userId = (await getUserIdByEmail(email)).id
+        addKindImgUser('FNID',FNIDimg, userId);
+        addKindImgUser('BNID',BNIDimg, userId);
+        addKindImgUser('FNDL',FNDLimg, userId);
+        addKindImgUser('BNDL',BNDLimg, userId)
     }catch(err){
-
+        console.log(err);
     }
 }
+
+const addKindImgUser = async (message, imageUrl, userId) => {
+    try {
+        let idImg = '';
+        if (message === 'FNID') {
+            idImg = 'FNID' + userId;
+        }
+        if (message === 'BNID') {
+            idImg = 'BNID' + userId;
+        }
+        if (message === 'FNDL') {
+            idImg = 'FNDL' + userId;
+        }
+        if (message === 'BNDL') {
+            idImg = 'BNDL' + userId;
+        }
+
+        const images = await getImgsUserById(userId);
+        const img = images.find(img => img.id === idImg);
+
+        let poolConnection = await sql.connect(config);
+        let query = '';
+
+        if (img) {
+            query = 'UPDATE [dbo].[image] SET url = @ImageUrl WHERE id = @IdImage';
+            await poolConnection.request()
+                .input('ImageUrl', sql.NVarChar, imageUrl)
+                .input('IdImage', sql.NVarChar, idImg)
+                .query(query);
+        } else {
+            query = 'INSERT INTO [dbo].[image] (id, url, carId, userId) VALUES (@IdImage, @ImageUrl, null, @UserId)';
+            await poolConnection.request()
+                .input('ImageUrl', sql.NVarChar, imageUrl)
+                .input('IdImage', sql.NVarChar, idImg)
+                .input('UserId', sql.Int, userId)
+                .query(query);
+        }
+    } catch (error) {
+        console.log('Err: ', error);
+    }
+};
+
 
 const deleteUser = async (email) =>{
     try{
@@ -182,19 +230,26 @@ const getMemberShipIdUserCurrent = async(userId)=>{
 
 const checkLogin = async (email, password)=>{
     try{
-        let poolConnection = await sql.connect(config)
+        const users = await getAllUser()
+        const user = users.find(user => user.email==email&& user.password==password)
+        if (user != null){
+            const payload ={userid: user.id, email: user.email};
+            const secretKey = 'carFlex2024'
+            const token = jwt.sign(payload, secretKey)
+            return {
+                message: 'Đăng Nhập thành công',
+                token: token
+            }
+        }else{
+            return {
+                message: 'Đăng Nhập thất bại',
+            }
+        }
     }catch(err){
-        
+        console.log("error: ",err)
     }
 }
 
-const addVoucher = async (voucherCode, userId)=>{
-    try{
-        let poolConnection = await sql.connect(config)
-    }catch(err){
-        
-    }
-}
 
 module.exports={
     getAllUser,
@@ -208,7 +263,6 @@ module.exports={
     promotedMembership,
     getMemberShipIdUserCurrent,
     checkLogin,
-    addVoucher,
-    getImgsUser
+    getImgsUserById
 }
 
