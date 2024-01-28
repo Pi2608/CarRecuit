@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Modal.css";
 
-export default function Modal(){
+export default function Modal({Modal}){
     
     const [modal, setModal] = useState(false);
 
