@@ -1,6 +1,7 @@
 const sql = require("mssql/msnodesqlv8");
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
+const { Int } = require("msnodesqlv8");
 
 const getAllCars= async()=>{
     try{
@@ -81,17 +82,41 @@ const filterCars=async(Cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels)=
     }
 }
 
-const addCarRental = async (userId, carTypeId, CLP, price, description, seats, typeOfFuels, locationIp, ldescription)=>{
+const addCarRental = async (ownerId, companyId, carTypeId, CLP, price, discount ,description, seats, typeOfFuels, locationIp, ldescription, Imgs)=>{
     try{
-
+        let poolConnection = await sql.connect(config)
+        const query = 'Insert into [dbo].[car] (ownerId, carTyper, CLP, price, discount, description, seats, typeOfFuels, status, companyId) Values (@OwnerId, @CarTyper, @CLP, @Price, @Discount, @Description, seats, typeOfFuels, 0, @CompanyId)';
+        await poolConnection.request()
+        .input('OwnerId', sql.Int, ownerId)
+        .input('CarTypeId', sql.Int, carTypeId)
+        .input('CLP', sql.Int, CLP)
+        .input('Price', sql.Money, price)
+        .input('Discount', sql.Float, discount)
+        .input('Description', sql.NVarChar, description)
+        .input('Seats', sql.Int, seats)
+        .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
+        .input('CompanyId', companyId)
+        .query(query);
     }catch(err){
         
     }
 }
 
-const updateCarRental = async (carId, carTypeId, CLP, price, description, seats, typeOfFuels, status, locationIp, ldescription) =>{
+const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, typeOfFuels, status, locationIp, ldescription, Imgs) =>{
     try{
-
+        let poolConnection = await sql.connect(config)
+        const query = 'Update [dbo].[car] set carTypeId = @CarTypeId, CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
+        await poolConnection.request()
+        .input('CarId', sql.Int, carId)
+        .input('CarTypeId', sql.Int, carTypeId)
+        .input('CLP', sql.Int, CLP)
+        .input('Price', sql.Money, price)
+        .input('Discount', sql.Float, discount)
+        .input('Description', sql.NVarChar, description)
+        .input('Seats', sql.Int, seats)
+        .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
+        .input('Status', sql.Bit, status)
+        .query(query);
     }catch(err){
         
     }
