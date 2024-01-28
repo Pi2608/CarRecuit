@@ -123,7 +123,7 @@
     width: 80%;
     display: grid;
     grid-template-columns: auto auto auto auto;
-    gap: 10px;
+    gap: 30px;
   }
 
 #body>.explorer-section{

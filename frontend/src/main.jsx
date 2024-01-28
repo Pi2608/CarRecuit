@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import ErrorPage from './components/Pages/ErrorPage/ErrorPage.jsx';
 import Home from './components/Pages/User/Home/Home.jsx';
-import Card from './components/Items/Card/Card.jsx';
+import Modal from './components/Items/Modal/Modal.jsx';
 
 const router = createBrowserRouter([
   {
