@@ -1,7 +1,7 @@
 const sql = require("mssql/msnodesqlv8");
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
-const { Int } = require("msnodesqlv8");
+
 
 const getAllCars= async()=>{
     try{
@@ -124,7 +124,11 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
 
 const deleteCarRental = async(carId)=>{
     try{
-
+        let poolConnection = await sql.connect(config)
+        const query = 'Update [dbo].[car] set isDeleted = 1, where id = @carId'
+        await poolConnection.request()
+        input('carId', sql.Int,carId)
+        .query(query);
     }catch(err){
         
     }
