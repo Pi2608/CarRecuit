@@ -1,3 +1,5 @@
+const arduino = require('./ArduinoConfig')
+
 const currentTime = async()=>{
     var date = new Date();
 
@@ -8,6 +10,13 @@ const currentTime = async()=>{
     return dateFormat;
 }
 
+const getPositionCar = async()=>{
+    await arduino.waitForData();
+    const output = arduino.getOutputString();
+    return output
+}
+
 module.exports={
-    currentTime
+    currentTime,
+    getPositionCar
 }
