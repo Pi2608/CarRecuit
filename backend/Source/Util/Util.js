@@ -1,4 +1,5 @@
-const arduino = require('./ArduinoConfig')
+const firebase = require('firebase')
+const config = require('./firebaseConfig')
 
 const currentTime = async()=>{
     var date = new Date();
@@ -9,12 +10,29 @@ const currentTime = async()=>{
     
     return dateFormat;
 }
+const getPositionCar = async () => {
+    firebase.initializeApp(config);
+    const rootRef = firebase.database().ref();
+    const latRef = rootRef.child('lat');
+    const lngRef = rootRef.child('lng');
 
-const getPositionCar = async()=>{
-    await arduino.waitForData();
-    const output = arduino.getOutputString();
-    return output
+    try {
+        const latSnapshot = await latRef.once('value');
+        const lngSnapshot = await lngRef.once('value');
+
+        const lat = latSnapshot.val() / 1000000;
+        const lng = lngSnapshot.val() / 1000000;
+
+        return {
+            latitude: lat,
+            longitude: lng
+        };
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        throw error;
+    }
 }
+
 
 module.exports={
     currentTime,
