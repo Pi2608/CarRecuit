@@ -195,6 +195,7 @@ module.exports = {
     updateRent,
     deleteRent,
     getRentById,
+    getRentsByUser,
 
     createRentDetail,
     getAllRentDetails,
