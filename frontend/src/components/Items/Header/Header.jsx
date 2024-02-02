@@ -1,11 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Header.css";
 
 function Header() {
+
+    const navigate = useNavigate()
+
     return(
         <div id="header">
             <div className="header-container">
-                <div className="logo-container">
+                <div className="logo-container" onClick={()=>navigate("/")}>
                     <h1>CarFlex</h1>
                 </div>
                 <div className="menu-container">

@@ -11,6 +11,8 @@ import {
 } from "react-router-dom";
 import ErrorPage from './components/Pages/ErrorPage/ErrorPage.jsx';
 import Home from './components/Pages/User/Home/Home.jsx';
+import CarList from './components/Pages/User/CarList/CarList.jsx';
+import CarDetail from './components/Pages/User/CarDetail/CarDetail.jsx';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
      <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/carlist" element={<CarList />} />
+        <Route path="/cardetail" element={<CarDetail />} />
         {/* <Route path="/blog/" element={<BlogApp />} />
         <Route path="/users/" element={<UserApp />} /> */}
       </Routes>

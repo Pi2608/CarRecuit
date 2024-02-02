@@ -1,6 +1,6 @@
 #item{
     height: fit-content ;
-    width: 350px;
+    width: 275px;
     background-color: #ffffff;
     border-radius: 25px;
     border: #c7c7c7 1px solid;
@@ -14,7 +14,7 @@
 
 #item>.container>.img{
     height: auto;
-    width: 306px;
+    width: 100%;
     border: #c7c7c7;
     border-radius: 25px;
 }
@@ -22,16 +22,16 @@
 #item>.container>.item-detail>.title{
     font-weight: 600;
     font-size: x-large;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
 }
 
 #item>.container>.item-detail>.location{
-    padding-bottom: 20px;
+    padding-bottom: 10px;
 }
 
 #item>.container>.item-detail>.price-info{
     display: flex;
     justify-content: space-between;
     font-size: larger;
-    padding: 20px 0 5px 0;
+    padding: 10px 0 5px 0;
 }

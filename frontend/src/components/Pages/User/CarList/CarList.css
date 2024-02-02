@@ -1,0 +1,65 @@
+#car{
+    width: 100%;
+}
+
+#cars>.body{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 50px;
+}
+
+#cars>.body>.filter-section{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc ;
+    padding: 15px;
+    gap: 20px;
+}
+
+#cars>.body>.filter-section>.details{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+#cars>.body>.filter-section>.amenities{
+    display: flex;
+    gap: 10px;
+}
+
+#cars>.body>.filter-section>.amenities>.amenity{
+    display: flex;
+    height: 30px;
+    min-width: 30px;
+    border: 0.5px solid #ccc;
+    border-radius: 15px;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+}
+
+#cars>.body>.filter-section>.amenities>.amenity>.icon{
+    padding-right: 8px;
+    height: 24px;
+    width: auto;
+}
+
+#cars>.body>.filter-section>.amenities>.reset-btn{
+    padding: 0;
+}
+
+#cars>.body>.car-list{
+    width: 80%;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    padding-top: 30px;
+}

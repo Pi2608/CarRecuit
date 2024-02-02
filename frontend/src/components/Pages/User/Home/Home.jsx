@@ -1,18 +1,20 @@
 import React, {useState} from "react";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import { useNavigate } from "react-router-dom";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import Card from "../../../Items/Card/Card";
 import Modal from "../../../Items/Modal/Modal";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
 import "./Home.css"
 
 export default function Home() {
 
+  const navigate = useNavigate();
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => {
@@ -53,7 +55,18 @@ export default function Home() {
                   </table>
                 </div>
                 <div className="search-button">
-                  <Button variant="outlined" size="large" style={{height: "40%",width: "60%", borderColor: "#00BF54", color: "#00BF54", fontWeight: "bold"}}>Tìm xe</Button>
+                  <Button 
+                    variant="outlined" 
+                    size="large" 
+                    style={{height: "40%",
+                            width: "60%", 
+                            borderColor: "#00BF54", 
+                            color: "#00BF54", 
+                            fontWeight: "bold"
+                          }}
+                    onClick={()=>navigate("/carlist")}>
+                            Tìm xe
+                            </Button>
                 </div>
               </div>
             </div>
@@ -92,7 +105,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <Modal/>
+          {/* <Modal/> */}
         </div>
         <Footer/>
     </div>

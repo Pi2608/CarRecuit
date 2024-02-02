@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import CarImage from "../../../images/Hyundai-accent-2022.jpg"
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StarRateIcon from '@mui/icons-material/StarRate';
@@ -6,8 +7,11 @@ import "./Card.css"
 
 // export default function Card({ itemId, shape, material, image, title, price, discount })
 export default function Card() {
+
+    const navigate = useNavigate()
+
     return (
-        <div id="item">
+        <div id="item" onClick={()=>navigate("/cardetail")}>
             <div className="container">
                 <img className="img" src={CarImage} />
                 <div className="item-detail">
