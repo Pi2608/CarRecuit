@@ -1,5 +1,7 @@
 const firebase = require('firebase')
 const config = require('./firebaseConfig')
+const imageToBase64 = require('image-to-base64')
+const decode = require ('node-base64-image').decode
 
 const currentTime = async()=>{
     var date = new Date();
@@ -32,9 +34,30 @@ const getPositionCar = async () => {
         throw error;
     }
 }
+const encodeImage = async(path)=>{
+    try {
+        const response = await imageToBase64(path);
+        return response;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+const decodeImage = async (base64Code, name) => {
+    const path = 'backend/photos/' + name;
+
+    try {
+        await decode(base64Code, { frame: path, ext: 'jpg' });
+        return path + '.jpg';
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 
 module.exports={
     currentTime,
-    getPositionCar
+    getPositionCar,
+    encodeImage,
+    decodeImage
 }
