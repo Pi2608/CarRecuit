@@ -28,6 +28,19 @@ const getUserIdByEmail= async(email) => {
     }
 }
 
+const getUserById= async(id) => {
+    try{
+        let poolConnection = await sql.connect(config);
+        const query = 'Select * From [dbo].[user] where id =@id';
+        const result = await poolConnection.request()
+        .input('id', sql.Int, id)
+        .query(query);
+        return result.recordset;
+    }catch(err){
+        console.log(err);
+    }
+}
+
 const getImgsUserById = async(userId)=> {
     try{
         let poolConnection = await sql.connect(config);
@@ -126,10 +139,10 @@ const addKindImgUser = async (message, imageUrl, userId) => {
 };
 
 
-const deleteUser = async (email) =>{
+const deleteUserById = async (Id) =>{
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'Delete from [dbo].[user] Where email = @Email';
+        const query = 'Update [dbo].[user] Set isDeleted = 1 Where email = @Email';
         await poolConnection.request()
         .input('Email', sql.NVarChar, email)
         .query(query);
@@ -195,21 +208,30 @@ const sendNotification = async (userId, title, message, dateUp, senderId) =>{
 }
 
 
-const promotedMembership = async (userId)=>{
+const autoPromotedMembership = async (userId)=>{
     try{
+            const userPoint = (await getUserById(userId)).point
             const memberShipId = await getMemberShipIdUserCurrent(userId);
             const newMemberShipId = memberShipId+1;
             let poolConnection = await sql.connect(config)
-            const query = 'Insert into [memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
-            await poolConnection.request()
-            .input('UserId', sql.Int, userId)
-            .input('MemberShipId', sql.Int, newMemberShipId)
-            .input('TimeChanged', sql.DateTime, util.currentTime)
-            .query(query)
+            const query1 ='Select pointRequire From [dbo].[memberShip] where id = %id'
+            const result = await poolConnection.request()
+            .input('id', sql.Int, newMemberShipId)
+            .query(query1)
+            const pointRequire = result.recordset.pointRequire
+            if(userPoint>=pointRequire){
+                const query2 = 'Insert into [dbo].[memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
+                await poolConnection.request()
+                .input('UserId', sql.Int, userId)
+                .input('MemberShipId', sql.Int, newMemberShipId)
+                .input('TimeChanged', sql.DateTime, util.currentTime)
+                .query(query2)
+            }
     }catch(err){
-    
+        console.log(err)
     }
 }
+
 
 const getMemberShipIdUserCurrent = async(userId)=>{
     try{
@@ -253,14 +275,15 @@ const checkLogin = async (email, password)=>{
 
 module.exports={
     getAllUser,
+    getUserById,
     createUser,
     updateUser,
-    deleteUser,
+    deleteUserById,
     replyFeedback,
     editStatusUser,
     getNotification,
     sendNotification,
-    promotedMembership,
+    autoPromotedMembership,
     getMemberShipIdUserCurrent,
     checkLogin,
     getImgsUserById

@@ -124,7 +124,7 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
 
 const deleteCarRental = async(carId)=>{
     try{
-
+        let poolConnection 
     }catch(err){
         
     }
