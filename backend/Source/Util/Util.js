@@ -2,6 +2,7 @@ const firebase = require('firebase')
 const config = require('./firebaseConfig')
 const imageToBase64 = require('image-to-base64')
 const decode = require ('node-base64-image').decode
+const path = require('path');
 
 const currentTime = async()=>{
     var date = new Date();
@@ -44,13 +45,14 @@ const encodeImage = async(path)=>{
     }
 }
 const decodeImage = async (base64Code, name) => {
-    const path = 'backend/photos/' + name;
-
+    const projectPath = path.resolve();
+    const savePath = projectPath + '/photos/' + name
     try {
-        await decode(base64Code, { frame: path, ext: 'jpg' });
-        return path + '.jpg';
+        await decode(base64Code, { fname: savePath, ext: 'jpg' });
+        return path+'.jpg';
     } catch (error) {
-        console.log(error);
+        console.error('Error decoding image:', error);
+        return null; // or throw the error if you want to handle it differently
     }
 };
 
