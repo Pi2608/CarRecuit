@@ -124,7 +124,11 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
 
 const deleteCarRental = async(carId)=>{
     try{
-        let poolConnection 
+        let poolConnection = await sql.connect(config)
+        const query = "Update [dbo].[car] set isDeleted = 1 where id = @carId"
+        await poolConnection.request()
+        .input('CarId', sql.Int, carId)
+        .query(query);
     }catch(err){
         
     }
