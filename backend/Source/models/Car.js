@@ -45,14 +45,15 @@ const getImgsCar = async(carId)=>{
 
 const getCarsByPage= async(Cars, numPage, numItems) =>{
     try{
-
+        
     }catch(err){
         
     }
 }
 
-const filterCars=async(Cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
+const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     try{
+        const Cars = await getAllCars();
         const filteredCars = Cars.filter(car => {
             if (carTypeId && car.carTypeId !== carTypeId) {
                 return false;
