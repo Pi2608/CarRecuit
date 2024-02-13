@@ -43,13 +43,17 @@ const getImgsCar = async(carId)=>{
     }
 }
 
-const getCarsByPage= async(Cars, numPage, numItems) =>{
-    try{
-        
-    }catch(err){
-        
+const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
+    try {
+        const startIndex = (numPage - 1) * numItemsPerPage;
+        const endIndex = startIndex + numItemsPerPage;
+
+        return Cars.slice(startIndex, endIndex);
+    } catch (err) {
+        console.error('Error:', err);
+        throw err;
     }
-}
+};
 
 const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     try{
