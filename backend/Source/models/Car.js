@@ -3,11 +3,24 @@ const config = require("../config/dbconfig");
 const util = require("../Util/Util");
 
 
-const getAllCars= async()=>{
+const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
         const query = 'Select * From [dbo].[car] Where status = 0'
         const result = await poolConnection.request().query(query);
+        return result.recordset;
+    }catch(err){
+        
+    }
+}
+
+const getCarById= async(id)=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query = 'Select * From [dbo].[car] Where id = @id'
+        const result = await poolConnection.request()
+        .input("id", sql.Int, id)
+        .query(query);
         return result.recordset;
     }catch(err){
         
@@ -141,12 +154,13 @@ const deleteCarRental = async(carId)=>{
 
 
 module.exports={
-    getAllCars,
+    getAllCarsInUse,
     getCarsByName,
     getImgsCar,
     getCarsByPage,
     filterCars,
     addCarRental,
     updateCarRental,
-    deleteCarRental
+    deleteCarRental,
+    getCarById
 }

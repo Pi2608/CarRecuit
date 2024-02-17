@@ -35,7 +35,7 @@ const getUserById= async(id) => {
         const result = await poolConnection.request()
         .input('id', sql.Int, id)
         .query(query);
-        return result.recordset;
+        return result.recordset[0];
     }catch(err){
         console.log(err);
     }
