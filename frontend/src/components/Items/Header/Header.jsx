@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Header.css";
 
 function Header() {
@@ -16,7 +16,9 @@ function Header() {
                     <a className="menu-item">About CarFlex</a>
                     <a className="menu-item">Become a partner</a>
                     <div class="vertical-line"></div>
-                    <a className="menu-item">User</a>
+                    <div className="menu-item user-container">
+                        <Link to={"/profile"}>User</Link>
+                    </div>
                 </div>
             </div>
         </div>

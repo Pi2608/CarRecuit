@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import Card from "../../../Items/Card/Card";
-import GearShift from "../../../../icons/GearShift.png";
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import FmdGoodOutlinedIcon from '@mui/icons-material/FmdGoodOutlined';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
@@ -16,6 +15,10 @@ import { GiGearStick } from "react-icons/gi";
 import "./CarList.css";
 
 export default function CarList(){
+    
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    },[])
 
     return (
         <div id="cars">
@@ -27,6 +30,10 @@ export default function CarList(){
                         <CalendarMonthOutlinedIcon style={{height: "20px", width: "auto", paddingLeft: "25px"}}/><p>07:00, 02/02/2024 - 08:00, 03/02/2024</p>
                     </div>
                     <div className="amenities">
+                    <label class="switch">
+                        <input type="checkbox"/>
+                        <span class="slider"><div className="amenity reset-btn"><RotateLeftIcon/></div></span>
+                    </label>
                         <div className="amenity reset-btn"><RotateLeftIcon/></div>
                         <div className="amenity car-tpye"><div className="icon"><AirportShuttleOutlinedIcon/></div><p>Loại xe</p></div>
                         <div className="amenity car-brand"><div className="icon"><LanguageIcon/></div><p>Hãng xe</p></div>

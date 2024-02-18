@@ -11,15 +11,20 @@
 }
 
 #cars>.body>.filter-section{
+    position: sticky;
     width: 100%;
     height: fit-content;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: #fff;
     border: 1px solid #ccc ;
+    box-shadow: 0 2px 5px #ccc;
     padding: 15px;
     gap: 20px;
+    top: 0;
+    z-index: 1;
 }
 
 #cars>.body>.filter-section>.details{
@@ -31,6 +36,7 @@
 #cars>.body>.filter-section>.amenities{
     display: flex;
     gap: 10px;
+    cursor: pointer;
 }
 
 #cars>.body>.filter-section>.amenities>.amenity{
@@ -42,6 +48,10 @@
     justify-content: center;
     align-items: center;
     padding: 0 10px;
+}
+
+#cars>.body>.filter-section>.amenities>.amenity:hover{
+    box-shadow: 0 2px 2px #ccc;
 }
 
 #cars>.body>.filter-section>.amenities>.amenity>.icon{
@@ -63,3 +73,36 @@
     align-items: center;
     padding-top: 30px;
 }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }

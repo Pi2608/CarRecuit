@@ -15,6 +15,7 @@
     align-items: center;
 }
 
+
 #car-detail>.body>.img-container>.item-1{
     grid-area: main;
     height: 630px;

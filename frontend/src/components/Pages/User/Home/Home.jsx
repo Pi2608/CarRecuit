@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
@@ -20,6 +20,10 @@ export default function Home() {
   const toggleModal = () => {
     setModal(!modal);
   }
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  },[])
 
   return (
     <div id="home">

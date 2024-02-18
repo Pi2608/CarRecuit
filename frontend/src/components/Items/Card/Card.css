@@ -8,6 +8,10 @@
     box-shadow: #c7c7c7 0 0 5px;
 }
 
+#item:hover{
+    box-shadow: 0 0 10px #9a9a9a;
+}
+
 #item>.container{
     padding: 20px;
 }
@@ -34,4 +38,11 @@
     justify-content: space-between;
     font-size: larger;
     padding: 10px 0 5px 0;
+}
+
+#item>.container>.item-detail>.price-info>.rating{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
 }

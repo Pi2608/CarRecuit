@@ -1,0 +1,82 @@
+:root {
+    --border-radius: 25px; /* Set default border-radius value */
+    --background-color: #fff; /* Set default background-color value */
+}
+
+#info>.container{
+    width: 842px;
+    min-height: 200px;
+    height: fit-content;
+    background-color: white;
+    box-shadow: 0 2px 5px #ccc;
+    border-radius: var(--border-radius);
+    padding: 24px;
+}
+
+#info>.container>.title{    
+    display: flex;
+    justify-content: space-between;
+}
+
+#info>.container>.title div{
+    display: flex;
+    border: 0,2px #c0c0c0 solid;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;    
+}
+
+#info>.container>.content{
+    display: flex;
+    height: fit-content;
+    width: 842px;
+    padding: 10px;
+}
+
+#info>.container>.content>.avatar-box{
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center ;
+    gap: 20px;
+}
+
+#info>.container>.content>.avatar-box>.ctn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+#info>.container>.content>.avatar-box>.ctn p{
+    font-size: large;
+}
+
+#info>.container>.content>.avatar-box>.ctn>.box{
+    padding: 5px 6px 5px 4px;
+    display: flex;
+    gap: 3px;
+    width: fit-content;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #c0c0c0;
+    border-radius: 5px;
+}
+
+#info>.container>.content>.avatar-box>.avatar-container{
+    height: 150px;
+    width: 150px;
+    background-color: #c0c0c0;
+    border-radius: 50%;
+}
+
+#info>.container>.content>.info-user{
+
+}
+
+#info>.container>.content>.info-user>.info-box div{
+    display: flex;
+}

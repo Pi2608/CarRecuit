@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import CarImg1 from "../../../../images/Hyundai-accent-2022-1.jpg"
@@ -13,6 +13,12 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import "./CarDetail.css";
 
 export default function CarDetail(){
+
+    
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    },[])
+
     return(
         <div id="car-detail">
             <Header/>

@@ -1,7 +1,7 @@
 :root {
     --border-radius: 25px; /* Set default border-radius value */
     --background-color: #fff; /* Set default background-color value */
-  }
+}
 
 #body{
     min-height: 100vh;
