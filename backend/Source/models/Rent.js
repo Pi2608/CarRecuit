@@ -190,6 +190,13 @@ const deleteRentDetail = async(userId, rentDetailId)=>{
 }
 
 const confirmPayment = async (userId)=>{
+    //tạo mã paymentCode
+    //tạo payment
+    //trừ tiền
+    //gán payment vào rent
+    //gửi thông báo đến owner
+    // gán notificationId vào rentDetail
+    // + point
     try {
         const rent = await getCurrentRent(userId)
         let poolConnection = await sql.connect(config)
@@ -239,6 +246,7 @@ const confirmPayment = async (userId)=>{
                                 where id = @carId`
                 const result5 =await poolConnection.request()
                 .input("carId", sql.Int, rentDetails[i].carId)
+                .query(query5)
                 const car = result5.recordset[0]
                 const title = "Lời yêu cầu thuê xe từ " + User.name
                 const message = ""
@@ -254,20 +262,121 @@ const confirmPayment = async (userId)=>{
                 .input("dateUp", sql.DateTime, dateUp)
                 .input("senderId", sql.Int, senderId)
                 .query(query6)
+                const query7 =`Update dbo.rentDetail 
+                            set notificationId = (Select Max(id) from db.notification) 
+                            where id =@rentDetailId`
+                await poolConnection.request()
+                .input('rentDetailId', sql.Int, rentDetails[i].id)
+                .query(query7)
             }
-            // gửi tiền cho admin 
-            // + point
+            //+point
         }
     } catch (error) {
         
     }
 }
+const acceptRentDetail = async(notificationId, ownerId)=>{
+    //chuyển status
+    //thêm tiền vào ví của chủ xe
+    //gửi notification cho người thuê
+    try {
+        let poolConnection =  await sql.connect(config)
+        const query1 = `Select * from dbo.rentDetail 
+                        where notificationId = @notificationId`
+        const result1 = await poolConnection.request()
+        .input('notificationId', sql.Int, notificationId)
+        .query(query1)
+        const rentDetail = result1.recordset[0]
+        const query2 = `Update from dbo.rentDetail set isAccepted = 1
+                        where id =@rentDetailId`
+        await poolConnection.request()
+        .input('rentDetailId', rentDetail.id)
+        .query(query2)
+        const addWallet = rentDetail.total*0.8
+        const query3=`Update from dbo.user 
+                    set wallet = wallet + @addWallet
+                    where id = @ownerId`
+        await poolConnection.request()
+        .input('addWallet', sql.Float, addWallet)
+        .input('ownerId', sql.Int, ownerId)
+        .query(query3)
+        const query4=`Insert into dbo.notification () values ()`
+    } catch (error) {
+        
+    }
+}
 
-const cancelRentDetail = async(rentDetailId)=>{
+const cancelRentDetailByUser = async(rentDetailId, userId)=>{
     // chuyển status
-    // gửi notificate cho owner
-    // hoàn tiền bao nhiêu %?
-    // 
+    // gửi notificate cho owner và user
+    // hoàn tiền cho user
+    try {
+        let poolConnection =  await sql.connect(config)
+        const query1 = `Update from dbo.rentDetail set isAccepted = 0
+                        where id =@rentDetailId`
+        await poolConnection.request()
+        .input('rentDetailId', rentDetailId)
+        .query(query1)
+        const query2 = `Insert into dbo.notification () values ()`
+        
+        const query3 = `Select * from dbo.rentDetail 
+                        where id = rentDetailId`
+        const result3 = await poolConnection.request()
+        .input('rentDetailId', sql.Int, rentDetailId)
+        .query(query3)
+        const rentDetail = result3.recordset[0]
+        
+        let dayLeft
+        let refund
+        if(dayLeft>=7){
+            refund = rentDetail.total*1
+        }
+        else if(dayLeft<7&& dayLeft>=1){
+            refund = rentDetail.total*0.7
+        }else{
+            refund = rentDetail.total*0
+        }
+        if (refund>0){
+            const query4 =`Update dbo.user set wallet = wallet + @refund
+                            where id = @userId`
+            await poolConnection.request()
+            .input("userId", sql.Int, userId)
+            .query(query4)
+            const query5 = `Insert into dbo.notification () values()`
+        }   
+    } catch (error) {
+        
+    }
+}
+const cancelRentDetailByOwner = async(notificationId)=>{
+    // chuyển status
+    // refund tiền cho user
+    // gửi thông báo
+    try {
+        let poolConnection =  await sql.connect(config)
+        const query1 = `Select * from dbo.rentDetail 
+                        where notificationId = @notificationId`
+        const result1 = await poolConnection.request()
+        .input('notificationId', sql.Int, notificationId)
+        .query(query1)
+        const rentDetail = result1.recordset[0]
+        const query2 = `Update from dbo.rentDetail set isAccepted = 0
+                        where id =@rentDetailId`
+        await poolConnection.request()
+        .input('rentDetailId', rentDetail.id)
+        .query(query2)
+        let refund = rentDetail.total
+        const query3=`Update from dbo.user 
+                    set wallet = wallet + @refund
+                    where id = (Select userId from dbo.rent where id=@rentId)`
+        await poolConnection.request()
+        .input('refund', sql.Float, refund)
+        .input('rentId', sql.Int, rentDetail.rentId)
+        .query(query3)
+        const query4=`Insert into dbo.notification () values ()`
+    } catch (error) {
+        
+    }
 }
 
 
@@ -277,5 +386,7 @@ module.exports = {
     addRentDetail,
     deleteRentDetail,
     confirmPayment,
-    cancelRentDetail
+    acceptRentDetail,
+    cancelRentDetailByUser,
+    cancelRentDetailByOwner
 }
