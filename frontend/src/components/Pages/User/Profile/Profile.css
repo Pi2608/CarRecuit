@@ -19,6 +19,6 @@
 }
 
 #profile>.body>.content-account{
-    height: 100px;
+    height: fit-content;
     width: 890px;
 }

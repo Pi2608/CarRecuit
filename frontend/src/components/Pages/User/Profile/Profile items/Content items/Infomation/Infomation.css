@@ -3,6 +3,12 @@
     --background-color: #fff; /* Set default background-color value */
 }
 
+#info{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
 #info>.container{
     width: 842px;
     min-height: 200px;
@@ -16,6 +22,7 @@
 #info>.container>.title{    
     display: flex;
     justify-content: space-between;
+    padding: 15px;
 }
 
 #info>.container>.title div{
@@ -74,9 +81,43 @@
 }
 
 #info>.container>.content>.info-user{
-
+    width: 100%;
+    padding: 0 0 0 30px;
 }
 
-#info>.container>.content>.info-user>.info-box div{
+#info>.container>.content>.info-user>.info-box,
+#info>.container>.content>.info-user>.info-desc{
+    line-height: 2;
+    padding: 10px 20px 10px 15px;
+    color: #565656;
+}
+
+#info>.container>.content>.info-user>.info-box{
+    background-color: #c0c0c0;
+    border-radius: 15px;
+}
+
+#info>.container>.content>.info-user>.info-box div,
+#info>.container>.content>.info-user>.info-desc div{
+    width: 100%;
     display: flex;
+    justify-content: space-between;
+}
+
+.main{
+    color: black;
+}
+
+#info>.container>.content>.info-license{
+    width: 50%;
+    display: flex;
+    padding-left: 5px;
+    flex-direction: column;
+    gap: 10px
+}
+
+#info>.container>.content>.info-license>.info-license-upload{
+    height: max-content;
+    width: max-content;
+    background-color: #565656;
 }
