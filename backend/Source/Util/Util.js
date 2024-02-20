@@ -1,3 +1,9 @@
+const firebase = require('firebase')
+const config = require('./firebaseConfig')
+const imageToBase64 = require('image-to-base64')
+const decode = require ('node-base64-image').decode
+const path = require('path');
+
 const currentTime = async()=>{
     var date = new Date();
 
@@ -7,7 +13,64 @@ const currentTime = async()=>{
     
     return dateFormat;
 }
+const getPositionCar = async () => {
+    firebase.initializeApp(config);
+    const rootRef = firebase.database().ref();
+    const latRef = rootRef.child('lat');
+    const lngRef = rootRef.child('lng');
+
+    try {
+        const latSnapshot = await latRef.once('value');
+        const lngSnapshot = await lngRef.once('value');
+
+        const lat = latSnapshot.val() / 1000000;
+        const lng = lngSnapshot.val() / 1000000;
+
+        return {
+            latitude: lat,
+            longitude: lng
+        };
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        throw error;
+    }
+}
+const encodeImage = async(path)=>{
+    try {
+        const response = await imageToBase64(path);
+        return response;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+const decodeImage = async (base64Code, name) => {
+    const projectPath = path.resolve();
+    const savePath = projectPath + '/photos/' + name
+    try {
+        await decode(base64Code, { fname: savePath, ext: 'jpg' });
+        return savePath+'.jpg';
+    } catch (error) {
+        console.error('Error decoding image:', error);
+        return null; // or throw the error if you want to handle it differently
+    }
+};
+
+const generateRandomString = async(length)=> {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
 
 module.exports={
-    currentTime
+    currentTime,
+    getPositionCar,
+    encodeImage,
+    decodeImage,
+    generateRandomString
 }

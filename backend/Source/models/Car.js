@@ -1,13 +1,26 @@
 const sql = require("mssql/msnodesqlv8");
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
-const { Int } = require("msnodesqlv8");
 
-const getAllCars= async()=>{
+
+const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
         const query = 'Select * From [dbo].[car] Where status = 0'
         const result = await poolConnection.request().query(query);
+        return result.recordset;
+    }catch(err){
+        
+    }
+}
+
+const getCarById= async(id)=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query = 'Select * From [dbo].[car] Where id = @id'
+        const result = await poolConnection.request()
+        .input("id", sql.Int, id)
+        .query(query);
         return result.recordset;
     }catch(err){
         
@@ -43,16 +56,21 @@ const getImgsCar = async(carId)=>{
     }
 }
 
-const getCarsByPage= async(Cars, numPage, numItems) =>{
-    try{
+const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
+    try {
+        const startIndex = (numPage - 1) * numItemsPerPage;
+        const endIndex = startIndex + numItemsPerPage;
 
-    }catch(err){
-        
+        return Cars.slice(startIndex, endIndex);
+    } catch (err) {
+        console.error('Error:', err);
+        throw err;
     }
-}
+};
 
-const filterCars=async(Cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
+const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     try{
+        const Cars = await getAllCars();
         const filteredCars = Cars.filter(car => {
             if (carTypeId && car.carTypeId !== carTypeId) {
                 return false;
@@ -124,7 +142,11 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
 
 const deleteCarRental = async(carId)=>{
     try{
-
+        let poolConnection = await sql.connect(config)
+        const query = "Update [dbo].[car] set isDeleted = 1 where id = @carId"
+        await poolConnection.request()
+        .input('CarId', sql.Int, carId)
+        .query(query);
     }catch(err){
         
     }
@@ -132,12 +154,13 @@ const deleteCarRental = async(carId)=>{
 
 
 module.exports={
-    getAllCars,
+    getAllCarsInUse,
     getCarsByName,
     getImgsCar,
     getCarsByPage,
     filterCars,
     addCarRental,
     updateCarRental,
-    deleteCarRental
+    deleteCarRental,
+    getCarById
 }

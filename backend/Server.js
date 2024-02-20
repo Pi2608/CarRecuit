@@ -1,56 +1,24 @@
-var userRouter = require('./Source/Routers/UserRouter')
+const { decodeImage } = require('./Source/Util/Util');
+const encode = require('node-base64-image').encode;
 
-const express = require ('express');
-const app = express()
-
-app.use('/User', userRouter)
-
-app.listen (3000, ()=>{
-    console.log('Server started on port')
-})
-
-const filterCars = async (Cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels) => {
+async function testDecodeImage() {
     try {
-        // Apply filters based on the provided criteria
-        const filteredCars = Cars.filter(car => {
-            if (carTypeId && car.carTypeId !== carTypeId) {
-                return false;
+        const url = 'https://e1.pxfuel.com/desktop-wallpaper/639/821/desktop-wallpaper-2560x1440-anime-city-1440p-resolution-anime-city.jpg';
+        const options = {
+            string: true,
+            headers: {
+                "User-Agent": "my-app"
             }
+        };
 
-            if (minPrice && car.price < minPrice) {
-                return false;
-            }
+        const image = await encode(url, options);
 
-            if (maxPrice && car.price > maxPrice) {
-                return false;
-            }
+        const decodedPath = await decodeImage(image, 'car1');
+        console.log('Decoded image path:', decodedPath);
 
-            if (seats && car.seats !== seats) {
-                return false;
-            }
-
-            if (typeOfFuels && car.typeOfFuels !== typeOfFuels) {
-                return false;
-            }
-
-            // If all conditions pass, include the car in the filtered result
-            return true;
-        });
-
-        // Do something with the filteredCars array, e.g., return it or perform further operations.
-
-        console.log('Filtered Cars:', filteredCars);
-
-    } catch (err) {
-        console.error('Error:', err);
+    } catch (error) {
+        console.error('Error in testDecodeImage:', error);
     }
-};
+}
 
-// Example usage:
-const carsList = [
-    { carId: 1, carTypeId: 1, price: 15000, seats: 5, typeOfFuels: 'Petrol' },
-    { carId: 2, carTypeId: 2, price: 20000, seats: 7, typeOfFuels: 'Diesel' },
-    // ... other cars
-];
-
-filterCars(carsList, 1, 10000, 30000, null, 'Petrol');
+testDecodeImage();
