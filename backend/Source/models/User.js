@@ -303,6 +303,33 @@ const getTransactionHistory = async(userId)=>{
     }
 }
 
+const confirmNID = async (userId)=>{
+    // chuyển status
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Update dbo.NID set isConfirm =1
+                    where id = (select NIDId 
+                    from dbo.user where id = @userId) `
+        await poolConnection.request()
+        .input("userId", sql.Int, userId)
+        .query(query)
+    } catch (error) {
+        
+    }
+}
+const confirmNDL = async (userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Update dbo.NDL set isConfirm =1
+                        where id = (select NDLId 
+                        from dbo.user where id = @userId)`
+        await poolConnection.connect()
+        .input("userId", sql.Int, userId)
+        .query(query)
+    } catch (error) {
+        
+    }
+}
 
 module.exports={
     getAllUser,

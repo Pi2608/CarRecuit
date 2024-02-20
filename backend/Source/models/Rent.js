@@ -26,6 +26,20 @@ const countRentalCar = async (carId)=>{
     }
 }
 
+const carRentalSchedule = async(carId)=>{
+    // thêm điều kiện gì không ?
+    try {
+        let poolConnection = await sql.connect(config)
+        const query ='Select pick_up, drop_off from dbo.rentDetail where carId = @carId'
+        const result = await poolConnection.request()
+        .input("carId", sql.Int, carId)
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        
+    }
+}
+
 const statisticRentalByYear = async (year)=>{
     try{
         let poolConnection = await sql.connect(config)
@@ -104,6 +118,13 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
     try {
         let rent = await getCurrentRent(userId)
         let poolConnection = await sql.connect(config)
+        const timeBeforeRent = await Util.calculatePeriod(await Util.currentTime, pick_up)
+        const [dayLeft, hourLeft, minuteLeft, secondLeft] = timeBeforeRent.split(":").map(Number)
+        if (dayLeft<3){
+            return {
+                message: "thời gian thuê phải sớm nhận xe 3 ngày"
+            }
+        }
         if(rent==null){
             createRent(userId)
             rent = await getCurrentRent(userId)
@@ -127,10 +148,17 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
                 .input(query1)
             }
         }
+        let rentalDay
+        const [rentDay, rentHour, rentMinute, rentSecond] = (await Util.calculatePeriod(pick_up, drop_off)).split(":").map(Number)
+        if(rentHour >=1){
+            rentalDay = rentDay+1
+        }else{
+            rentalDay = rentDay
+        }        
         const Car = await car.getCarById(carId)
         const discountCar = Car.discount
         const priceCar = Car.price
-        const final = priceCar*(1-discountCar)*(1-voucherDiscount) 
+        const final = priceCar*(1-discountCar)*(1-voucherDiscount)*rentalDay
         
         const query2 =  `Insert into dbo.rentDetail (carId, pick_up, drop_off, rentId, voucherId, status, total)
                             values (@carId, @pick_up, @drop_off, @rentId, @voucherId, 0, @final)`
@@ -270,6 +298,13 @@ const confirmPayment = async (userId)=>{
                 .query(query7)
             }
             //+point
+            const extraPoint = Math.floor(rent.total/1000);
+            const query8 =`Update dbo.user set point = point + @extraPoint
+                        where id = @userId`
+            await poolConnection.request()
+            .input("extraPoint", sql.Int , extraPoint)
+            .input("userId", sql.Int, userId)
+            .query(query8)
         }
     } catch (error) {
         
@@ -300,7 +335,26 @@ const acceptRentDetail = async(notificationId, ownerId)=>{
         .input('addWallet', sql.Float, addWallet)
         .input('ownerId', sql.Int, ownerId)
         .query(query3)
-        const query4=`Insert into dbo.notification () values ()`
+        const query4 = `Select * from dbo.rent 
+                        where id = @rentId`
+        const result4 = await poolConnection.request()
+        .input("rentId", sql.Int, rentDetail.rentId)
+        .query(query4)
+        const rent = result4.recordset
+        let receivedId = rent.userId
+        let title = ""
+        let message ="" 
+        let dateUp = await Util.currentTime()
+        let senderId = ownerId
+        const query5=`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
+                        values(@receivedId, @senderId, @title, @message, @dateUp)`
+        await poolConnection.request()
+        .input("receivedId", sql.Int, receivedId)
+        .input("senderId", sql.Int, senderId)
+        .input("title", sql.NVarChar, title)
+        .input("message", sql.NVarChar, message)
+        .input("dateUp", sql.DateTime, dateUp)
+        .query(query5)
     } catch (error) {
         
     }
@@ -310,6 +364,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
     // chuyển status
     // gửi notificate cho owner và user
     // hoàn tiền cho user
+    //-point
     try {
         let poolConnection =  await sql.connect(config)
         const query1 = `Update from dbo.rentDetail set isAccepted = 0
@@ -317,7 +372,6 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         await poolConnection.request()
         .input('rentDetailId', rentDetailId)
         .query(query1)
-        const query2 = `Insert into dbo.notification () values ()`
         
         const query3 = `Select * from dbo.rentDetail 
                         where id = rentDetailId`
@@ -325,9 +379,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         .input('rentDetailId', sql.Int, rentDetailId)
         .query(query3)
         const rentDetail = result3.recordset[0]
-        
-        let dayLeft
-        let refund
+        const [dayLeft, hourLeft, minuteLeft, secondLeft] = (await Util.calculatePeriod(await Util.currentTime(), rentDetail.pick_up)).split(":").map(Number)
         if(dayLeft>=7){
             refund = rentDetail.total*1
         }
@@ -336,19 +388,63 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         }else{
             refund = rentDetail.total*0
         }
+        let receivedId
+        let title
+        let message 
+        let dateUp
+        let senderId
         if (refund>0){
             const query4 =`Update dbo.user set wallet = wallet + @refund
                             where id = @userId`
             await poolConnection.request()
             .input("userId", sql.Int, userId)
             .query(query4)
-            const query5 = `Insert into dbo.notification () values()`
-        }   
+            receivedId = userId
+            title = ""
+            message = "" 
+            dateUp =await Util.currentTime()
+            senderId = 1
+            const query5 = `Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
+                            values(@receivedId, @senderId, @title, @message, @dateUp)`
+            await poolConnection.request()
+            .input("receivedId", sql.Int, receivedId)
+            .input("senderId", sql.Int, senderId)
+            .input("title", sql.NVarChar, title)
+            .input("message", sql.NVarChar, message)
+            .input("dateUp", sql.DateTime, dateUp)
+            .query(query5)
+        }
+        const query6 = `Select ownerId from dbo.car 
+                        where id = @carId`
+        const result6 =await poolConnection.request()
+        .input("carId", sql.NVarChar, rentDetail.carId)
+        .query(query6)
+        const car = result6.recordset[0]
+        receivedId = car.ownerId
+        title=""
+        message=""
+        senderId = userId
+        const query7 =`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
+                        values(@receivedId, @senderId, @title, @message, @dateUp)`
+        await poolConnection.request()
+        .input("receivedId", sql.Int, receivedId)
+        .input("senderId", sql.Int, senderId)
+        .input("title", sql.NVarChar, title)
+        .input("message", sql.NVarChar, message)
+        .input("dateUp", sql.DateTime, dateUp)
+        .query(query7)
+        const minusPoint = Math.floor();
+        const query8 = `Update dbo.user set point = point - @minusPoint
+                        where id = @userId`
+        await poolConnection.request()
+        .input("minusPoint", sql.Int, minusPoint)
+        .input("userId", sql.Int, userId)
+        .query(query8)   
     } catch (error) {
         
     }
 }
-const cancelRentDetailByOwner = async(notificationId)=>{
+const cancelRentDetailByOwner = async(notificationId, ownerId)=>{
     // chuyển status
     // refund tiền cho user
     // gửi thông báo
@@ -373,7 +469,26 @@ const cancelRentDetailByOwner = async(notificationId)=>{
         .input('refund', sql.Float, refund)
         .input('rentId', sql.Int, rentDetail.rentId)
         .query(query3)
-        const query4=`Insert into dbo.notification () values ()`
+        const query4 = `Select * from dbo.rent 
+                        where id = @rentId`
+        const result4 = await poolConnection.request()
+        .input("rentId", sql.Int, rentDetail.rentId)
+        .query(query4)
+        const rent = result4.recordset
+        let receivedId = rent.userId
+        let title = ""
+        let message ="" 
+        let dateUp = await Util.currentTime()
+        let senderId = ownerId
+        const query5=`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
+                        values(@receivedId, @senderId, @title, @message, @dateUp)`
+        await poolConnection.request()
+        .input("receivedId", sql.Int, receivedId)
+        .input("senderId", sql.Int, senderId)
+        .input("title", sql.NVarChar, title)
+        .input("message", sql.NVarChar, message)
+        .input("dateUp", sql.DateTime, dateUp)
+        .query(query5)
     } catch (error) {
         
     }
@@ -382,6 +497,7 @@ const cancelRentDetailByOwner = async(notificationId)=>{
 
 module.exports = {
     countRentalCar,
+    carRentalSchedule,
     statisticRentalByYear,
     addRentDetail,
     deleteRentDetail,

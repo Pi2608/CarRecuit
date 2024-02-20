@@ -13,6 +13,21 @@ const currentTime = async()=>{
     
     return dateFormat;
 }
+const calculatePeriod= async(startDate, endDate)=> {
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
+
+    // Tính toán số milliseconds giữa hai thời điểm
+    const timeDifference = Math.abs(endDateTime - startDateTime);
+
+    // Chuyển đổi milliseconds thành ngày, giờ, phút và giây
+    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+    return days+':'+hours+':'+minutes+':'+seconds;
+}
 const getPositionCar = async () => {
     firebase.initializeApp(config);
     const rootRef = firebase.database().ref();
@@ -72,5 +87,6 @@ module.exports={
     getPositionCar,
     encodeImage,
     decodeImage,
-    generateRandomString
+    generateRandomString,
+    calculatePeriod
 }

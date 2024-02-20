@@ -14,6 +14,7 @@ const getAllCarsInUse= async()=>{
     }
 }
 
+
 const getCarById= async(id)=>{
     try{
         let poolConnection = await sql.connect(config)
