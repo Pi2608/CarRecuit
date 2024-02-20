@@ -22,7 +22,7 @@ const getUserIdByEmail= async(email) => {
         const result = await poolConnection.request()
         .input('Email', sql.NVarChar, email)
         .query(query);
-        return result.recordset;
+        return result.recordset[0];
     }catch(err){
         console.log(err);
     }
@@ -41,18 +41,6 @@ const getUserById= async(id) => {
     }
 }
 
-const getImgsUserById = async(userId)=> {
-    try{
-        let poolConnection = await sql.connect(config);
-        const query = 'Select id, url From [dbo].[image] where userId= @UserId'
-        const result = await poolConnection.request()
-        .input('UserId',sql.id, userId)
-        .query(query);
-        return result.recordset
-    }catch(err){
-        console.log(err);
-    }
-}
 
 const createUser = async (email, password)=>{
     try{
@@ -75,23 +63,14 @@ const createUser = async (email, password)=>{
 
 
 
-const updateUser = async (name, phone, dateOfBirth, NID, NDL, email, FNIDimg, BNIDimg, FNDLimg, BNDLimg)=>{
+const updateUser = async (name, phone, dateOfBirth, NID, NIDName, NIDBirth, NIDNative, NIDAddress, NIDDate, NIDProvided, NDL, NDLName, NDLBirth, email, FNIDimg, BNIDimg, FNDLimg)=>{
     try{
-        let poolConnection = await sql.connect(config);
-        const query = 'UPDATE [dbo].[user] SET name = @Name, phone = @Phone, dateOfBirth = @DateOfBirth, NID = @NID, NDL = @NDL Where email = @Email';
-        await poolConnection.request()
-        .input('Name', sql.NVarChar, name)
-        .input('Phone', sql.NVarChar, phone)
-        .input('DateOfBirth', sql.DateTime, dateOfBirth)
-        .input('NID', sql.NVarChar, NID)
-        .input('NDL', sql.NVarChar, NDL)
-        .input('Email', sql.NVarChar, email)
-        .query(query);
+        let poolConnection = await sql.connect(config)
+        const query1 ="Insert into dbo.NID (NID, name, birth, native, address, date, provided, isConfirm)"
         const userId = (await getUserIdByEmail(email)).id
         addKindImgUser('FNID',FNIDimg, userId);
         addKindImgUser('BNID',BNIDimg, userId);
         addKindImgUser('FNDL',FNDLimg, userId);
-        addKindImgUser('BNDL',BNDLimg, userId)
     }catch(err){
         console.log(err);
     }
@@ -108,9 +87,6 @@ const addKindImgUser = async (message, imageUrl, userId) => {
         }
         if (message === 'FNDL') {
             idImg = 'FNDL' + userId;
-        }
-        if (message === 'BNDL') {
-            idImg = 'BNDL' + userId;
         }
 
         const images = await getImgsUserById(userId);
@@ -139,12 +115,12 @@ const addKindImgUser = async (message, imageUrl, userId) => {
 };
 
 
-const deleteUserById = async (Id) =>{
+const deleteUserById = async (userId) =>{
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'Update [dbo].[user] Set isDeleted = 1 Where email = @Email';
+        const query = 'Update [dbo].[user] Set isDeleted = 1 Where id=@userId';
         await poolConnection.request()
-        .input('Email', sql.NVarChar, email)
+        .input('userId', sql.Int, userId)
         .query(query);
     }catch(err){
 
@@ -211,7 +187,7 @@ const sendNotification = async (userId, title, message, dateUp, senderId) =>{
 const autoPromotedMembership = async (userId)=>{
     try{
             const userPoint = (await getUserById(userId)).point
-            const memberShipId = await getMemberShipIdUserCurrent(userId);
+            const memberShipId = (await getMemberShipUserCurrent(userId)).memberShipId;
             const newMemberShipId = memberShipId+1;
             let poolConnection = await sql.connect(config)
             const query1 ='Select pointRequire From [dbo].[memberShip] where id = %id'
@@ -233,15 +209,15 @@ const autoPromotedMembership = async (userId)=>{
 }
 
 
-const getMemberShipIdUserCurrent = async(userId)=>{
+const getMemberShipUserCurrent = async(userId)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'SELECT memberShipId FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
+        const query = 'SELECT * FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
         const result = await poolConnection.request()
         .input('UserId', sql.Int, userId)
         .query(query)
         if (result.recordset.length > 0) {
-            return result.recordset[0].memberShipId;
+            return result.recordset[0];
         } else {
             return null;
         }
@@ -254,7 +230,7 @@ const checkLogin = async (email, password)=>{
     try{
         const users = await getAllUser()
         const user = users.find(user => user.email==email&& user.password==password)
-        if (user != null){
+        if (user != null && user.status == 1 && user.idDeleted == 0){
             const payload ={userid: user.id, email: user.email};
             const secretKey = 'carFlex2024'
             const token = jwt.sign(payload, secretKey)
@@ -342,7 +318,7 @@ module.exports={
     getNotification,
     sendNotification,
     autoPromotedMembership,
-    getMemberShipIdUserCurrent,
+    getMemberShipUserCurrent,
     checkLogin,
     getImgsUserById,
     createTransaction,
