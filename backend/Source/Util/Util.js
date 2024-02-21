@@ -61,7 +61,7 @@ const encodeImage = async(path)=>{
 }
 const decodeImage = async (base64Code, name) => {
     const projectPath = path.resolve();
-    const savePath = projectPath + '/photos/' + name
+    const savePath = projectPath + 'Source/photos/' + name
     try {
         await decode(base64Code, { fname: savePath, ext: 'jpg' });
         return savePath+'.jpg';

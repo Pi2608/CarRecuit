@@ -14,6 +14,18 @@ const getAllCarsInUse= async()=>{
     }
 }
 
+const showCarFeedback = async (carId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * From dbo.feedback where carId = @carId`
+        const result = await poolConnection.request()
+        .input('carId', sql.Int,carId)
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        
+    }
+}
 
 const getCarById= async(id)=>{
     try{
@@ -163,5 +175,6 @@ module.exports={
     addCarRental,
     updateCarRental,
     deleteCarRental,
-    getCarById
+    getCarById,
+    
 }
