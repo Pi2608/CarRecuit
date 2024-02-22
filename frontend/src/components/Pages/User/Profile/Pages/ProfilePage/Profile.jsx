@@ -1,8 +1,8 @@
 import React from "react";
-import Header from "../../../Items/Header/Header";
-import Footer from "../../../Items/Footer/Footer";
-import Sidebar from "./Profile items/Sidebar/Sidebar";
-import Infomation from "./Profile items/Content items/Infomation/Infomation";
+import Header from "../../../../../Items/Header/Header";
+import Footer from "../../../../../Items/Footer/Footer";
+import Sidebar from "../../Profile items/Sidebar/Sidebar";
+import Infomation from "../../Profile items/Content items/Infomation/Infomation";
 import "./Profile.css"
 
 export default function Profile() {

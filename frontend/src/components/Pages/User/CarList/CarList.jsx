@@ -40,7 +40,7 @@ export default function CarList(){
                         <div className="amenity five-star-owner"><div className="icon"><StarRoundedIcon style={{color: "rgb(255, 225, 0)"}}/></div><p>Chủ xe 5 sao</p></div>
                         <div className="amenity delivery"><div className="icon"><LocationOnOutlinedIcon/></div><p>Giao xe tận nơi</p></div>
                         <div className="amenity electric-car"><div className="icon"><ElectricCarOutlinedIcon/></div><p>Xe điện</p></div>
-                        <div className="amenity gear-shift"><div className="icon"><GiGearStick size={{height: "10"}} /></div><p>Truyền động</p></div>
+                        <div className="amenity gear-shift"><div className="icon"><GiGearStick size={{height: "10px"}} /></div><p>Truyền động</p></div>
                         <div className="amenity all-filter"><div className="icon"><TuneIcon/></div><p>Bộ lọc</p></div>
                     </div>
                 </div>

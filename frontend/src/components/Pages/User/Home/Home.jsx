@@ -76,7 +76,7 @@ export default function Home() {
             </div>
           </div>
           <div className="membership-section">
-            <p>Membership</p>
+            <p>Mã giảm giá</p>
             <div className="membership-container">
               <div className="membership mem1"></div>
               <div className="membership mem2"></div>

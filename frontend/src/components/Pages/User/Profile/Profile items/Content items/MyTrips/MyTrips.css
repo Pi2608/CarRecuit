@@ -1,0 +1,11 @@
+#mytrip>.container h1{
+    padding : 15px 0px 15px 20px
+}
+
+#mytrip>.container>.trip-container{
+    height: fit-content;
+    min-height: 440px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

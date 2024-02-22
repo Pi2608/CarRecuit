@@ -1,4 +1,4 @@
-#profile>.body{
+#trip>.body{
     position: relative;
     /* display: grid;
     grid-template-columns: 30% 64%;
@@ -10,7 +10,7 @@
     padding: 75px 120px;
 }
 
-#profile>.body>.sidebar{
+#trip>.body>.sidebar{
     position: sticky;
     width: 380px;
     top: 0;
@@ -18,7 +18,8 @@
     background-color: #F6F6F6;
 }
 
-#profile>.body>.content-account{
+#trip>.body>.content-account{
     height: fit-content;
     width: 890px;
+    overflow: visible;
 }

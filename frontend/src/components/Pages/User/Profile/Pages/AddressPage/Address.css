@@ -1,0 +1,25 @@
+#address>.body{
+    position: relative;
+    /* display: grid;
+    grid-template-columns: 30% 64%;
+    gap: 1%; */
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    background-color: #F6F6F6;
+    padding: 75px 120px;
+}
+
+#address>.body>.sidebar{
+    position: sticky;
+    width: 380px;
+    top: 0;
+    height: fit-content;
+    background-color: #F6F6F6;
+}
+
+#address>.body>.content-account{
+    height: fit-content;
+    width: 890px;
+    overflow: visible;
+}

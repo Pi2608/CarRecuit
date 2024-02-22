@@ -9,6 +9,11 @@
 #sidebar>.sidebar-item{
     padding: 15px 0 15px 25px;
     border-top: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#sidebar>.sidebar-item:hover{
+    background: radial-gradient(circle, rgba(200,200,200,1) 0%, rgba(246,246,246,1) 90%);
 }
 
 #sidebar>.sidebar-item p{
