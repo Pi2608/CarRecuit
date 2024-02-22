@@ -180,6 +180,50 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode) => {
         throw error;
     }
 }
+const deleteRentDetail = async (userId, rentDetailId) => {
+    const poolConnection = await sql.connect(config);
+    const transaction = new sql.Transaction(poolConnection);
+
+    try {
+        await transaction.begin();
+
+        const query1 = `SELECT * FROM dbo.rentDetail WHERE id = @rentDetailId`;
+        const result1 = await transaction.request()
+            .input("rentDetailId", sql.Int, rentDetailId)
+            .query(query1);
+        const rentDetail = result1.recordset[0];
+
+        if (!rentDetail) {
+            throw new Error("RentDetail not found.");
+        }
+
+        const query2 = `UPDATE dbo.rent SET total = total - @rentDetailTotal WHERE id = @rentId`;
+        await transaction.request()
+            .input("rentDetailTotal", sql.Float, rentDetail.total)
+            .input("rentId", sql.Int, rentDetail.rentId)
+            .query(query2);
+
+        const query3 = `DELETE FROM dbo.voucherUser WHERE voucherId = @voucherId AND userId = @userId`;
+        await transaction.request()
+            .input("voucherId", sql.Int, rentDetail.voucherId)
+            .input("userId", sql.Int, userId)
+            .query(query3);
+
+        const query4 = `DELETE FROM dbo.rentDetail WHERE id = @rentDetailId`;
+        await transaction.request()
+            .input("rentDetailId", sql.Int, rentDetailId)
+            .query(query4);
+
+        await transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        console.error(error);
+        throw error;
+    } finally {
+        poolConnection.close();
+    }
+};
+
 const getRentById = async (rentId) => {
     try {
         let poolConnection = await sql.connect(config);
@@ -449,6 +493,7 @@ module.exports = {
     getCurrentRent,
     getRentDetailCurrent,
     addRentDetail,
+    deleteRentDetail,
     cancelRent,
     cancelRentDetailByOwner,
     cancelRentDetailByUser,
