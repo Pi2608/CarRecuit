@@ -113,12 +113,13 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     }
 }
 
-const addCarRental = async (ownerId, companyId, carTypeId, CLP, price, discount ,description, seats, typeOfFuels, locationIp, ldescription, Imgs)=>{
+const addCarRental = async (ownerId, name, carTypeId, CLP, price, discount ,description, seats, typeOfFuels, ldescription, imgs)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'Insert into [dbo].[car] (ownerId, carTyper, CLP, price, discount, description, seats, typeOfFuels, status, companyId) Values (@OwnerId, @CarTyper, @CLP, @Price, @Discount, @Description, seats, typeOfFuels, 0, @CompanyId)';
+        const query1 = 'Insert into [dbo].[car] (ownerId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, status) Values (@OwnerId, @name, @CarTypeId, @CLP, @Price, @Discount, @Description, @seats, @typeOfFuels, 1)';
         await poolConnection.request()
         .input('OwnerId', sql.Int, ownerId)
+        .input('name', sql.NVarChar, name)
         .input('CarTypeId', sql.Int, carTypeId)
         .input('CLP', sql.Int, CLP)
         .input('Price', sql.Money, price)
@@ -126,20 +127,42 @@ const addCarRental = async (ownerId, companyId, carTypeId, CLP, price, discount 
         .input('Description', sql.NVarChar, description)
         .input('Seats', sql.Int, seats)
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
-        .input('CompanyId', companyId)
-        .query(query);
+        .query(query1);
+        const query2 =`Select MAX(id) as id from dbo.car`
+        const result2= await poolConnection.request()
+        .query(query2)
+        const car = result2.recordset[0]
+        const query3 = 'Insert ino dbo.location (typeLocationId, description) values (1, @ldescription)'
+        await poolConnection.request()
+        .input('ldescription', sql.NVarChar, ldescription)
+        .query(query3)
+        for (let i = 0; i< imgs.length;i++){
+            let id
+            if(i==0){
+                id = 'FC-'+car.id+'-'+i
+            }else{
+                id = 'C-'+car.id+'-'+i
+            }
+            const query4 =`Insert into dbo.image (id, url, carId) values (@id, @imgUrl, @carId)`
+            await poolConnection.request()
+            .input('id', sql.NVarChar, id)
+            .input('imgUrl', sql.NVarChar, imgs[i])
+            .input('carId', sql.Int, car.id)
+            .query(query4)
+        }
     }catch(err){
         
     }
 }
 
-const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, typeOfFuels, status, locationIp, ldescription, Imgs) =>{
+const updateCarRental = async (carId, name ,carTypeId, CLP, price, discount , description, seats, typeOfFuels, status, ldescription, imgs) =>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'Update [dbo].[car] set carTypeId = @CarTypeId, CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
+        const query1 = 'Update [dbo].[car] set carTypeId = @CarTypeId, name=@name ,CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
         await poolConnection.request()
         .input('CarId', sql.Int, carId)
         .input('CarTypeId', sql.Int, carTypeId)
+        .input('name', sql.Int, name)
         .input('CLP', sql.Int, CLP)
         .input('Price', sql.Money, price)
         .input('Discount', sql.Float, discount)
@@ -147,7 +170,39 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
         .input('Seats', sql.Int, seats)
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
         .input('Status', sql.Bit, status)
-        .query(query);
+        .query(query1);
+        const query2 =`Update dbo.location set description = @ldescription where carId =@carId and typeLocationId = 1`
+        await poolConnection.request()
+        .input('ldescription', sql.NVarChar, ldescription)
+        .input('carId', sql.Int, carId)
+        .query(query2)
+        for(let i = 0; i<imgs.length;i++){
+            let id
+            if(i==0){
+                id = 'FC-'+carId+'-'+i
+            }else{
+                id = 'C-'+carId+'-'+i
+            }
+            const query3 =`Select * from dbo.image where id =@id`
+            const result = await poolConnection.request()
+            .input('id', sql.NVarChar, id)
+            .query(query3)
+            const image = result.recordset[0]
+            if(image!=null){
+                const query4 =`Update dbo.image set url =@imgUrl where id=@id`
+                await poolConnection.request()
+                .input('id', sql.NVarChar, id)
+                .input('imgUrl', sql.NVarChar, imgs[i])
+                .query(query4)
+            }else{
+                const query4 =`Insert into dbo.image (id, url, carId) values (@id, @imgUrl, @carId)`
+                await poolConnection.request()
+                .input('id', sql.NVarChar, id)
+                .input('imgUrl', sql.NVarChar, imgs[i])
+                .input('carId', sql.Int, carId)
+                .query(query4)
+            }
+        } 
     }catch(err){
         
     }
@@ -176,5 +231,4 @@ module.exports={
     updateCarRental,
     deleteCarRental,
     getCarById,
-    
 }

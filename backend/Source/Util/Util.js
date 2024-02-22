@@ -64,10 +64,9 @@ const decodeImage = async (base64Code, name) => {
     const savePath = projectPath + 'Source/photos/' + name
     try {
         await decode(base64Code, { fname: savePath, ext: 'jpg' });
-        return savePath+'.jpg';
+        return 'localhost:4000/img/'+name+'.jpg'
     } catch (error) {
         console.error('Error decoding image:', error);
-        return null; // or throw the error if you want to handle it differently
     }
 };
 

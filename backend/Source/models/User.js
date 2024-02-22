@@ -42,10 +42,11 @@ const getNIDinfoByUserId = async(userId)=>{
     .query(query2)
     const images = result2.recordset
     for(let i=0; i< images.length; i++){
-        images[i].url = await util.decodeImage(images[i].url)
+        images[i].url = await util.decodeImage(images[i].url, images[i].id)
     }
     return [NID, images]
 }
+
 const getNDLinfoByUserId = async(userId)=>{
     let poolConnection = await sql.connect(config)
     const query1 = `Select * from dbo. 
@@ -60,7 +61,7 @@ const getNDLinfoByUserId = async(userId)=>{
     .query(query2)
     const images = result2.recordset
     for(let i=0; i< images.length; i++){
-        images[i].url = await util.decodeImage(images[i].url)
+        images[i].url = await util.decodeImage(images[i].url, images[i].id)
     }
     return [NDL, images]
 }
@@ -131,9 +132,28 @@ const createUser = async (email, password)=>{
     }
 }
 
+const changePassword = async(oldPass, newPass, userId)=>{
+    let poolConnection = await sql.connect(config)
+    const query1 =`Select * from dbo.user where id = @userId and password = @oldPass`
+    const result1 = await poolConnection.request()
+    .input('userId', sql.Int, userId)
+    .input('oldPass', sql.NVarChar, oldPass)
+    .query(query1)
+    const user = result1.recordset[0]
+    if(user!=null){
+        const query2 = `Update dbo.user set password = @newPass where id =@userId`
+        await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .input('newPass', sql.NVarChar, newPass)
+        .query(query2)
+    }else{
+        return {
+            message: "Nhập sai mật khẩu cũ"
+        }
+    }
+}
 
-
-const updateUser = async (name, phone, dateOfBirth, userId, FNIDimg, BNIDimg, FNDLimg)=>{
+const updateUser = async (name, phone, dateOfBirth, userId)=>{
     try{
         let poolConnection = await sql.connect(config)
         const query =`Update dbo.user 
@@ -144,16 +164,13 @@ const updateUser = async (name, phone, dateOfBirth, userId, FNIDimg, BNIDimg, FN
         .input('phone', sql.NVarChar, phone)
         .input('dateOfBirth', sql.DateTime, dateOfBirth)
         .input('userId', sql.Int, userId)
-        .query(query)
-        addKindImgUser('NIDF',FNIDimg, userId);
-        addKindImgUser('NIDB',BNIDimg, userId);
-        addKindImgUser('NDLF',FNDLimg, userId);
+        .query(query);
     }catch(err){
         console.log(err);
     }
 }
 
-const sendConfirmNID = async (userId, NID, name, dateOfBirth, native, address, dateProvide, provider)=>{
+const sendConfirmNID = async (userId, NID, name, dateOfBirth, native, address, dateProvide, provider, imgs)=>{
     try {
         let poolConnection = await sql.connect(config)
         const user = await getTransactionHistory(userId)
@@ -172,12 +189,14 @@ const sendConfirmNID = async (userId, NID, name, dateOfBirth, native, address, d
         .input('provider', sql.NVarChar, provider)
         .input('NIDId', sql.Int, user.NIDId)
         .query(query)
+        addKindImgUser('NIDF', imgs[0], userId)
+        addKindImgUser('NIDB', imgs[1], userId)
     } catch (error) {
         
     }
 }
 
-const sendConfirmNDL = async (userId, NDL, name, dateOfBirth)=>{
+const sendConfirmNDL = async (userId, NDL, name, dateOfBirth, imgbase64)=>{
     try {
         let poolConnection = await sql.connect(config)
         const user = await getTransactionHistory(userId)
@@ -191,6 +210,7 @@ const sendConfirmNDL = async (userId, NDL, name, dateOfBirth)=>{
         .input('dateOfBirth', sql.DateTime, dateOfBirth)
         .input('NIDId', sql.Int, user.NDLId)
         .query(query)
+        addKindImgUser('NDLF', imgbase64, userId)
     } catch (error) {
         
     }
@@ -260,6 +280,17 @@ const replyFeedback = async (userId, carId, message, rating)=>{
         .query(query);
     }catch(err){
 
+    }
+}
+const deleteFeedback = async (feebackId)=>{
+    try {
+        let poolConnection = await sql.connect(config);
+        const query =  `Delete from dbo.feedback where id =@feedbackId`
+        await poolConnection.request()
+        .input('feedbackId', sql.Int, feebackId)
+        .query(query)   
+    } catch (error) {
+        
     }
 }
 const editStatusUser = async (userId, status) =>{
@@ -414,7 +445,6 @@ const editStatusNID = async (userId, isConfirm)=>{
     }
 }
 
-const registerCarForOwner = async (u)
 
 const editStatusNDL = async (userId, isConfirm)=>{
     try {
