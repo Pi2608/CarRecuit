@@ -7,6 +7,7 @@
     display: flex;
     flex-direction: column;
     gap: 40px;
+    overflow: visible;
 }
 
 #info>.container{
@@ -82,7 +83,7 @@
 
 #info>.container>.content>.info-user{
     width: 100%;
-    padding: 0 0 0 30px;
+    padding: 0 15px 0 30px;
 }
 
 #info>.container>.content>.info-user>.info-box,
@@ -108,7 +109,8 @@
     color: black;
 }
 
-#info>.container>.content>.info-license{
+#info>.container>.content>.info-license,
+#info>.container>.content>.info-id-card{
     width: 50%;
     display: flex;
     padding-left: 5px;
@@ -116,8 +118,19 @@
     gap: 10px
 }
 
-#info>.container>.content>.info-license>.info-license-upload{
-    height: max-content;
-    width: max-content;
-    background-color: #565656;
+#info>.container>.content>.info-license{
+    padding-right: 15px;
 }
+
+#info>.container>.content>.info-license>.info-license-upload,
+#info>.container>.content>.info-license>.img-container>.info-license-upload{
+    height: 240px;
+    width: 100%;
+    background-color: #e7e7e7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: #565656 1px dashed;
+    border-radius: var(--border-radius);
+}   
+

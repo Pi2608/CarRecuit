@@ -3,8 +3,9 @@
 }
 
 #cars>.body{
-    width: 100%;
+    position: relative;
     display: flex;
+    width: 100%;
     flex-direction: column;
     align-items: center;
     padding-bottom: 50px;
@@ -48,6 +49,7 @@
     justify-content: center;
     align-items: center;
     padding: 0 10px;
+    overflow: hidden;
 }
 
 #cars>.body>.filter-section>.amenities>.amenity:hover{
@@ -58,6 +60,7 @@
     padding-right: 8px;
     height: 24px;
     width: auto;
+    overflow: hidden;
 }
 
 #cars>.body>.filter-section>.amenities>.reset-btn{
