@@ -34,7 +34,7 @@ const getCarById= async(id)=>{
         const result = await poolConnection.request()
         .input("id", sql.Int, id)
         .query(query);
-        return result.recordset;
+        const car =  result.recordset;
     }catch(err){
         
     }
@@ -83,7 +83,7 @@ const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
 
 const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     try{
-        const Cars = await getAllCars();
+        const Cars = await getAllCarsInUse();
         const filteredCars = Cars.filter(car => {
             if (carTypeId && car.carTypeId !== carTypeId) {
                 return false;

@@ -15,7 +15,7 @@ const getAllUser = async()=>{
     }
 }
 
-const getUserIdByEmail= async(email) => {
+const getUserByEmail= async(email) => {
     try{
         let poolConnection = await sql.connect(config);
         const query = 'Select * From [dbo].[user] where email=@Email';
@@ -23,32 +23,46 @@ const getUserIdByEmail= async(email) => {
         .input('Email', sql.NVarChar, email)
         .query(query);
         return result.recordset[0]
-        // const user = result.recordset[0];
-        // const images =await getImageByUserId(user.Id)
-        // for(let i=0; i< images.length; i++){
-        //     images[i].url = await util.decodeImage(images[i].url)
-        // }
-        // const query1 = `Select * from dbo.NID where id =@NIDId`
-        // const result1 = await poolConnection.request()
-        // .input('NIDId', sql.Int, user.NIDId)
-        // .query(query1)
-        // const NID = result1.recordset[0]
-        // const query2 = `Select * from dbo.NDL where id =@NDLId`
-        // const result2 = await poolConnection.request()
-        // .input('NDLId', sql.Int, user.NDLId)
-        // .query(query2)
-        // const NDL = result2.recordset[0]
-        // return [user, images, NID, NDL]
     }catch(err){
         console.log(err);
     }
 }
 
-const getNIDinfoByUserId = async(id)=>{
-
+const getNIDinfoByUserId = async(userId)=>{
+    let poolConnection = await sql.connect(config)
+    const query1 = `Select * from dbo.NID 
+                    where id = (Select NIDid from dbo.user where id = @userId)`
+    const  result1 =await poolConnection.request()
+    .input('userId',sql.Int, userId)
+    .query(query1)
+    const NID = result1.recordset[0]
+    const query2 = `Select * from dbo.image where userId = @userId and id like %NID%`
+    const result2 = await poolConnection.request()
+    .input('userId', sql.Int, userId)
+    .query(query2)
+    const images = result2.recordset
+    for(let i=0; i< images.length; i++){
+        images[i].url = await util.decodeImage(images[i].url)
+    }
+    return [NID, images]
 }
-const getNDLinfoByUserId = async(id)=>{
-
+const getNDLinfoByUserId = async(userId)=>{
+    let poolConnection = await sql.connect(config)
+    const query1 = `Select * from dbo. 
+                    where id = (Select NDLid from dbo.user where id = @userId)`
+    const  result1 =await poolConnection.request()
+    .input('userId',sql.Int, userId)
+    .query(query1)
+    const NDL = result1.recordset[0]
+    const query2 = `Select * from dbo.image where userId = @userId and id like %NDL%`
+    const result2 = await poolConnection.request()
+    .input('userId', sql.Int, userId)
+    .query(query2)
+    const images = result2.recordset
+    for(let i=0; i< images.length; i++){
+        images[i].url = await util.decodeImage(images[i].url)
+    }
+    return [NDL, images]
 }
 
 const getImageByUserId= async(userId)=>{
@@ -80,11 +94,9 @@ const getUserById= async(id) => {
 
 const createUser = async (email, password)=>{
     try{
-        // chưa check đã tồn tại
-        //check duplicate
         let poolConnection = await sql.connect(config);
-        const user = await getUserIdByEmail(email);
-        if(user = null){
+        const user = await getUserByEmail(email);
+        if(user != null){
             return {
                 message: "Email này đã tồn tại"
             }
@@ -107,7 +119,7 @@ const createUser = async (email, password)=>{
         .query(query3);
         const query4 = 'Insert Into [dbo].[MemberShipUser] (userId, memberShipId, timeChanged) VALUES (@UserId, @MemberShipId, @TimeChanged)'
         await poolConnection.request()
-        .input('UserId', sql.Int, getUserIdByEmail(email))
+        .input('UserId', sql.Int, (await getUserByEmail(email)).id)
         .input('MemberShipId', sql.Int, 1)
         .input(timeChanged, sql.DateTime, util.currentTime)
         .query(query4);
@@ -401,6 +413,9 @@ const editStatusNID = async (userId, isConfirm)=>{
         
     }
 }
+
+const registerCarForOwner = async (u)
+
 const editStatusNDL = async (userId, isConfirm)=>{
     try {
         let poolConnection = await sql.connect(config)
@@ -436,6 +451,6 @@ module.exports={
     sendConfirmNDL,
     sendConfirmNID,
     getNDLinfoByUserId,
-    getNDLinfoByUserId
+    getNIDinfoByUserId,
 }
 
