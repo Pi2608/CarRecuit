@@ -38,17 +38,19 @@ const carRentalSchedule = async (carId) => {
     }
 }
 
-const statisticRentalByYear = async (year) => {
+const statisticRental = async (year) => {
     try {
         let poolConnection = await sql.connect(config);
-        const query = `SELECT YEAR(dbo.rent.time) AS year,
-                              MONTH(dbo.rent.time) AS month,
-                              COUNT(*) AS total
+        const query = `SELECT 
+                            YEAR(dbo.rent.time) AS year,
+                            MONTH(dbo.rent.time) AS month,
+                            DATEPART(week, dbo.rent.time) AS week,
+                            COUNT(*) AS total
                         FROM dbo.rent
                         WHERE dbo.rent.paymentId IS NOT NULL AND
-                              YEAR(dbo.rent.time) = @year
-                        GROUP BY YEAR(dbo.rent.time), MONTH(dbo.rent.time)
-                        ORDER BY year, month`;
+                            YEAR(dbo.rent.time) = @year
+                        GROUP BY YEAR(dbo.rent.time), MONTH(dbo.rent.time), DATEPART(week, dbo.rent.time)
+                        ORDER BY year, month, week`;
         const result = await poolConnection.request()
             .input('year', sql.Int, year)
             .query(query);
@@ -58,6 +60,7 @@ const statisticRentalByYear = async (year) => {
         throw error;
     }
 }
+
 
 const createRent = async (userId) => {
     try {
@@ -441,7 +444,7 @@ const cancelRentDetailByOwner = async (notificationId, ownerId) => {
 module.exports = {
     countRentalCar,
     carRentalSchedule,
-    statisticRentalByYear,
+    statisticRental,
     createRent,
     getCurrentRent,
     getRentDetailCurrent,
@@ -451,5 +454,6 @@ module.exports = {
     cancelRentDetailByUser,
     getRentById,
     updateRentTotal,
-
+    confirmPayment,
+    acceptRentDetail,
 }
