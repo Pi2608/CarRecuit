@@ -1,24 +1,15 @@
-const { decodeImage } = require('./Source/Util/Util');
-const encode = require('node-base64-image').encode;
+const express = require('express');
+const bodyParser = require('body-parser')
+const userRouter = require('./Source/Routers/UserRouter')
+const app = express()
 
-async function testDecodeImage() {
-    try {
-        const url = 'https://e1.pxfuel.com/desktop-wallpaper/639/821/desktop-wallpaper-2560x1440-anime-city-1440p-resolution-anime-city.jpg';
-        const options = {
-            string: true,
-            headers: {
-                "User-Agent": "my-app"
-            }
-        };
+const port = 4000
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+app.use("/user", userRouter)
+app.use("/img", express.static('Source/photos'))
+app.listen(port, ()=>{
+    console.log("Server is running on port "+ port)
+})
 
-        const image = await encode(url, options);
 
-        const decodedPath = await decodeImage(image, 'car1');
-        console.log('Decoded image path:', decodedPath);
-
-    } catch (error) {
-        console.error('Error in testDecodeImage:', error);
-    }
-}
-
-testDecodeImage();

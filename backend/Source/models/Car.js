@@ -6,9 +6,41 @@ const util = require("../Util/Util");
 const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'Select * From [dbo].[car] Where status = 0'
-        const result = await poolConnection.request().query(query);
-        return result.recordset;
+        const query1 = 'Select * From [dbo].[car] Where status = 1'
+        const result = await poolConnection.request().query(query1);
+        const cars= result.recordset;
+        for (let car of cars){
+            const query2 = `Select url from dbo.image where id LIKE %FC% AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const {img} = result2.recordset
+            car.imgUrl = img 
+        }
+        return cars
+    }catch(err){
+        
+    }
+}
+
+const getAllCarsOfOwner = async(ownnerId, status)=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query1 = 'Select * From [dbo].[car] Where status = @status AND ownerId=@ownerId'
+        const result = await poolConnection.request()
+        .input('status', sql.Bit, status)
+        .input('ownerId', sql.Int, ownnerId)
+        .query(query1);
+        const cars= result.recordset;
+        for (let car of cars){
+            const query2 = `Select url from dbo.image where id LIKE %FC% AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const {img} = result2.recordset
+            car.imgUrl = img 
+        }
+        return cars
     }catch(err){
         
     }
@@ -27,6 +59,27 @@ const showCarFeedback = async (carId)=>{
     }
 }
 
+const getCarRating = async(carId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * From dbo.feedback where carId = @carId`
+        const result = await poolConnection.request()
+        .input('carId', sql.Int,carId)
+        .query(query)
+        const feedbacks= result.recordset
+        let rating = 0
+        let count = 0
+        for(const feedback of feedbacks){
+            rating = rating + feedback.rating
+            count++;
+        }
+        return (rating/count).toFixed(1)
+    } catch (error) {
+        
+    }
+}
+
+
 const getCarById= async(id)=>{
     try{
         let poolConnection = await sql.connect(config)
@@ -35,31 +88,36 @@ const getCarById= async(id)=>{
         .input("id", sql.Int, id)
         .query(query);
         const car =  result.recordset;
-    }catch(err){
-        
-    }
-}
-
-const getCarsByName = async(name)=>{
-    try{
-        if(name){
-            let poolConnection = await sql.connect(config)
-            const query = 'Select * From [dbo].[car] Where name like %@Name% and status =0'
-            const result = await poolConnection.request()
-            .input('Name', sql.NVarChar, name)
-            .query(query);
-            return result.recordset;
+        const imgs = await getImgsCarById(id)
+        for (let img of imgs){
+            img.url = await util.decodeImage(img.url, img.id)
         }
-        else return getAllCars;
+        return [car,imgs]
     }catch(err){
         
     }
 }
 
-const getImgsCar = async(carId)=>{
+// const getCarsByName = async(name)=>{
+//     try{
+//         if(name){
+//             let poolConnection = await sql.connect(config)
+//             const query = 'Select * From [dbo].[car] Where name like %@Name% and status =0'
+//             const result = await poolConnection.request()
+//             .input('Name', sql.NVarChar, name)
+//             .query(query);
+//             return result.recordset;
+//         }
+//         else return getAllCars;
+//     }catch(err){
+        
+//     }
+// }
+
+const getImgsCarById = async(carId)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'Select url From [dbo].[car] Where carId = @CarId'
+        const query = 'Select * From [dbo].[car] Where carId = @CarId'
         const result = await poolConnection.request()
         .input("CarId", sql.Int, carId)
         .query(query);
@@ -223,12 +281,15 @@ const deleteCarRental = async(carId)=>{
 
 module.exports={
     getAllCarsInUse,
-    getCarsByName,
-    getImgsCar,
+    // getCarsByName,
+    getImgsCarById,
     getCarsByPage,
     filterCars,
     addCarRental,
     updateCarRental,
     deleteCarRental,
     getCarById,
+    getCarRating,
+    showCarFeedback,
+    getAllCarsOfOwner
 }
