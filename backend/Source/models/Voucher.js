@@ -1,6 +1,6 @@
 const sql = require("mssql/msnodesqlv8");
 const config = require("../config/dbconfig");
-const Util = require("../Util")
+const Util = require("../Util/Util")
 
 const checkVoucher = async(userId, code)=>{
     try {
@@ -63,12 +63,26 @@ const getVoucherByCode = async(code)=>{
         const result = await poolConnection.request()
             .input('Code', sql.NVarChar, code)
             .query(query)
-        return result.recordset
+        return result.recordset[0]
     } catch (error) {
         console.log(error)
     }
 }
+const getVoucherById = async(id)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = 'Select * from dbo.voucher where id = @id'
+        const result = await poolConnection.request()
+        .input('id', sql.Int, id)
+        .query(query)
+        return result.recordset[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 module.exports= {
     checkVoucher,
-    getVoucherByCode
+    getVoucherByCode,
+    getVoucherById
 }

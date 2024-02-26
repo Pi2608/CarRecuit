@@ -19,6 +19,9 @@ const createAmenities = async(name)=>{
         await poolConnection.request()
         .input('name', sql.NVarChar, name)
         .query(query)
+        return{
+            message: "thêm thành công"
+        }
     } catch (error) {
         
     }
@@ -34,15 +37,17 @@ const searchAmenitesByName = async(name) =>{
         
     }
 }
-const updateAmenities = async(name)=>{
+const updateAmenities = async(id, name)=>{
     try {
-        const id = await searchAmenitesByName(name)
         let poolConnection = await sql.connect(config)
         const query = 'Update [dbo].[amenities] set name = @name where id = @id'
         await poolConnection.request()
         .input('name', sql.NVarChar, name)
         .input('id', sql.NVarChar, id)
         .query(query)
+        return {
+            message: "update thành công"
+        }
     } catch (error) {
         
     }

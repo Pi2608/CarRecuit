@@ -1,7 +1,7 @@
 
 
 var config = {
-    server: "DESKTOP-2QN2UFI\\SQLEXPRESS",
+    server: "DESKTOP-QT7U87N\\SQLEXPRESS",
     user: "sa",
     password: "12345",
     database: "RentCarPlatform",

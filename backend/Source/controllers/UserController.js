@@ -188,6 +188,71 @@ const sendNotification = async (req, res)=>{
         
     }
 }
+const getMemberShipByUserId= async (req, res)=>{
+    try {
+        const userId = req.params.userId
+        console.log(userId)
+        const response = await User.getMemberShipByUserId(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const checkLogin = async (req, res)=>{
+    try {
+        const email = req.body.email
+        const password = req.body.password
+        const response = await User.checkLogin(email, password)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const getTransactionHistory = async(req, res)=>{
+    try {
+        const userId = req.params.userId
+        const response = await User.getTransactionHistory(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const editStatusNID = async(req, res)=>{
+    try {
+        const userId = req.query.userId
+        const status = req.query.status
+        const response = await User.editStatusNID(userId, status)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const editStatusNDL = async(req, res)=>{
+    try {
+        const userId = req.query.userId
+        const status = req.query.status
+        const response = await User.editStatusNDL(userId, status)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const showRequestConfirmNID = async(req, res)=>{
+    try {
+        const response = await User.showRequestConfirmNID()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const showRequestConfirmNDL = async(req,res)=>{
+    try {
+        const response = await User.showRequestConfirmNDL()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 module.exports={
     getAllUser,
     getUserByEmail,
@@ -203,5 +268,12 @@ module.exports={
     replyFeedback,
     editStatusUser,
     getNotification,
-    sendNotification
+    sendNotification,
+    getMemberShipByUserId,
+    checkLogin,
+    getTransactionHistory,
+    editStatusNID,
+    editStatusNDL,
+    showRequestConfirmNDL,
+    showRequestConfirmNID,
 }
