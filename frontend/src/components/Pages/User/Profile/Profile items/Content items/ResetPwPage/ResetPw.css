@@ -1,0 +1,29 @@
+#reset-pw>.container{
+    width: 842px;
+    min-height: 200px;
+    height: fit-content;
+    min-height: 300px;
+    background-color: white;
+    box-shadow: 0 2px 5px #ccc;
+    border-radius: var(--border-radius);
+    padding: 24px;
+}
+
+#reset-pw>.title{
+    padding : 15px 0px 15px 20px;
+}
+
+#reset-pw>.container>.pw-container{
+    position: relative;
+}
+
+#reset-pw>.container>.pw-container>.box-container>.box>.box-inner{
+    color: #767676;
+}
+
+#reset-pw>.container>.pw-container>.submit{
+    position: relative;
+    display: flex;
+    left: 80%;
+    gap: 10px;
+}
