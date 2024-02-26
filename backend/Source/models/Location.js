@@ -42,12 +42,12 @@ const getCarLocation = async(carId, typeLocation)=>{
         if (typeLocation == 3){
             await recordCarLocation(carId)
         }
-        const query = 'Select TOP 1 latitude, longtitude From [dbo].[loction] where carId = @carId, typeLocation = @typeLocation Order By id DESC'
+        const query = 'Select TOP 1 * From [dbo].[loction] where carId = @carId, typeLocation = @typeLocation Order By id DESC'
         const result = await poolConnection.request()
         .input('carId', sql.NVarChar, carId)
         .input('typeLocation', sql.Int, typeLocation)
         .query(query)
-        return result.recordset
+        return result.recordset[0]
     } catch (error) {
         
     }

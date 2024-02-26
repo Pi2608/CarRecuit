@@ -78,8 +78,18 @@ const generateRandomString = async(length)=> {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
-  }
+}
 
+const compareDates= async(startDate, endDate) =>{
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+    
+    if (startDateObj > endDateObj) {
+        return false;
+    } else {
+        return true;
+    }
+}
 
 module.exports={
     currentTime,
@@ -87,5 +97,6 @@ module.exports={
     encodeImage,
     decodeImage,
     generateRandomString,
-    calculatePeriod
+    calculatePeriod,
+    compareDates
 }

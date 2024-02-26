@@ -80,9 +80,97 @@ const getVoucherById = async(id)=>{
         console.log(error)
     }
 }
+const getAllVoucher = async()=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = 'Select * from dbo.voucher'
+        const result = await poolConnection.request()
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        console.log(error)
+    }
+}
 
+const createVoucher = async(discount, startDate, endDate)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        let voucherCode
+        let status = true
+        // check duplicate
+        while(status){
+            voucherCode = 'Carflex-'+ (await Util.generateRandomString(8))
+            const voucher = await getVoucherByCode(voucherCode)
+            if(voucher == null){
+                status = false
+            } 
+        }
+        console.log(voucherCode)
+        if(await Util.compareDates(startDate, endDate)){
+            const query = `Insert into dbo.voucher (voucherCode, discount, startDate, endDate, isDeleted) values (@voucherCode, @discount, @startDate, @endDate, 0)`
+            await poolConnection.request()
+            .input('voucherCode', sql.NVarChar, voucherCode)
+            .input('discount', sql.Float, discount)
+            .input('startDate', sql.DateTime, startDate)
+            .input('endDate', sql.DateTime, endDate)
+            .query(query)
+            return{
+                message: "Tạo voucher thành công"
+            }
+        }else{
+            return{
+                message: "Ngày bắt đầu phải bé hơn ngày kết thúc"
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+const deleteVoucher = async(id)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = "Update dbo.voucher set isDeleted = 1 where id= @id"
+        await poolConnection.request()
+        .input('id', sql.Int, id)
+        .query(query)
+        return{
+            message: "Xóa thành công"
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+const updateVoucher = async(id, voucherCode, discount, startDate, endDate)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        if(await Util.compareDates(startDate, endDate)){
+            const query =  `Update dbo.voucher set voucherCode = @voucherCode, discount = @discount, startDate = @startDate, endDate = @endDate
+                        where id =@id`
+            await poolConnection.request()
+            .input('voucherCode', sql.NVarChar, voucherCode)
+            .input('discount', sql.Float, discount)
+            .input('startDate', sql.DateTime, startDate)
+            .input('endDate', sql.DateTime, endDate)
+            .input('id', sql.Int, id)
+            .query(query)
+            return{
+                message: "Update thành công"
+            }
+        }else{
+            return{
+                message: "Ngày bắt đầu phải bé hơn ngày kết thúc"
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+} 
 module.exports= {
     checkVoucher,
     getVoucherByCode,
-    getVoucherById
+    getVoucherById,
+    getAllVoucher,
+    createVoucher,
+    deleteVoucher,
+    updateVoucher
 }
