@@ -122,6 +122,8 @@
     padding-right: 15px;
 }
 
+#info>.container>.content>.info-id-card>.info-license-upload,
+#info>.container>.content>.info-id-card>.img-container>.info-license-upload,
 #info>.container>.content>.info-license>.info-license-upload,
 #info>.container>.content>.info-license>.img-container>.info-license-upload{
     height: 240px;

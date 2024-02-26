@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, TextField } from "@mui/material";
+import "./ResetPw.css"
 
 export default function ResetPw() {
 
@@ -59,6 +60,7 @@ export default function ResetPw() {
                         onChange={(e) => setInputValue3(e.target.value)}
                         />
                     </label>
+                    <br />
                     <br />
                     <div className="submit">
                         <Button variant="outlined" onClick={handleCancel}>Hủy</Button>
