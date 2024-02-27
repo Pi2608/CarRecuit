@@ -1,4 +1,4 @@
-const sql = require("mssql/msnodesqlv8");
+const sql = require('mssql');
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
 
@@ -10,7 +10,7 @@ const getAllCarsInUse= async()=>{
         const result = await poolConnection.request().query(query1);
         const cars= result.recordset;
         for (let car of cars){
-            const query2 = `Select url from dbo.image where id LIKE %FC% AND carId = @carId`
+            const query2 = `Select url from dbo.image where id LIKE '%FC%' AND carId = @carId`
             const result2 = await poolConnection.request()
             .input('carId', sql.Int, car.id)
             .query(query2)
@@ -19,7 +19,7 @@ const getAllCarsInUse= async()=>{
         }
         return cars
     }catch(err){
-        
+        console.log(err)
     }
 }
 

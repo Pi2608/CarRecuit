@@ -3,7 +3,7 @@ const locationController = require('../controllers/LocationController')
 
 const locationRouters = express.Router()
 
-locationRouters.get('/', locationController.getCarLocation)
+locationRouters.get('/:carId', locationController.getCarLocation)
 
 module.exports=locationRouters
 

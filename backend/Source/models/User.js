@@ -1,4 +1,4 @@
-const sql = require("mssql/msnodesqlv8");
+const sql = require('mssql');
 const config = require("../config/dbconfig");
 const Car = require("./Car")
 const util = require("../Util/Util");
@@ -547,6 +547,18 @@ const showRequestConfirmNDL = async ()=>{
         console.log(error)
     }
 }
+const registerByGg = async (email)=>{
+    try {
+        const user = await getUserByEmail(email)
+        if(user != null){
+            return await checkLogin(email, null)
+        }else{
+            return await createUser(email, null)
+        }
+    } catch (error) {
+        console.log(error)   
+    }
+}
 module.exports={
     getAllUser,
     getUserById,
@@ -571,6 +583,7 @@ module.exports={
     changePassword,
     getMemberShipByUserId,
     showRequestConfirmNID,
-    showRequestConfirmNDL
+    showRequestConfirmNDL,
+    registerByGg
 }
 

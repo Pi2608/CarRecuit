@@ -253,6 +253,15 @@ const showRequestConfirmNDL = async(req,res)=>{
         
     }
 }
+const registerByGg = async(req, res)=>{
+    try {
+        const email = req.body.email
+        const response = await User.registerByGg(email)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 module.exports={
     getAllUser,
     getUserByEmail,
@@ -276,4 +285,5 @@ module.exports={
     editStatusNDL,
     showRequestConfirmNDL,
     showRequestConfirmNID,
+    registerByGg
 }
