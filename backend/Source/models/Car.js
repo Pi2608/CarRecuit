@@ -23,17 +23,16 @@ const getAllCarsInUse= async()=>{
     }
 }
 
-const getAllCarsOfOwner = async(ownnerId, status)=>{
+const getAllCarsOfOwner = async(ownnerId)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Select * From [dbo].[car] Where status = @status AND ownerId=@ownerId'
+        const query1 = 'Select * From [dbo].[car] Where ownerId=@ownerId'
         const result = await poolConnection.request()
-        .input('status', sql.Bit, status)
         .input('ownerId', sql.Int, ownnerId)
         .query(query1);
         const cars= result.recordset;
         for (let car of cars){
-            const query2 = `Select url from dbo.image where id LIKE %FC% AND carId = @carId`
+            const query2 = `Select url from dbo.image where id LIKE '%FC%' AND carId = @carId`
             const result2 = await poolConnection.request()
             .input('carId', sql.Int, car.id)
             .query(query2)
@@ -42,7 +41,7 @@ const getAllCarsOfOwner = async(ownnerId, status)=>{
         }
         return cars
     }catch(err){
-        
+        console.log(err)
     }
 }
 
@@ -87,14 +86,18 @@ const getCarById= async(id)=>{
         const result = await poolConnection.request()
         .input("id", sql.Int, id)
         .query(query);
-        const car =  result.recordset;
+        const car =  result.recordset[0];
         const imgs = await getImgsCarById(id)
-        for (let img of imgs){
-            img.url = await util.decodeImage(img.url, img.id)
+        if (Array.isArray(imgs)) {
+            for (let img of imgs) {
+                img.url = await util.decodeImage(img.url, img.id);
+            }
+            return [car, imgs];
+        } else {
+            return [car, []];
         }
-        return [car,imgs]
     }catch(err){
-        
+        console.log(err)
     }
 }
 
@@ -141,9 +144,16 @@ const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
 
 const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     try{
+        console.log({
+            carTypeId:carTypeId,
+            maxPrice: maxPrice,
+            minPrice:minPrice,
+            seats:seats,
+            typeOfFuels:typeOfFuels,
+        })
         const Cars = await getAllCarsInUse();
         const filteredCars = Cars.filter(car => {
-            if (carTypeId && car.carTypeId !== carTypeId) {
+            if (carTypeId && car.carTypeId.toString() !== carTypeId) {
                 return false;
             }
 
@@ -155,7 +165,7 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
                 return false;
             }
 
-            if (seats && car.seats !== seats) {
+            if (seats && car.seats.toString() !== seats) {
                 return false;
             }
 
@@ -167,7 +177,7 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
 
         return filteredCars;
     }catch(err){
-        
+        console.log(err)
     }
 }
 

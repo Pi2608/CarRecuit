@@ -1,5 +1,9 @@
 const express = require('express');
+const firebase = require('firebase')
+const config = require('./Source/Util/firebaseConfig')
+firebase.initializeApp(config);
 const bodyParser = require('body-parser')
+
 const userRouter = require('./Source/Routers/UserRouter')
 const membershipRouter = require('./Source/Routers/MembershipRouter')
 const voucherRouter = require('./Source/Routers/VoucherRouter')
