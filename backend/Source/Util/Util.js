@@ -13,6 +13,21 @@ const currentTime = async()=>{
     
     return dateFormat;
 }
+const calculatePeriod= async(startDate, endDate)=> {
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
+
+    // Tính toán số milliseconds giữa hai thời điểm
+    const timeDifference = Math.abs(endDateTime - startDateTime);
+
+    // Chuyển đổi milliseconds thành ngày, giờ, phút và giây
+    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+    return days+':'+hours+':'+minutes+':'+seconds;
+}
 const getPositionCar = async () => {
     firebase.initializeApp(config);
     const rootRef = firebase.database().ref();
@@ -46,13 +61,12 @@ const encodeImage = async(path)=>{
 }
 const decodeImage = async (base64Code, name) => {
     const projectPath = path.resolve();
-    const savePath = projectPath + '/photos/' + name
+    const savePath = projectPath + '/Source/photos/' + name
     try {
         await decode(base64Code, { fname: savePath, ext: 'jpg' });
-        return savePath+'.jpg';
+        return 'http://localhost:4000/img/'+name+'.jpg'
     } catch (error) {
         console.error('Error decoding image:', error);
-        return null; // or throw the error if you want to handle it differently
     }
 };
 
@@ -64,13 +78,25 @@ const generateRandomString = async(length)=> {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
-  }
+}
 
+const compareDates= async(startDate, endDate) =>{
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+    
+    if (startDateObj > endDateObj) {
+        return false;
+    } else {
+        return true;
+    }
+}
 
 module.exports={
     currentTime,
     getPositionCar,
     encodeImage,
     decodeImage,
-    generateRandomString
+    generateRandomString,
+    calculatePeriod,
+    compareDates
 }

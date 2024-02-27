@@ -39,16 +39,19 @@ const addCarRentLocation = async (carId, typeLocation, latitude, longtitude, des
 const getCarLocation = async(carId, typeLocation)=>{
     try {
         let poolConnection = await sql.connect(config);
-        const query = 'Select TOP 1 latitude, longtitude From [dbo].[loction] where carId = @carId, typeLocation = @typeLocation Order By id DESC'
+        if (typeLocation == 3){
+            await recordCarLocation(carId)
+        }
+        const query = 'Select TOP 1 * From [dbo].[loction] where carId = @carId, typeLocation = @typeLocation Order By id DESC'
         const result = await poolConnection.request()
         .input('carId', sql.NVarChar, carId)
         .input('typeLocation', sql.Int, typeLocation)
         .query(query)
-        return result.recordset
+        return result.recordset[0]
     } catch (error) {
         
     }
-} 
+}
 
 module.exports={
     recordCarLocation,

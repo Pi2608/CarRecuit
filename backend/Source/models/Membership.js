@@ -29,11 +29,11 @@ const getAllMembership = async()=>{
 const getMembershipById = async(id)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query = 'Select * From [dbo].[memberShip] where id = %id'
+        const query = 'Select * From [dbo].[memberShip] where id = @id'
         const result = await poolConnection.request()
         .input('id', sql.Int, id)
         .query(query)
-        return result.recordset
+        return result.recordset[0]
     } catch (error) {
         console.log(error);
     }
@@ -42,33 +42,25 @@ const getMembershipById = async(id)=>{
 const updateMembershipById = async (id, name, discount, pointRequire)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query = 'Update [dbo].[memberShip] set name = %name, discount = %discount, pointRequire = %pointRequire where id = %id'
+        const query = 'Update [dbo].[memberShip] set name = @name, discount = @discount, pointRequire = @pointRequire where id = @id'
         await poolConnection.request()
         .input('name', sql.NVarChar, name)
         .input('discount', sql.Float, discount)
         .input('pointRequire', sql.Int, pointRequire)
         .input('id', sql.Int, id)
         .query(query)
-    } catch (error) {
-        console.log(error)
-    }
-}
-const deleteMembershipById = async(id) =>{
-    try {
-        let poolConnection  = await sql.connect(config)
-        const query = 'DELETE FROM [dbo].[memberShip] where id = %id'
-        await poolConnection.request()
-        .input('id', sql.Int, id)
-        .query(query)
+        return{
+            message: "update thành công"
+        }
     } catch (error) {
         console.log(error)
     }
 }
 
+
 module.exports={
     createMembership,
     getAllMembership,
     getMembershipById,
-    getMembershipById,
-    deleteMembershipById
+    updateMembershipById
 }
