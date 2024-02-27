@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react'
-//import jwt_decode from 'jwt-decode'
+import React, {useEffect, useState} from 'react';
+// import { jwtDecode } from "jwt-decode"
 
 
 function Login() {
@@ -9,7 +9,7 @@ function Login() {
   function handleCallbackResponse(response) {
     //document.getElementById('google').hidden = true
     console.log(response.credential);
-   // var userOject = jwt_decode(response.credential)
+  //  var userOject = jwtDecode(response.credential)
     //setGoogleUser(userOject)
     //setEmail(userOject.email)
   }

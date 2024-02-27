@@ -1,8 +1,9 @@
-import React from "react";
+import { React, useState} from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "./Header.css";
-import LoginForm from "../../features/LoginForm/LoginForm";
+import { Button } from "@mui/material";
+import LoginForm from "../../Pages/Login/LoginForm/LoginForm";
 import Popup from "reactjs-popup";
+import "./Header.css";
 
 function Header() {
 
@@ -29,9 +30,18 @@ function Header() {
                     </div>
                     <Popup
                         trigger={
-                            <button type="button" className="login" onClick={handleLogin}>
-                                <span>Đăng nhập</span>
-                            </button>
+                            <Button 
+                            className="login"
+                            variant="outlined" 
+                            size="large" 
+                            style={{
+                                    borderColor: "#00BF54", 
+                                    color: "#00BF54", 
+                                    fontWeight: "bold"
+                                  }}
+                            onClick={handleLogin}>
+                                    Đăng nhập
+                                    </Button>
                         }
                         position="center"
                         modal
