@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-// import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode"
 
 
 function Login() {
@@ -9,7 +9,8 @@ function Login() {
   function handleCallbackResponse(response) {
     //document.getElementById('google').hidden = true
     console.log(response.credential);
-  //  var userOject = jwtDecode(response.credential)
+    var userOject = jwtDecode(response.credential)
+    console.log(userOject)
     //setGoogleUser(userOject)
     //setEmail(userOject.email)
   }
@@ -53,11 +54,11 @@ function Login() {
     <div 
     id="google"
     style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
+        flexDirection: 'column'
+    }}>
     </div>
   )
   }

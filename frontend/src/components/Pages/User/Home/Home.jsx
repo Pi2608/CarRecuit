@@ -3,27 +3,35 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import Card from "../../../Items/Card/Card";
-import Modal from "../../../Items/Modal/Modal";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
+import Axios from 'axios';
+import ReactAxios from 'react-axios';
 import "./Home.css"
 
 export default function Home() {
 
   const navigate = useNavigate();
-  const [modal, setModal] = useState(false);
-
-  const toggleModal = () => {
-    setModal(!modal);
-  }
-
+  const [users, setUsers] = useState([]);
+  
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo(0, 0);
+    fetchData();
   },[])
+  
+  const fetchData = async () => {
+    try {
+      const response = await Axios.get('/'); // Adjust the URL according to your API endpoint
+      setUsers(response.data); // Assuming the response contains an array of user data
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   return (
     <div id="home">
@@ -109,7 +117,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* <Modal/> */}
         </div>
         <Footer/>
     </div>
