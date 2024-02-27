@@ -1,5 +1,6 @@
 const sql = require("mssql/msnodesqlv8");
 const config = require("../config/dbconfig");
+const Car = require("./Car")
 const util = require("../Util/Util");
 var jwt = require('jsonwebtoken');
 
@@ -15,16 +16,76 @@ const getAllUser = async()=>{
     }
 }
 
-const getUserIdByEmail= async(email) => {
+const getUserByEmail= async(email) => {
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'Select id From [dbo].[user] where email=@Email';
+        const query = 'Select * From [dbo].[user] where email=@Email';
         const result = await poolConnection.request()
         .input('Email', sql.NVarChar, email)
         .query(query);
-        return result.recordset;
+        return result.recordset[0]
     }catch(err){
         console.log(err);
+    }
+}
+
+const getNIDinfoByUserId = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select * from dbo.NID 
+                        where id = (Select NIDid from [dbo].[user] where id = @userId)`
+        const  result1 =await poolConnection.request()
+        .input('userId',sql.Int, userId)
+        .query(query1)
+        const NID = result1.recordset[0]
+        const query2 = `Select * from dbo.image where userId = @userId and id like '%NID%'`
+        const result2 = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query2)
+        const images = result2.recordset
+        for(let i=0; i< images.length; i++){
+            images[i].url = await util.decodeImage(images[i].url, images[i].id)
+        }
+        return [NID, images]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const getNDLinfoByUserId = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select * from dbo.NDL 
+                        where id = (Select NDLid from [dbo].[user] where id = @userId)`
+        const  result1 =await poolConnection.request()
+        .input('userId',sql.Int, userId)
+        .query(query1)
+        const NDL = result1.recordset[0]
+        
+        const query2 = `Select * from dbo.image where userId = @userId and id like '%NDL%'`
+        const result2 = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query2)
+        const images = result2.recordset
+        for(let i=0; i< images.length; i++){
+            images[i].url = await util.decodeImage(images[i].url, images[i].id)
+        }
+        return [NDL, images]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const getImageByUserId= async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select * from dbo.image where userId = @userId`
+        const result = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query1)
+        return result.recordset
+    } catch (error) {
+        
     }
 }
 
@@ -35,88 +96,165 @@ const getUserById= async(id) => {
         const result = await poolConnection.request()
         .input('id', sql.Int, id)
         .query(query);
-        return result.recordset[0];
+        return result.recordset[0]
     }catch(err){
         console.log(err);
     }
 }
 
-const getImgsUserById = async(userId)=> {
-    try{
-        let poolConnection = await sql.connect(config);
-        const query = 'Select id, url From [dbo].[image] where userId= @UserId'
-        const result = await poolConnection.request()
-        .input('UserId',sql.id, userId)
-        .query(query);
-        return result.recordset
-    }catch(err){
-        console.log(err);
-    }
-}
 
 const createUser = async (email, password)=>{
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'INSERT INTO [dbo].[user] (roleID, email, password, status, wallet) VALUES (1, @Email, @Password, true, 0)';
+        const user = await getUserByEmail(email);
+        if(user != null){
+            return {
+                message: "Email này đã tồn tại"
+            }
+        }
+        const query1 = `Insert into dbo.NID (NID, name, dateOfBirth, native, address, dateProvide, provider, isConfirm)
+                        values (NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)`
+        await poolConnection.request()
+        .query(query1)
+        const query2 = `Insert into dbo.NDL (NDL, name, dateOfBirth, isConfirm)
+                        values (NULL, NULL, NULL, 0)`
+        await poolConnection.request()
+        .query(query2)
+        const query3 = `INSERT INTO [dbo].[user] (roleID, email, password, status, wallet, NIDId, NDLId, point, isDeleted)
+                         VALUES (1, @Email, @Password, 1, 0,
+                            (Select MAX(id) from dbo.NID),
+                            (Select MAX(id) from dbo.NDL), 0, 0)`;
         await poolConnection.request()
         .input('Email', sql.NVarChar, email)
         .input('Password', sql.NVarChar, password)
-        .query(query);
-        const query2 = 'Insert Into [dbo].[MemberShipUser] (userId, memberShipId, timeChanged) VALUES (@UserId, @MemberShipId, @TimeChanged)'
+        .query(query3);
+        const query4 = 'Insert Into [dbo].[memberShipUser] (userId, memberShipId, timeChanged) VALUES (@UserId, @MemberShipId, @TimeChanged)'
         await poolConnection.request()
-        .input('UserId', sql.Int, getUserIdByEmail(email))
+        .input('UserId', sql.Int, (await getUserByEmail(email)).id)
         .input('MemberShipId', sql.Int, 1)
-        .input(timeChanged, sql.DateTime, util.currentTime)
-        .query(query2);
+        .input('TimeChanged', sql.DateTime,await util.currentTime())
+        .query(query4);
+        return {
+            message:"Tạo tài khoản thành công"
+        }
     }catch(err){
         console.log(err);
     }
 }
 
-
-
-const updateUser = async (name, phone, dateOfBirth, NID, NDL, email, FNIDimg, BNIDimg, FNDLimg, BNDLimg)=>{
-    try{
-        let poolConnection = await sql.connect(config);
-        const query = 'UPDATE [dbo].[user] SET name = @Name, phone = @Phone, dateOfBirth = @DateOfBirth, NID = @NID, NDL = @NDL Where email = @Email';
+const changePassword = async(oldPass, newPass, userId)=>{
+    let poolConnection = await sql.connect(config)
+    const query1 =`Select * from [dbo].[user] where id = @userId and password = @oldPass`
+    const result1 = await poolConnection.request()
+    .input('userId', sql.Int, userId)
+    .input('oldPass', sql.NVarChar, oldPass)
+    .query(query1)
+    const user = result1.recordset[0]
+    if(user!=null){
+        const query2 = `Update [dbo].[user] set password = @newPass where id =@userId`
         await poolConnection.request()
-        .input('Name', sql.NVarChar, name)
-        .input('Phone', sql.NVarChar, phone)
-        .input('DateOfBirth', sql.DateTime, dateOfBirth)
-        .input('NID', sql.NVarChar, NID)
-        .input('NDL', sql.NVarChar, NDL)
-        .input('Email', sql.NVarChar, email)
+        .input('userId', sql.Int, userId)
+        .input('newPass', sql.NVarChar, newPass)
+        .query(query2)
+        return{
+            message: "Đổi mật khẩu thành công"
+        }
+    }else{
+        return {
+            message: "Nhập sai mật khẩu cũ"
+        }
+    }
+}
+
+const updateUser = async (name, phone, dateOfBirth, userId)=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query =`Update [dbo].[user] 
+                    set name=@name, phone=@phone, dateOfBirth= @dateOfBirth
+                    where id = @userId` 
+        await poolConnection.request()
+        .input('name', sql.NVarChar, name)
+        .input('phone', sql.NVarChar, phone)
+        .input('dateOfBirth', sql.DateTime, dateOfBirth)
+        .input('userId', sql.Int, userId)
         .query(query);
-        const userId = (await getUserIdByEmail(email)).id
-        addKindImgUser('FNID',FNIDimg, userId);
-        addKindImgUser('BNID',BNIDimg, userId);
-        addKindImgUser('FNDL',FNDLimg, userId);
-        addKindImgUser('BNDL',BNDLimg, userId)
+        return {
+            message: "Cập nhật thông tin cá nhân thành công"
+        }
     }catch(err){
         console.log(err);
+    }
+}
+
+const sendConfirmNID = async (userId, NID, name, dateOfBirth, native, address, dateProvide, provider, imgs)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const user = await getUserById(userId)
+        const query = `Update dbo.NID 
+                        set NID = @NID, name = @name, dateOfBirth=@dateOfBirth,
+                        native = @native, address = @address, dateProvide = @dateProvide, provider = @provider, 
+                        isConfirm = null
+                        where id = @NIDId`
+        await poolConnection.request()
+        .input('NID', sql.NVarChar, NID)
+        .input('name', sql.NVarChar, name)
+        .input('dateOfBirth', sql.DateTime, dateOfBirth)
+        .input('native', sql.NVarChar, native)
+        .input('address', sql.NVarChar, address)
+        .input('dateProvide', sql.DateTime, dateProvide)
+        .input('provider', sql.NVarChar, provider)
+        .input('NIDId', sql.Int, user.NIDId)
+        .query(query)
+        addKindImgUser('NIDF', imgs[0], userId)
+        addKindImgUser('NIDB', imgs[1], userId)
+        return {
+            message: "Gửi yêu cầu xác nhận thành công"
+        }
+    } catch (error) {
+        
+    }
+}
+
+const sendConfirmNDL = async (userId, NDL, name, dateOfBirth, imgbase64)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const user = await getUserById(userId)
+        const query = `Update dbo.NDL 
+                        set NDL = @NDL, name = @name, dateOfBirth=@dateOfBirth,
+                        isConfirm = null
+                        where id = @NDLId`
+        await poolConnection.request()
+        .input('NDL', sql.NVarChar, NDL)
+        .input('name', sql.NVarChar, name)
+        .input('dateOfBirth', sql.DateTime, dateOfBirth)
+        .input('NDLId', sql.Int, user.NDLId)
+        .query(query)
+        addKindImgUser('NDLF', imgbase64[0], userId)
+        return {
+            message: "Gửi yêu cầu xác nhận thành công"
+        }
+    } catch (error) {
+        console.log(error)
     }
 }
 
 const addKindImgUser = async (message, imageUrl, userId) => {
     try {
+        let poolConnection = await sql.connect(config);
         let idImg = '';
-        if (message === 'FNID') {
-            idImg = 'FNID' + userId;
+        if (message === 'NIDF') {
+            idImg = 'NIDF' + userId;
         }
-        if (message === 'BNID') {
-            idImg = 'BNID' + userId;
+        if (message === 'NIDB') {
+            idImg = 'NIDB' + userId;
         }
-        if (message === 'FNDL') {
-            idImg = 'FNDL' + userId;
-        }
-        if (message === 'BNDL') {
-            idImg = 'BNDL' + userId;
+        if (message === 'NDLF') {
+            idImg = 'NDLF' + userId;
         }
 
-        const images = await getImgsUserById(userId);
+        const images = await getImageByUserId(userId);
         const img = images.find(img => img.id === idImg);
 
-        let poolConnection = await sql.connect(config);
         let query = '';
 
         if (img) {
@@ -139,15 +277,15 @@ const addKindImgUser = async (message, imageUrl, userId) => {
 };
 
 
-const deleteUserById = async (Id) =>{
+const deleteUserById = async (userId) =>{
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'Update [dbo].[user] Set isDeleted = 1 Where email = @Email';
+        const query = 'Update [dbo].[user] Set isDeleted = 1 Where id=@userId';
         await poolConnection.request()
-        .input('Email', sql.NVarChar, email)
+        .input('userId', sql.Int, userId)
         .query(query);
     }catch(err){
-
+        
     }
 }
 
@@ -160,50 +298,76 @@ const replyFeedback = async (userId, carId, message, rating)=>{
         .input('CarId', sql.Int, carId)
         .input('Message', sql.NVarChar, message)
         .input('Rating', sql.Int, rating)
-        .input('FeedbackDate', sql.DateTime, util.currentTime)
+        .input('FeedbackDate', sql.DateTime,await util.currentTime())
         .query(query);
+        const ratingCar = await Car.getCarRating(carId)
+        const query2 = `Update dbo.car set rating = @rating where id =@carId`
+        await poolConnection.request()
+        .input('rating', sql.Float, ratingCar)
+        .input('carId', sql.Int, carId)
+        .query(query2)
+        return {
+            message: "gửi Feedback thành công"
+        }
     }catch(err){
-
+        console.log(err)
+    }
+}
+const deleteFeedback = async (feebackId)=>{
+    try {
+        let poolConnection = await sql.connect(config);
+        const query =  `Delete from dbo.feedback where id =@feedbackId`
+        await poolConnection.request()
+        .input('feedbackId', sql.Int, feebackId)
+        .query(query)   
+    } catch (error) {
+        
     }
 }
 const editStatusUser = async (userId, status) =>{
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'Update [dbo].[user] Set status =@Status Where userId = @UserId'
+        const query = 'Update [dbo].[user] Set status =@Status Where id = @UserId'
         await poolConnection.request()
-        .input('Status',sql.Bit, status)
-        .input('UserId',sql.Int,userId)
+        .input('Status', sql.Int, status)
+        .input('UserId',sql.Int, userId)
         .query(query)
+        return{
+            message: "sửa status thành công"
+        }
     }catch(err){
-
+        console.log(err)
     }
 }
 const getNotification = async (userId) => {
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'SELECT * FROM [dbo].[notification] Where userId = @UserId'
+        const query = 'SELECT * FROM [dbo].[notification] Where receivedId = @UserId'
         const result = await poolConnection.request()
         .input('UserId',sql.Int,userId)
         .query(query)
         return result.recordset;
     }catch(err){
-
+        console.log(err)
     }
 }
 
-const sendNotification = async (userId, title, message, dateUp, senderId) =>{
+const sendNotification = async (receivedId, title, message, senderId) =>{
     try{
         let poolConnection = await sql.connect(config);
-        const query = 'Insert to [dbo].[notification] (userId, title, message, dateUp, senderId) Values (@UserId, @Title, @Message, @DateUp, @SenderId))'
+        const query = 'Insert into [dbo].[notification] (receivedId, title, message, dateUp, senderId) Values (@receivedId, @Title, @Message, @DateUp, @SenderId)'
         await poolConnection.request()
-        .input('UserId',sql.Int,userId)
+        .input('receivedId',sql.Int,receivedId)
         .input('Title',sql.NVarChar, title)
         .input('Message', sql.NVarChar, message)
-        .input('DateUp', sql.DateTime, dateUp)
+        .input('DateUp', sql.DateTime, await util.currentTime())
         .input('SenderId', sql.Int, senderId)
         .query(query)
+        return {
+            message : "gửi thông báo thành công"
+        }
     }catch(err){
-        
+        console.log(err)
     }
 }
 
@@ -211,7 +375,7 @@ const sendNotification = async (userId, title, message, dateUp, senderId) =>{
 const autoPromotedMembership = async (userId)=>{
     try{
             const userPoint = (await getUserById(userId)).point
-            const memberShipId = await getMemberShipIdUserCurrent(userId);
+            const memberShipId = (await getMemberShipUserCurrent(userId)).memberShipId;
             const newMemberShipId = memberShipId+1;
             let poolConnection = await sql.connect(config)
             const query1 ='Select pointRequire From [dbo].[memberShip] where id = %id'
@@ -233,20 +397,33 @@ const autoPromotedMembership = async (userId)=>{
 }
 
 
-const getMemberShipIdUserCurrent = async(userId)=>{
+const getMemberShipUserCurrent = async(userId)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'SELECT memberShipId FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
+        const query = 'SELECT * FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
         const result = await poolConnection.request()
         .input('UserId', sql.Int, userId)
         .query(query)
         if (result.recordset.length > 0) {
-            return result.recordset[0].memberShipId;
+            return result.recordset[0];
         } else {
             return null;
         }
     }catch(err){
-        
+        console.log(err)
+    }
+}
+
+const getMemberShipByUserId = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * from [dbo].[memberShip] where id =@id`
+        const result = await poolConnection.request()
+        .input('id', sql.Int, (await getMemberShipUserCurrent(userId)).memberShipId)
+        .query(query)
+        return result.recordset[0]
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -254,7 +431,7 @@ const checkLogin = async (email, password)=>{
     try{
         const users = await getAllUser()
         const user = users.find(user => user.email==email&& user.password==password)
-        if (user != null){
+        if (user != null && user.status == 1 && user.idDeleted != true){
             const payload ={userid: user.id, email: user.email};
             const secretKey = 'carFlex2024'
             const token = jwt.sign(payload, secretKey)
@@ -293,20 +470,87 @@ const createTransaction = async(userId, time, money, payerCode, currency, pointG
 const getTransactionHistory = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config);
-        const query = "Select * From [dbo].[transaction] where userId = @userId"
-        const result = await poolConnection.request()
-        .input('userId', sql.Int, userId)
+        const user = await getUserById(userId)
+        console.log(user)
+        if (user.roleId != 5){
+            const query = "Select * From [dbo].[transaction] where userId = @userId"
+            const result = await poolConnection.request()
+            .input('userId', sql.Int, userId)
+            .query(query)
+            return result.recordset
+        }else{
+            const query ="Select * From [dbo].[transaction]"
+            const result = await poolConnection.request()
+            .query(query)
+            return result.recordset
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const editStatusNID = async (userId, isConfirm)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Update dbo.NID set isConfirm =@isConfirm
+                    where id = (select NIDId 
+                    from [dbo].[user] where id = @userId) `
+        await poolConnection.request()
+        .input("isConfirm", sql.Int, isConfirm)
+        .input("userId", sql.Int, userId)
         .query(query)
-        return result.recordset
+        return{
+            message :"đổi status thành công"
+        }
     } catch (error) {
         
     }
 }
 
 
+const editStatusNDL = async (userId, isConfirm)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Update dbo.NDL set isConfirm = @isConfirm
+                        where id = (select NDLId 
+                        from [dbo].[user] where id = @userId)`
+        await poolConnection.request()
+        .input("isConfirm", sql.Int, isConfirm)
+        .input("userId", sql.Int, userId)
+        .query(query)
+        return{
+            message:"đổi status thành công"
+        }
+    } catch (error) {
+        console.log(error)   
+    }
+}
+const showRequestConfirmNID = async ()=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * from dbo.NID where isConfirm is null`
+        const result = await poolConnection.request()
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        console.log(error)
+    }
+}
+const showRequestConfirmNDL = async ()=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * from dbo.NDL where isConfirm is null`
+        const result = await poolConnection.request()
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports={
     getAllUser,
     getUserById,
+    getUserByEmail,
     createUser,
     updateUser,
     deleteUserById,
@@ -315,10 +559,18 @@ module.exports={
     getNotification,
     sendNotification,
     autoPromotedMembership,
-    getMemberShipIdUserCurrent,
     checkLogin,
-    getImgsUserById,
     createTransaction,
-    getTransactionHistory
+    getTransactionHistory,
+    editStatusNDL,
+    editStatusNID,
+    sendConfirmNDL,
+    sendConfirmNID,
+    getNDLinfoByUserId,
+    getNIDinfoByUserId,
+    changePassword,
+    getMemberShipByUserId,
+    showRequestConfirmNID,
+    showRequestConfirmNDL
 }
 
