@@ -167,11 +167,6 @@ const updateVoucher = async(id, voucherCode, discount, startDate, endDate)=>{
 } 
 module.exports= {
     checkVoucher,
-<<<<<<< HEAD
-    getVoucherByCode
-
-}
-=======
     getVoucherByCode,
     getVoucherById,
     getAllVoucher,
@@ -179,4 +174,3 @@ module.exports= {
     deleteVoucher,
     updateVoucher
 }
->>>>>>> 8d6ec76640ec7843a90cefc0eba9bf6cccfada63
