@@ -1,5 +1,5 @@
 var config = {
-    server: "PI",
+    server: "DESKTOP-M6GQVKG",
     user: "sa",
     password: "12345",
     database: "RentCarPlatform",

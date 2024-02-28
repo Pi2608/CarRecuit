@@ -92,6 +92,13 @@
     justify-content: space-around;
 }
 
+#car-detail>.body>.car-info>.info>.character>.character-container>.char{
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 10px;
+}
+
 #car-detail>.body>.car-info>.info>.character>.char p{
     font-size: 20px;
     font-weight: 500;
@@ -109,9 +116,10 @@
 #car-detail>.body>.car-info>.price{
     display: flex;
     flex-direction: column;
-    background-color: rgb(218, 238, 255);
+    background-color: rgb(249, 252, 255);
     padding: 20px;
     border-radius: var(--border-radius);
+    box-shadow: 0 0 10px #d5d5d5a8;
 }
 
 #car-detail>.body>.car-info>.price h1{
@@ -190,8 +198,6 @@
     font-weight: 600;
     padding: 10px 8px    
 }
-
-
 
 .titl{
     font-size: 24px;

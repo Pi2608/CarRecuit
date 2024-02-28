@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import CarImg1 from "../../../../images/Hyundai-accent-2022-1.jpg"
@@ -10,10 +10,21 @@ import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DiscountIcon from '@mui/icons-material/Discount';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import DirectionsCarFilledOutlinedIcon from '@mui/icons-material/DirectionsCarFilledOutlined';
+import { GiGearStickPattern } from "react-icons/gi";
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import EvStationIcon from '@mui/icons-material/EvStation';
 import "./CarDetail.css";
 
 export default function CarDetail(){
 
+    const [carImages, setCarImages] = useState([]);
+    const [carsSeats, setCarsSeats] = useState(0);
+    const [carGear, setCarGear] = useState('');
+    const [carFuel, setCarFuel] = useState(true);
+    const [carPrize, setCarPrize] = useState('');
+    const [rentDate, setRentDate] = useState([]);
+    const [returnDate, setReturnDate] = useState([]);
     
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -35,35 +46,42 @@ export default function CarDetail(){
                             <p>Hyundai accent 2022</p>
                         </div>
                         <div className="rating">
-                            <StarRoundedIcon style={{color: "rgb(255, 225, 0)"}}/><p>5.0</p><div className="dot"><FiberManualRecordIcon style={{height: "10px"}}/></div><p>Quận 8, Hồ Chí Minh</p>
+                            <StarRoundedIcon style={{color: "rgb(255, 225, 0)"}}/><p>5.0</p><div className="dot"><FiberManualRecordIcon style={{height: "10px", color: "#b2b2b2"}}/></div><p>Quận 8, Hồ Chí Minh</p>
                         </div>
                         <hr/>
                         <div className="character">
                             <div className="titl">
-                                <p>Đặc điểm</p>       
+                                <p style={{fontSize: "1.2em", fontWeight: "500"}}>Đặc điểm</p>       
                             </div>
+                            <br />
                             <div className="character-container">
                                 <div className="char">
-                                    <div className="icon"></div>
-                                    <div className="tittle"><p>Số ghế</p></div>
-                                    <p>5 chỗ</p>
+                                    <div className="icon"><DirectionsCarFilledOutlinedIcon style={{height: "45px", width: "auto"}}/></div>
+                                    <div className="tittle">
+                                        <p>Số ghế</p>
+                                        <p style={{fontSize: "1.5em", fontWeight: "500", lineHeight: "1.7"}}>5 chỗ</p>
+                                    </div>
                                 </div>
                                 <div className="char">
-                                    <div className="icon"></div>
-                                    <div className="tittle"><p>Truyền động</p></div>
-                                    <p>Số sàn</p>
+                                    <div className="icon"><GiGearStickPattern style={{height: "45px", width: "auto"}}/></div>
+                                    <div className="tittle">
+                                        <p>Truyền động</p>
+                                        <p style={{fontSize: "1.5em", fontWeight: "500", lineHeight: "1.7"}}>Số sàn</p>
+                                    </div>
                                 </div>
                                 <div className="char">
-                                    <div className="icon"></div>
-                                    <div className="tittle"><p>Nhiên liệu</p></div>
-                                    <p>Xăng</p>
+                                    <div className="icon"><LocalGasStationIcon style={{height: "45px", width: "auto"}}/></div>
+                                    <div className="tittle">
+                                        <p>Nhiên liệu</p>
+                                        <p style={{fontSize: "1.5em", fontWeight: "500", lineHeight: "1.7"}}>Xăng</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <hr/>
                         <div className="amenities">
-                            <div className="titl">
-                                Các tính năng khác 
+                            <div className="titl" style={{fontSize: "1.2em", fontWeight: "500"}}>
+                                Các tiện nghi khác 
                             </div>
                         </div>
                         <hr/>
