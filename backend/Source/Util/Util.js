@@ -1,5 +1,4 @@
 const firebase = require('firebase')
-const config = require('./firebaseConfig')
 const imageToBase64 = require('image-to-base64')
 const decode = require ('node-base64-image').decode
 const path = require('path');
@@ -9,10 +8,9 @@ const currentTime = async()=>{
 
     date.setHours(date.getHours()+7);
 
-    var dateFormat = date.toISOString().slice(0,19).replace('T',' ');
-    
-    return dateFormat;
+    return date;
 }
+
 const calculatePeriod= async(startDate, endDate)=> {
     const startDateTime = new Date(startDate);
     const endDateTime = new Date(endDate);
@@ -28,12 +26,11 @@ const calculatePeriod= async(startDate, endDate)=> {
 
     return days+':'+hours+':'+minutes+':'+seconds;
 }
+
 const getPositionCar = async () => {
-    firebase.initializeApp(config);
     const rootRef = firebase.database().ref();
     const latRef = rootRef.child('lat');
     const lngRef = rootRef.child('lng');
-
     try {
         const latSnapshot = await latRef.once('value');
         const lngSnapshot = await lngRef.once('value');
@@ -50,6 +47,7 @@ const getPositionCar = async () => {
         throw error;
     }
 }
+
 const encodeImage = async(path)=>{
     try {
         const response = await imageToBase64(path);

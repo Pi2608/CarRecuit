@@ -33,5 +33,6 @@ userRouter.get("/NID/:userId", userController.getNIDinfoByUserId)
 userRouter.get("/NDL/:userId", userController.getNDLinfoByUserId)
 
 userRouter.get("/:email", userController.getUserByEmail)
+userRouter.post("/registerGG", userController.registerByGg)
 
 module.exports = userRouter;
