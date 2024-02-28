@@ -119,71 +119,84 @@ const getRentDetailCurrent = async (userId)=>{
 
 const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
     try {
-        let rent = await getCurrentRent(userId)
-        let poolConnection = await sql.connect(config)
-        const timeBeforeRent = await Util.calculatePeriod(await Util.currentTime, pick_up)
-        const [dayLeft, hourLeft, minuteLeft, secondLeft] = timeBeforeRent.split(":").map(Number)
-        if (dayLeft<3){
-            return {
-                message: "thời gian thuê phải sớm nhận xe 3 ngày"
-            }
-        }
-        if(rent==null){
-            createRent(userId)
-            rent = await getCurrentRent(userId)
-        }
-        let voucherId = null;
-        let voucherDiscount = 0;
-        if(voucherCode != null){
-            const checkVoucher = await voucher.checkVoucher(voucherCode)
-            if(checkVoucher.valid == true){
-                voucherId = checkVoucher.id
-                const Voucher = voucher.getVoucherByCode(voucherCode)
-                voucherDiscount = Voucher.discount
-                const addDate = await Util.currentTime()
-                
-                const query1 =  `Insert into dbo.voucherUser (voucherId, userId, addDate)
-                            values (@voucherId, @userId, @addDate)`
-                await poolConnection.request()
-                .input('voucherId', sql.Int, checkVoucher.id)
-                .input('userId', sql.Int, userId)
-                .input('addDate', sql.DateTime, addDate)
-                .input(query1)
-            }else{
+        const NID = await user.getNIDinfoByUserId(userId)
+        const NDL = await user.getNDLinfoByUserId(userId)
+
+        if(NID.isConfirm == true && NDL.isConfirm == true){ // NID và NDL phải được xác minh
+            let rent = await getCurrentRent(userId)
+            let poolConnection = await sql.connect(config)
+            const timeBeforeRent = await Util.calculatePeriod(await Util.currentTime, pick_up) // khoảng thời gian giữa hiện tại và tg thuê
+            const [dayLeft, hourLeft, minuteLeft, secondLeft] = timeBeforeRent.split(":").map(Number)
+            if (dayLeft<3){// thời gian thuê phải ngắn hơn 3 ngày
                 return {
-                    message: checkVoucher.message
+                    message: "thời gian thuê phải sớm nhận xe 3 ngày"
                 }
             }
+            if(rent==null){ // chưa có rent thì tạo mới
+                createRent(userId)
+                rent = await getCurrentRent(userId)
+            }
+            // check xem có thuê trùng xe không
+            const rentDetails = await getRentDetailCurrent(userId)
+            for (let rentDetail of rentDetails){
+                
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////
+
+            let voucherId = null;
+            let voucherDiscount = 0;
+            if(voucherCode != null){
+                const checkVoucher = await voucher.checkVoucher(voucherCode) // check voucher
+                if(checkVoucher.valid == true){
+                    voucherId = checkVoucher.id
+                    const Voucher = voucher.getVoucherByCode(voucherCode)
+                    voucherDiscount = Voucher.discount
+                    const addDate = await Util.currentTime()
+                    
+                    const query1 =  `Insert into dbo.voucherUser (voucherId, userId, addDate)
+                                values (@voucherId, @userId, @addDate)`
+                    await poolConnection.request()
+                    .input('voucherId', sql.Int, checkVoucher.id)
+                    .input('userId', sql.Int, userId)
+                    .input('addDate', sql.DateTime, addDate)
+                    .input(query1)
+                }else{
+                    return {
+                        message: checkVoucher.message
+                    }
+                }
+            }
+            const memberShip = await user.getMemberShipByUserId(userId) // lấy membership hiện tại
+            let rentalDay
+            const [rentDay, rentHour, rentMinute, rentSecond] = (await Util.calculatePeriod(pick_up, drop_off)).split(":").map(Number) // khoảng tg giữa ngày thuê và ngày trả
+            if(rentHour >=1){
+                rentalDay = rentDay+1
+            }else{
+                rentalDay = rentDay
+            }        
+            const Car = await car.getCarById(carId)
+            const discountCar = Car.discount
+            const priceCar = Car.price
+            const final = priceCar*(1-memberShip.discount)*(1-discountCar)*(1-voucherDiscount)*rentalDay // tiền phải trả
+            // thêm rentDetail
+            const query2 =  `Insert into dbo.rentDetail (carId, pick_up, drop_off, rentId, voucherId, status, total)
+                                values (@carId, @pick_up, @drop_off, @rentId, @voucherId, 0, @final)`
+            await poolConnection.request()
+            .input('carId', sql.Int, carId)
+            .input('pick_up', sql.DateTime, pick_up)
+            .input('drop_off', sql.DateTime, drop_off)
+            .input('rentId', sql.Int, rent.id)
+            .input('voucherId', sql.Int, voucherId)
+            .input('final', sql.Float, final)
+            .query(query2)
+            // sủa tổng giá trên rent
+            const query3 = `Update dbo.rent set total = total + @final
+                            Where id = @id`
+            await poolConnection.request()
+            .input('final', sql.Float, final)
+            .input('id', sql.Int, rent.id)
+            .query(query3)
         }
-        let rentalDay
-        const [rentDay, rentHour, rentMinute, rentSecond] = (await Util.calculatePeriod(pick_up, drop_off)).split(":").map(Number)
-        if(rentHour >=1){
-            rentalDay = rentDay+1
-        }else{
-            rentalDay = rentDay
-        }        
-        const Car = await car.getCarById(carId)
-        const discountCar = Car.discount
-        const priceCar = Car.price
-        const final = priceCar*(1-discountCar)*(1-voucherDiscount)*rentalDay
-        
-        const query2 =  `Insert into dbo.rentDetail (carId, pick_up, drop_off, rentId, voucherId, status, total)
-                            values (@carId, @pick_up, @drop_off, @rentId, @voucherId, 0, @final)`
-        await poolConnection.request()
-        .input('carId', sql.Int, carId)
-        .input('pick_up', sql.DateTime, pick_up)
-        .input('drop_off', sql.DateTime, drop_off)
-        .input('rentId', sql.Int, rent.id)
-        .input('voucherId', sql.Int, voucherId)
-        .input('final', sql.Float, final)
-        .query(query2)
-        
-        const query3 = `Update dbo.rent set total = total + @final
-                        Where id = @id`
-        await poolConnection.request()
-        .input('final', sql.Float, final)
-        .input('id', sql.Int, rent.id)
-        .query(query3)
     } catch (error) {
         
     }
