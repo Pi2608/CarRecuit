@@ -16,13 +16,13 @@ const countRentalCar = async (carId)=>{
                             dbo.rent.paymentId is not null and 
                             dbo.rentDetail.carId = @carId
                         group by 
-                            bo.rentDetail.carId`
+                            dbo.rentDetail.carId`
         const result = await poolConnection.request()
         .input('carId', sql.Int, carId)
         .query(query)
-        return result.recordset
+        return result.recordset[0]
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
@@ -36,7 +36,7 @@ const carRentalSchedule = async(carId)=>{
         .query(query)
         return result.recordset
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
@@ -61,7 +61,7 @@ const statisticRentalByYear = async (year)=>{
         .query(query)
         return result.recordset
     }catch(error){
-
+        console.log(error)
     }
 }
 
@@ -83,20 +83,23 @@ const createRent = async (userId)=>{
 const getCurrentRent = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query = `Select Max(id) as id, total from dbo.rent
-                        Where userId = @userId
-                        And paymentId is null`
+        const query = `SELECT MAX(id) as id, total 
+                        FROM [dbo].[rent] 
+                        WHERE userId = @userId 
+                        AND paymentId IS NULL
+                        GROUP BY total`
         const result = await poolConnection.request()
         .input('userId', sql.Int, userId)
         .query(query)
         return result.recordset[0]
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
 const getRentDetailCurrent = async (userId)=>{
     try {
+        console.log("hi")
         const rent = await getCurrentRent(userId)
         if(rent != null){
             let poolConnection = await sql.connect(config)
@@ -107,10 +110,10 @@ const getRentDetailCurrent = async (userId)=>{
             .query(query)
             return result.recordset
         }else{
-            return null
+            return []
         }
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
@@ -146,6 +149,10 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
                 .input('userId', sql.Int, userId)
                 .input('addDate', sql.DateTime, addDate)
                 .input(query1)
+            }else{
+                return {
+                    message: checkVoucher.message
+                }
             }
         }
         let rentalDay
@@ -498,6 +505,7 @@ const cancelRentDetailByOwner = async(notificationId, ownerId)=>{
 module.exports = {
     countRentalCar,
     carRentalSchedule,
+    getRentDetailCurrent,
     statisticRentalByYear,
     addRentDetail,
     deleteRentDetail,
