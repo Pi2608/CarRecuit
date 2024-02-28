@@ -7,5 +7,6 @@ rentRouter.get('/counting/:carId', rentController.getCountRentalCar)
 rentRouter.get('/schedule/:carId', rentController.getCarRentalSchedule)
 rentRouter.post('/statistic', rentController.statisticRentalByYear)
 rentRouter.get('/detail/:userId', rentController.getRentDetailCurrent)
+rentRouter.get('/')
 
 module.exports= rentRouter

@@ -30,11 +30,19 @@ const carRentalSchedule = async(carId)=>{
     // thêm điều kiện gì không ?
     try {
         let poolConnection = await sql.connect(config)
-        const query ='Select pick_up, drop_off from dbo.rentDetail where carId = @carId'
+        const query ='Select pick_up, drop_off from dbo.rentDetail where carId = @carId and isAccepted = 1'
         const result = await poolConnection.request()
         .input("carId", sql.Int, carId)
         .query(query)
-        return result.recordset
+        const schedules = result.recordset
+        let returnResult = []
+        const currentTime =await Util.currentTime()
+        for(const schedule of schedules){
+            if(await Util.compareDates(currentTime, schedule.drop_off)){
+                returnResult.push(schedule)
+            }
+        }
+        return returnResult
     } catch (error) {
         console.log(error)
     }
@@ -99,7 +107,6 @@ const getCurrentRent = async(userId)=>{
 
 const getRentDetailCurrent = async (userId)=>{
     try {
-        console.log("hi")
         const rent = await getCurrentRent(userId)
         if(rent != null){
             let poolConnection = await sql.connect(config)
@@ -136,12 +143,6 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
                 createRent(userId)
                 rent = await getCurrentRent(userId)
             }
-            // check xem có thuê trùng xe không
-            const rentDetails = await getRentDetailCurrent(userId)
-            for (let rentDetail of rentDetails){
-                
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////
 
             let voucherId = null;
             let voucherDiscount = 0;
