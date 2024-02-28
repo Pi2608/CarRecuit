@@ -10,6 +10,7 @@ const voucherRouter = require('./Source/Routers/VoucherRouter')
 const amenitiesRouter = require('./Source/Routers/AmenitiesRouter')
 const locationRouter = require('./Source/Routers/LocationRouter')
 const carRouter = require('./Source/Routers/CarRouter')
+const rentRouter = require('./Source/Routers/RentRouter')
 const app = express()
 
 const port = 4000
@@ -21,6 +22,7 @@ app.use("/voucher", voucherRouter)
 app.use("/amenities", amenitiesRouter)
 app.use("/location", locationRouter)
 app.use("/car", carRouter)
+app.use("/rent", rentRouter)
 app.use("/img", express.static('Source/photos'))
 app.listen(port, ()=>{
     console.log("Server is running on port "+ port)
