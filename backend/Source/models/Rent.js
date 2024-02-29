@@ -145,7 +145,7 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
 
             let voucherId = null;
             let voucherDiscount = 0;
-            if(!voucherCode.length==0){
+            if(!(voucherCode===undefined)){
                 const checkVoucher = await voucher.checkVoucher(userId, voucherCode) // check voucher
                 if(checkVoucher.valid == true){
                     voucherId = checkVoucher.id
@@ -204,7 +204,7 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
             }
         }
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
@@ -347,12 +347,17 @@ const confirmPayment = async (userId)=>{
         console.log(error)
     }
 }
-const acceptRentDetail = async(notificationId, ownerId)=>{
+const acceptRentDetail = async(notificationId)=>{
     //chuyển status
     //thêm tiền vào ví của chủ xe
     //gửi notification cho người thuê
     try {
         let poolConnection =  await sql.connect(config)
+        const query =  `Select * from dbo.notification where id = @notificationId`
+        const result = await poolConnection.request()
+        .input('notificationId', sql.Int, notificationId)
+        .query(query)
+        const ownerId = (result.recordset[0]).receivedId
         const query1 = `Select * from dbo.rentDetail 
                         where notificationId = @notificationId`
         const result1 = await poolConnection.request()
@@ -404,22 +409,30 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
     // chuyển status
     // gửi notificate cho owner và user
     // hoàn tiền cho user
+    // - tiền trong ví của owner
     //-point
     try {
         let poolConnection =  await sql.connect(config)
-        const query1 = `Update from dbo.rentDetail set isAccepted = 0
+        const query1 = `Update dbo.rentDetail set status = 0
                         where id =@rentDetailId`
         await poolConnection.request()
         .input('rentDetailId', rentDetailId)
         .query(query1)
         
         const query3 = `Select * from dbo.rentDetail 
-                        where id = rentDetailId`
+                        where id = @rentDetailId`
         const result3 = await poolConnection.request()
         .input('rentDetailId', sql.Int, rentDetailId)
         .query(query3)
         const rentDetail = result3.recordset[0]
+        const query7 = `Select ownerId from dbo.car 
+                        where id = @carId`
+        const result7 =await poolConnection.request()
+        .input("carId", sql.Int, rentDetail.carId)
+        .query(query7)
+        const Car = result7.recordset[0]
         const [dayLeft, hourLeft, minuteLeft, secondLeft] = (await Util.calculatePeriod(await Util.currentTime(), rentDetail.pick_up)).split(":").map(Number)
+        let refund
         if(dayLeft>=7){
             refund = rentDetail.total*1
         }
@@ -434,37 +447,38 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         let dateUp
         let senderId
         if (refund>0){
-            const query4 =`Update dbo.user set wallet = wallet + @refund
+            const query4 =`Update [dbo].[user] set wallet = wallet + @refund
                             where id = @userId`
             await poolConnection.request()
+            .input("refund", sql.Float, refund)
             .input("userId", sql.Int, userId)
             .query(query4)
+            if (rentDetail.isAccepted == true){
+                const query5 =`Update [dbo].[user] set wallet = wallet - @refund
+                            where id = @ownerId`
+                await poolConnection.request()
+                .input("refund", sql.Float, refund*0.8)
+                .input("ownerId", sql.Int, Car.ownerId)
+                .query(query5)
+            }
             receivedId = userId
-            title = ""
-            message = "" 
+            title = "Thông báo hoàn tiền"
+            message = "Bạn đã được Hoàn lại " + refund + " vào trong ví" 
             dateUp =await Util.currentTime()
-            senderId = 1
-            const query5 = `Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
-                            values(@receivedId, @senderId, @title, @message, @dateUp)`
+            const query6 = `Insert into dbo.notification (receivedId, title, message, dateUp)
+                            values(@receivedId, @title, @message, @dateUp)`
             await poolConnection.request()
             .input("receivedId", sql.Int, receivedId)
-            .input("senderId", sql.Int, senderId)
             .input("title", sql.NVarChar, title)
             .input("message", sql.NVarChar, message)
             .input("dateUp", sql.DateTime, dateUp)
-            .query(query5)
+            .query(query6)
         }
-        const query6 = `Select ownerId from dbo.car 
-                        where id = @carId`
-        const result6 =await poolConnection.request()
-        .input("carId", sql.NVarChar, rentDetail.carId)
-        .query(query6)
-        const car = result6.recordset[0]
-        receivedId = car.ownerId
-        title=""
-        message=""
+        receivedId = Car.ownerId
+        title="Hủy chuyến xe từ " + (await user.getUserById(userId)).name
+        message="Chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)).name + " vào ngày " +  rentDetail.pick_up + " đã bị hủy."
         senderId = userId
-        const query7 =`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
+        const query8 =`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
                         values(@receivedId, @senderId, @title, @message, @dateUp)`
         await poolConnection.request()
         .input("receivedId", sql.Int, receivedId)
@@ -472,37 +486,45 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         .input("title", sql.NVarChar, title)
         .input("message", sql.NVarChar, message)
         .input("dateUp", sql.DateTime, dateUp)
-        .query(query7)
+        .query(query8)
         const minusPoint = Math.floor();
-        const query8 = `Update dbo.user set point = point - @minusPoint
+        const query9 = `Update [dbo].[user] set point = point - @minusPoint
                         where id = @userId`
         await poolConnection.request()
         .input("minusPoint", sql.Int, minusPoint)
         .input("userId", sql.Int, userId)
-        .query(query8)   
+        .query(query9)
+        return{
+            message: "Hủy đơn thuê thành công"
+        }   
     } catch (error) {
-        
+        console.log(error)
     }
 }
-const cancelRentDetailByOwner = async(notificationId, ownerId)=>{
+const cancelRentDetailByOwner = async(notificationId)=>{
     // chuyển status
     // refund tiền cho user
     // gửi thông báo
     try {
         let poolConnection =  await sql.connect(config)
+        const query =  `Select * from dbo.notification where id = @notificationId`
+        const result = await poolConnection.request()
+        .input('notificationId', sql.Int, notificationId)
+        .query(query)
+        const ownerId = (result.recordset[0]).receivedId
         const query1 = `Select * from dbo.rentDetail 
                         where notificationId = @notificationId`
         const result1 = await poolConnection.request()
         .input('notificationId', sql.Int, notificationId)
         .query(query1)
         const rentDetail = result1.recordset[0]
-        const query2 = `Update from dbo.rentDetail set isAccepted = 0
+        const query2 = `Update dbo.rentDetail set isAccepted = 0
                         where id =@rentDetailId`
         await poolConnection.request()
         .input('rentDetailId', rentDetail.id)
         .query(query2)
         let refund = rentDetail.total
-        const query3=`Update from dbo.user 
+        const query3=`Update [dbo].[user] 
                     set wallet = wallet + @refund
                     where id = (Select userId from dbo.rent where id=@rentId)`
         await poolConnection.request()
@@ -514,10 +536,10 @@ const cancelRentDetailByOwner = async(notificationId, ownerId)=>{
         const result4 = await poolConnection.request()
         .input("rentId", sql.Int, rentDetail.rentId)
         .query(query4)
-        const rent = result4.recordset
+        const rent = result4.recordset[0]
         let receivedId = rent.userId
-        let title = ""
-        let message ="" 
+        let title = "Chủ xe đã từ chối cho thuê xe"
+        let message ="Hủy thuê chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)) + " vào ngày " + rentDetail.pick_up
         let dateUp = await Util.currentTime()
         let senderId = ownerId
         const query5=`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
@@ -530,7 +552,7 @@ const cancelRentDetailByOwner = async(notificationId, ownerId)=>{
         .input("dateUp", sql.DateTime, dateUp)
         .query(query5)
         return{
-            message: "thuê thành công"
+            message: "Từ chối đơn hàng thành công"
         }
     } catch (error) {
         console.log(error)

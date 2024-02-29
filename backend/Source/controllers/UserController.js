@@ -1,6 +1,7 @@
 const User = require("../models/User")
 const multer = require("multer")
-const Uitl = require("../Util/Util")
+const Uitl = require("../Util/Util");
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -205,7 +206,7 @@ const checkLogin = async (req, res)=>{
         const response = await User.checkLogin(email, password)
         res.json(response)
     } catch (error) {
-        
+        console.log(error)
     }
 }
 const getTransactionHistory = async(req, res)=>{
@@ -262,6 +263,58 @@ const registerByGg = async(req, res)=>{
         
     }
 }
+
+const getUserByToken = async(req,res)=>{
+    try {
+        const token = req.query.token
+        const response = await User.getUserByToken(token)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const checkCustomer = async(req,res,next)=>{
+    try {
+        const userId = req.query.userId
+        const role = (await User.getRoleByUserId(userId)).name
+        console.log(role)
+        if(role === 'Customer'){
+            next();
+        }else{
+            res.json("bạn không đủ thẩm quyền")
+        }
+    } catch (error) {
+        
+    }
+}
+const checkStaff = async(req,res,next)=>{
+    try {
+        const userId = req.query.userId
+        const role = (await User.getRoleByUserId(userId)).name
+        console.log(role)
+        if(role === 'Staff'){
+            next();
+        }else{
+            res.json("bạn không đủ thẩm quyền")
+        }
+    } catch (error) {
+        
+    }
+}
+const checkAdmin = async(req,res,next)=>{
+    try {
+        const userId = req.query.userId
+        const role = (await User.getRoleByUserId(userId)).name
+        console.log(role)
+        if(role === 'System Administator'){
+            next();
+        }else{
+            res.json("bạn không đủ thẩm quyền")
+        }
+    } catch (error) {
+        
+    }
+}
 module.exports={
     getAllUser,
     getUserByEmail,
@@ -285,5 +338,9 @@ module.exports={
     editStatusNDL,
     showRequestConfirmNDL,
     showRequestConfirmNID,
-    registerByGg
+    registerByGg,
+    getUserByToken,
+    checkCustomer,
+    checkStaff,
+    checkAdmin
 }

@@ -449,16 +449,15 @@ const checkLogin = async (email, password)=>{
     }
 }
 
-const createTransaction = async(userId, time, money, payerCode, currency, pointGet, paymentMethod)=>{
+const createTransaction = async(userId, money, payerCode, pointGet, paymentMethod)=>{
     try {
         let poolConnection = await sql.connect(config);
-        const query = "Insert into [dbo].[transaction] (userId, time, money, payerCode, currency, pointGet, paymentMethod) values (@userId, @time, @money, @payerCode, @currency, @pointGet, @paymentMethod)"
+        const query = "Insert into [dbo].[transaction] (userId, time, money, payerCode, pointGet, paymentMethod) values (@userId, @time, @money, @payerCode, @pointGet, @paymentMethod)"
         await poolConnection.request()
         .input('userId', sql.Int, userId)
-        .input('time', sql.DateTime, time)
+        .input('time', sql.DateTime, await util.currentTime())
         .input('money', sql.Float, money)
         .input('payerCode', sql.NVarChar, payerCode)
-        .input('currency', sql.NVarChar, currency)
         .input('pointGet', sql.Int, pointGet)
         .input('paymentMethod', sql.NVarChar, paymentMethod)
         .query(query)
@@ -559,6 +558,27 @@ const registerByGg = async (email)=>{
         console.log(error)   
     }
 }
+
+const getUserByToken = async (token)=>{
+    try {
+        return jwt.verify(token, 'carFlex2024')
+    } catch (error) {
+        
+    }
+}
+const getRoleByUserId = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select * from dbo.role where id = (Select roleId from [dbo].[user]
+                        where id = @userId)`
+        const result = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query1)
+        return result.recordset[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports={
     getAllUser,
     getUserById,
@@ -584,6 +604,8 @@ module.exports={
     getMemberShipByUserId,
     showRequestConfirmNID,
     showRequestConfirmNDL,
-    registerByGg
+    registerByGg,
+    getUserByToken,
+    getRoleByUserId
 }
 

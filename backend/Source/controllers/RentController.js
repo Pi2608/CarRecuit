@@ -72,8 +72,7 @@ const confirmPayment = async (req,res)=>{
 const acceptRentDetail = async(req,res)=>{
     try {   
         const notificationId = req.query.notificationId
-        const ownerId = req.query.ownerId
-        const response = await rent.acceptRentDetail(notificationId, ownerId)
+        const response = await rent.acceptRentDetail(notificationId)
         res.json(response)
     } catch (error) {
         
@@ -94,13 +93,14 @@ const cancelRentDetailByUser = async(req,res)=>{
 const cancelRentDetailByOwner = async(req, res)=>{
     try {
         const notificationId = req.query.notificationId
-        const ownerId = req.query.notificationId
-        const response = await rent.cancelRentDetailByOwner(notificationId, ownerId)
+        const response = await rent.cancelRentDetailByOwner(notificationId)
         res.json(response)
     } catch (error) {
         
     }
 }
+
+
 
 module.exports= {
     getCountRentalCar,

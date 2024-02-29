@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors')
+const paypal = require('paypal-rest-sdk');
 const firebase = require('firebase');
-const config = require('./Source/Util/firebaseConfig')
-firebase.initializeApp(config);
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+
 
 const userRouter = require('./Source/Routers/UserRouter')
 const membershipRouter = require('./Source/Routers/MembershipRouter')
@@ -12,9 +12,18 @@ const amenitiesRouter = require('./Source/Routers/AmenitiesRouter')
 const locationRouter = require('./Source/Routers/LocationRouter')
 const carRouter = require('./Source/Routers/CarRouter')
 const rentRouter = require('./Source/Routers/RentRouter')
-const app = express()
+const transactionRouter = require('./Source/Routers/TransactionRouter')
 
+const firebaseConfig = require('./Source/config/firebaseConfig')
+const paypalConfig = require('./Source/config/paypalConfig')
+
+
+const app = express()
 const port = 4000
+
+firebase.initializeApp(firebaseConfig);
+paypal.configure(paypalConfig);
+
 app.use(cors())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
@@ -25,7 +34,9 @@ app.use("/amenities", amenitiesRouter)
 app.use("/location", locationRouter)
 app.use("/car", carRouter)
 app.use("/rent", rentRouter)
+app.use("/transaction", transactionRouter)
 app.use("/img", express.static('Source/photos'))
+
 app.listen(port, ()=>{
     console.log("Server is running on port "+ port)
 })
