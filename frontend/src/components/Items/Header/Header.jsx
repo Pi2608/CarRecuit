@@ -1,18 +1,19 @@
-import React from "react";
+import {useState} from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Header.css";
 import LoginForm from "../../features/LoginForm/LoginForm";
 import Popup from "reactjs-popup";
 
 function Header() {
-
-    const navigate = useNavigate()
-
-    const [isTriggerClicked, setIsTriggerClicked] = useState(false);
+     const [isTriggerClicked, setIsTriggerClicked] = useState(false);
 
     const handleLogin = () => {
         setIsTriggerClicked(true)
     }
+
+    const navigate = useNavigate()
+
+   
 
     return(
         <div id="header">
