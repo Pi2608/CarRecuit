@@ -79,9 +79,38 @@ const acceptRentDetail = async(req,res)=>{
         
     }
 }
+
+const cancelRentDetailByUser = async(req,res)=>{
+    try {
+        const rentDetailId = req.query.rentDetailId
+        const userId = req.query.userId
+        const response = await rent.cancelRentDetailByUser(rentDetailId, userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const cancelRentDetailByOwner = async(req, res)=>{
+    try {
+        const notificationId = req.query.notificationId
+        const ownerId = req.query.notificationId
+        const response = await rent.cancelRentDetailByOwner(notificationId, ownerId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
 module.exports= {
     getCountRentalCar,
     getCarRentalSchedule,
     statisticRentalByYear,
-    getRentDetailCurrent
+    getRentDetailCurrent,
+    addRentDetail,
+    deleteRentDetail,
+    confirmPayment,
+    acceptRentDetail,
+    cancelRentDetailByOwner,
+    cancelRentDetailByUser
 }

@@ -90,6 +90,7 @@ const addCarRental = async (req, res)=>{
         const discount = req.body.discount
         const description = req.body.description
         const seats = req.body.seats
+        console.log(seats)
         const typeOfFuels = req.body.typeOfFuels
         const ldescription = req.body.ldescription
         const imagePaths = req.files.map(file=>file.path);
@@ -102,7 +103,7 @@ const addCarRental = async (req, res)=>{
                 console.error('Error encoding image:', error);
             }
         }
-        const response = await car.addCarRental(ownerId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, ldescription, imgs)
+        const response = await car.addCarRental(ownerId, name, carTypeId, CLP, price, description, seats, typeOfFuels, ldescription, imgs)
         res.json(response)
     } catch (error) {
         

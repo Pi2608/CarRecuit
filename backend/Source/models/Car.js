@@ -180,7 +180,7 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
 const addCarRental = async (ownerId, name, carTypeId, CLP, price, description, seats, typeOfFuels, ldescription, imgs)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Insert into [dbo].[car] (ownerId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, status, isDeleted) Values (@OwnerId, @name, @CarTypeId, @CLP, @Price, 0, @Description, @seats, @typeOfFuels, 1, 0)';
+        const query1 = 'Insert into [dbo].[car] (ownerId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, status, isDeleted) Values (@OwnerId, @name, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @typeOfFuels, 1, 0)';
         await poolConnection.request()
         .input('OwnerId', sql.Int, ownerId)
         .input('name', sql.NVarChar, name)
@@ -192,7 +192,7 @@ const addCarRental = async (ownerId, name, carTypeId, CLP, price, description, s
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
         .query(query1);
         const query2 =`Select MAX(id) as id from dbo.car`
-        const result2= await poolConnection.request
+        const result2= await poolConnection.request()
         .query(query2)
         const car = result2.recordset[0]
         console.log(car)
@@ -319,9 +319,23 @@ const getCarType = async(carBrandId)=>{
     }
 }
 
+const getCarTypeByTypeId = async(typeId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = "Select * from dbo.carType where id = @typeId"
+        const result = await poolConnection.request()
+        .input('typeId', sql.Int, typeId)
+        .query(query)
+        return result.recordset[0]
+    } catch (error) {
+        
+    }
+}
+
 
 module.exports={
     getAllCarsInUse,
+    getCarTypeByTypeId,
     // getCarsByName,
     getImgsCarById,
     getCarsByPage,

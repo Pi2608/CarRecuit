@@ -14,7 +14,6 @@ const currentTime = async()=>{
 const calculatePeriod= async(startDate, endDate)=> {
     const startDateTime = new Date(startDate);
     const endDateTime = new Date(endDate);
-
     // Tính toán số milliseconds giữa hai thời điểm
     const timeDifference = Math.abs(endDateTime - startDateTime);
 
