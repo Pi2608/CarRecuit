@@ -6,7 +6,7 @@ const util = require("../Util/Util");
 const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Select * From [dbo].[car] Where status = 1'
+        const query1 = 'Select * From [dbo].[car] Where status = 1 and isDeleted = 0'
         const result = await poolConnection.request().query(query1);
         const cars= result.recordset;
         for (let car of cars){
@@ -177,25 +177,24 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     }
 }
 
-const addCarRental = async (ownerId, name, carTypeId, CLP, price, description, seats, typeOfFuels, ldescription, imgs)=>{
+const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, year, typeOfFuels, ldescription, imgs)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Insert into [dbo].[car] (ownerId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, status, isDeleted) Values (@OwnerId, @name, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @typeOfFuels, 1, 0)';
+        const query1 = 'Insert into [dbo].[car] (ownerId, carTypeId, CLP, price, discount, description, seats, year, typeOfFuels, status, isDeleted) Values (@OwnerId, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @year, @typeOfFuels, 1, 0)';
         await poolConnection.request()
         .input('OwnerId', sql.Int, ownerId)
-        .input('name', sql.NVarChar, name)
         .input('CarTypeId', sql.Int, carTypeId)
         .input('CLP', sql.NVarChar, CLP)
         .input('Price', sql.Float, price)
         .input('Description', sql.NVarChar, description)
         .input('Seats', sql.Int, seats)
+        .input('year', sql.Int, year)
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
         .query(query1);
         const query2 =`Select MAX(id) as id from dbo.car`
         const result2= await poolConnection.request()
         .query(query2)
         const car = result2.recordset[0]
-        console.log(car)
         const query3 = 'Insert into dbo.location (carId, typeLocationId, description) values (@carId, 1, @ldescription)'
         await poolConnection.request()
         .input('carId', sql.Int, car.id)
@@ -223,19 +222,19 @@ const addCarRental = async (ownerId, name, carTypeId, CLP, price, description, s
     }
 }
 
-const updateCarRental = async (carId, name ,carTypeId, CLP, price, discount , description, seats, typeOfFuels, status, ldescription, imgs) =>{
+const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, year, typeOfFuels, status, ldescription, imgs) =>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Update [dbo].[car] set carTypeId = @CarTypeId, name=@name ,CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
+        const query1 = 'Update [dbo].[car] set carTypeId = @CarTypeId, CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, year = @year, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
         await poolConnection.request()
         .input('CarId', sql.Int, carId)
         .input('CarTypeId', sql.Int, carTypeId)
-        .input('name', sql.NVarChar, name)
         .input('CLP', sql.NVarChar, CLP)
         .input('Price', sql.Float, price)
         .input('Discount', sql.Float, discount)
         .input('Description', sql.NVarChar, description)
         .input('Seats', sql.Int, seats)
+        .input('year', sql.Int, year)
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
         .input('Status', sql.Int, status)
         .query(query1);
