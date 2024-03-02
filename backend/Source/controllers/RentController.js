@@ -100,6 +100,25 @@ const cancelRentDetailByOwner = async(req, res)=>{
     }
 }
 
+const getRentAlreadyPayment = async(req,res)=>{
+    try {
+        const userId = req.params.userId
+        const response = await rent.getRentAlreadyPayment(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const getRentDetailByRentId = async(req,res)=>{
+    try {
+        const rentId = req.params.rentId
+        const response = await rent.getRentDetailByRentId(rentId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 
 
 module.exports= {
@@ -112,5 +131,7 @@ module.exports= {
     confirmPayment,
     acceptRentDetail,
     cancelRentDetailByOwner,
-    cancelRentDetailByUser
+    cancelRentDetailByUser,
+    getRentAlreadyPayment,
+    getRentDetailByRentId
 }

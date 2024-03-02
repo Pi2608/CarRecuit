@@ -2,6 +2,7 @@ const firebase = require('firebase')
 const imageToBase64 = require('image-to-base64')
 const decode = require ('node-base64-image').decode
 const path = require('path');
+const fs = require('fs').promises
 
 const currentTime = async()=>{
     var date = new Date();
@@ -67,6 +68,18 @@ const decodeImage = async (base64Code, name) => {
     }
 };
 
+const deleteAllImages = async() =>{
+    const projectPath = path.resolve();
+    const photos = projectPath + '/Source/photos/'
+    const files = await fs.readdir(photos);
+        for (const file of files) {
+            if (file !== 'note.txt') {
+                const filePath = path.join(photos, file);
+                await fs.unlink(filePath);
+            }
+        }
+}
+
 const generateRandomString = async(length)=> {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -95,5 +108,6 @@ module.exports={
     decodeImage,
     generateRandomString,
     calculatePeriod,
-    compareDates
+    compareDates,
+    deleteAllImages
 }

@@ -10,12 +10,12 @@ const getAllCarsInUse= async()=>{
         const result = await poolConnection.request().query(query1);
         const cars= result.recordset;
         for (let car of cars){
-            const query2 = `Select url from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
             const result2 = await poolConnection.request()
             .input('carId', sql.Int, car.id)
             .query(query2)
-            const {img} = result2.recordset
-            car.imgUrl = img 
+            const img = result2.recordset[0]
+            car.imgUrl = await util.decodeImage(img.url, img.id)
         }
         return cars
     }catch(err){
@@ -32,12 +32,13 @@ const getAllCarsOfOwner = async(ownnerId)=>{
         .query(query1);
         const cars= result.recordset;
         for (let car of cars){
-            const query2 = `Select url from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
             const result2 = await poolConnection.request()
             .input('carId', sql.Int, car.id)
             .query(query2)
-            const {img} = result2.recordset
-            car.imgUrl = img 
+            const img = result2.recordset[0]
+            console.log(img)
+            car.imgUrl = await util.decodeImage(img.url, img.id)
         }
         return cars
     }catch(err){

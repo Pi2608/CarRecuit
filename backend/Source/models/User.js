@@ -378,18 +378,24 @@ const autoPromotedMembership = async (userId)=>{
             const memberShipId = (await getMemberShipUserCurrent(userId)).memberShipId;
             const newMemberShipId = memberShipId+1;
             let poolConnection = await sql.connect(config)
-            const query1 ='Select pointRequire From [dbo].[memberShip] where id = %id'
+            const query1 ='Select pointRequire From [dbo].[memberShip] where id = @id'
             const result = await poolConnection.request()
             .input('id', sql.Int, newMemberShipId)
             .query(query1)
-            const pointRequire = result.recordset.pointRequire
+            const pointRequire = result.recordset[0].pointRequire
             if(userPoint>=pointRequire){
                 const query2 = 'Insert into [dbo].[memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
                 await poolConnection.request()
                 .input('UserId', sql.Int, userId)
                 .input('MemberShipId', sql.Int, newMemberShipId)
-                .input('TimeChanged', sql.DateTime, util.currentTime)
+                .input('TimeChanged', sql.DateTime,await util.currentTime())
                 .query(query2)
+                return{
+                    message: "cập nhật thành công"
+                }
+            }
+            return{
+                message:"chưa đủ điểm"
             }
     }catch(err){
         console.log(err)
@@ -476,7 +482,7 @@ const getTransactionHistory = async(userId)=>{
         let poolConnection = await sql.connect(config);
         const user = await getUserById(userId)
         console.log(user)
-        if (user.roleId != 5){
+        if (user.roleId != 3){
             const query = "Select * From [dbo].[transaction] where userId = @userId"
             const result = await poolConnection.request()
             .input('userId', sql.Int, userId)
@@ -490,17 +496,6 @@ const getTransactionHistory = async(userId)=>{
         }
     } catch (error) {
         console.log(error)
-    }
-}
-const getAllTransaction = async()=>{
-    try {
-        let poolConnection = await sql.connect(config);
-        const query = `Select * from dbo.transaction`
-        const result = await poolConnection.request()
-        .query(query)
-        return result.recordset
-    } catch (error) {
-        
     }
 }
 const editStatusNID = async (userId, isConfirm)=>{
@@ -621,7 +616,6 @@ module.exports={
     showRequestConfirmNDL,
     registerByGg,
     getUserByToken,
-    getRoleByUserId,
-    getAllTransaction
+    getRoleByUserId
 }
 

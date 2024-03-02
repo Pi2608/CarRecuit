@@ -34,6 +34,7 @@ const getUserByEmail = async(req, res)=>{
 }
 const getNIDinfoByUserId = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNIDinfoByUserId(userId)
         res.json(response)
@@ -43,6 +44,7 @@ const getNIDinfoByUserId = async(req, res)=>{
 }
 const getNDLinfoByUserId = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNDLinfoByUserId(userId)
         res.json(response)
@@ -89,6 +91,7 @@ const updateUser = async(req, res)=>{
 
 const sendConfirmNID = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const NID = req.body.NID
         const name = req.body.name
@@ -115,6 +118,7 @@ const sendConfirmNID = async(req, res)=>{
 }
 const sendConfirmNDL = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const NDL = req.body.NDL
         const name = req.body.name
@@ -192,7 +196,6 @@ const sendNotification = async (req, res)=>{
 const getMemberShipByUserId= async (req, res)=>{
     try {
         const userId = req.params.userId
-        console.log(userId)
         const response = await User.getMemberShipByUserId(userId)
         res.json(response)
     } catch (error) {
@@ -315,6 +318,7 @@ const checkAdmin = async(req,res,next)=>{
         
     }
 }
+
 module.exports={
     getAllUser,
     getUserByEmail,
@@ -342,5 +346,5 @@ module.exports={
     getUserByToken,
     checkCustomer,
     checkStaff,
-    checkAdmin
+    checkAdmin,
 }

@@ -123,6 +123,33 @@ const getRentDetailCurrent = async (userId)=>{
         console.log(error)
     }
 }
+const getRentAlreadyPayment = async (userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * from dbo.rent 
+                        where userId = @userId
+                        And paymentId IS NOT NULL`
+        const result = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        console.log(error)
+    }
+}
+const getRentDetailByRentId = async (rentId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * from dbo.rentDetail
+                        where rentId = @rentId`
+        const result = await poolConnection.request()
+        .input('rentId', sql.Int, rentId)
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
     try {
@@ -335,6 +362,8 @@ const confirmPayment = async (userId)=>{
             .input("extraPoint", sql.Int , extraPoint)
             .input("userId", sql.Int, userId)
             .query(query8)
+            // cập nhật lại memberShip
+            await user.autoPromotedMembership(userId)
             return{
                 message: "thanh toán thành công"
             }
@@ -494,6 +523,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         .input("minusPoint", sql.Int, minusPoint)
         .input("userId", sql.Int, userId)
         .query(query9)
+        await user.autoPromotedMembership(userId)
         return{
             message: "Hủy đơn thuê thành công"
         }   
@@ -570,5 +600,7 @@ module.exports = {
     confirmPayment,
     acceptRentDetail,
     cancelRentDetailByUser,
-    cancelRentDetailByOwner
+    cancelRentDetailByOwner,
+    getRentAlreadyPayment,
+    getRentDetailByRentId
 }

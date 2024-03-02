@@ -164,6 +164,13 @@ const updateVoucher = async(id, voucherCode, discount, startDate, endDate)=>{
         console.log(error)
     }
 } 
+const createVoucherAWeek = async(discount)=>{
+    const startDate = await Util.currentTime()
+    var date = new Date(startDate)
+    date.setDate(date.getDate()+7)
+    const endDate = date
+    await createVoucher(discount, startDate, endDate)
+}
 module.exports= {
     checkVoucher,
     getVoucherByCode,
@@ -171,5 +178,6 @@ module.exports= {
     getAllVoucher,
     createVoucher,
     deleteVoucher,
-    updateVoucher
+    updateVoucher,
+    createVoucherAWeek
 }
