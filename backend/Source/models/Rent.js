@@ -328,7 +328,7 @@ const confirmPayment = async (userId)=>{
                 .query(query7)
             }
             //+point
-            const extraPoint = Math.floor(rent.total/1000);
+            const extraPoint = Math.floor(rent.total/2);
             const query8 =`Update [dbo].[user] set point = point + @extraPoint
                         where id = @userId`
             await poolConnection.request()
@@ -487,7 +487,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         .input("message", sql.NVarChar, message)
         .input("dateUp", sql.DateTime, dateUp)
         .query(query8)
-        const minusPoint = Math.floor();
+        const minusPoint = Math.floor(rentDetail.total);
         const query9 = `Update [dbo].[user] set point = point - @minusPoint
                         where id = @userId`
         await poolConnection.request()

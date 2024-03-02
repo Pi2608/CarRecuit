@@ -365,6 +365,5 @@ module.exports={
     showCarFeedback,
     getAllCarsOfOwner,
     getBrandCar,
-    getCarType,
-    addCarAmenities
+    getCarType
 }

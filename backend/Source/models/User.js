@@ -492,7 +492,17 @@ const getTransactionHistory = async(userId)=>{
         console.log(error)
     }
 }
-
+const getAllTransaction = async()=>{
+    try {
+        let poolConnection = await sql.connect(config);
+        const query = `Select * from dbo.transaction`
+        const result = await poolConnection.request()
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        
+    }
+}
 const editStatusNID = async (userId, isConfirm)=>{
     try {
         let poolConnection = await sql.connect(config)
@@ -611,6 +621,7 @@ module.exports={
     showRequestConfirmNDL,
     registerByGg,
     getUserByToken,
-    getRoleByUserId
+    getRoleByUserId,
+    getAllTransaction
 }
 

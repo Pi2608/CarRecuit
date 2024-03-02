@@ -14,6 +14,5 @@ carRouter.post('/filter', carController.filterCars)
 carRouter.post('/new/:ownerId', carController.uploadImgs ,carController.addCarRental)
 carRouter.post('/update/:carId', carController.uploadImgs, carController.updateCarRental)
 carRouter.put('/delete/:carId', carController.deleteCarRental)
-carRouter.post('/amenities/:carId', carController.addCarAmenities)
 
 module.exports=carRouter
