@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
-import Axios from 'axios';
+import axios from "axios";
 import ReactAxios from 'react-axios';
 import "./Home.css"
 
@@ -25,13 +25,13 @@ export default function Home() {
   
   const fetchData = async () => {
     try {
-      const response = await Axios.get('/'); // Adjust the URL according to your API endpoint
+      const response = await axios.get('http://localhost:4000/user/'); // Adjust the URL according to your API endpoint
       setUsers(response.data); // Assuming the response contains an array of user data
       console.log(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  };
+  }
 
   return (
     <div id="home">

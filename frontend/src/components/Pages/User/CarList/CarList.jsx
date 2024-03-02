@@ -12,12 +12,26 @@ import TuneIcon from '@mui/icons-material/Tune';
 import LanguageIcon from '@mui/icons-material/Language';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { GiGearStick } from "react-icons/gi";
+import axios from "axios";
 import "./CarList.css";
 
 export default function CarList(){
+
+    const [carList, setCarList] = useState([]);
+
+    const fetchCarList = async () => {
+        try {
+          const response = await axios.get('http://localhost:4000/car/'); // Adjust the URL according to your API endpoint
+          setCarList(response.data); // Assuming the response contains an array of user data
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
     
     useEffect(() => {
         window.scrollTo(0, 0)
+
+        fetchCarList();
     },[])
 
     return (

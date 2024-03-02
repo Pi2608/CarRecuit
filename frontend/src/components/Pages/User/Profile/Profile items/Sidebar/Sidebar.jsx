@@ -17,46 +17,45 @@ export default function Sidebar() {
         <div id="sidebar">
             <h1>Xin chào user</h1>
             <div className="sidebar-item" onClick={() => navigate("/profile")}>
-                <table>
-                    <td><PermIdentityOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Tài khoản của tôi</p></td>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><PermIdentityOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Tài khoản của tôi</p></td>
                 </table>
             </div>
-            <div className="sidebar-item" onClick={() => navigate("/")}>
-                <table>
-                    <td><DirectionsCarFilledOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Xe của tôi</p></td>
+            <div className="sidebar-item" onClick={() => navigate("/mycars")}>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><DirectionsCarFilledOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Xe của tôi</p></td>
                 </table>
             </div>
             <div className="sidebar-item" onClick={() => navigate("/mytrips")}>  
-
-                <table>
-                    <td><WorkOutlineOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Chuyến của tôi</p></td>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><WorkOutlineOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Chuyến của tôi</p></td>
                 </table>
             </div>
             <div className="sidebar-item" onClick={() => navigate("/myaddress")}>
-                <table>
-                    <td><RoomOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Địa chỉ của tôi</p></td>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><RoomOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Địa chỉ của tôi</p></td>
                 </table>
             </div>
             <div className="sidebar-item" onClick={() => navigate("/resetpw")}>
-                <table>
-                    <td><LockOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Đổi mật khẩu</p></td>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><LockOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Đổi mật khẩu</p></td>
                 </table>
             </div>
             <div className="sidebar-item" onClick={() => navigate("/")}>
-                <table>
-                    <td><LogoutOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Đăng xuất</p> </td>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><LogoutOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Đăng xuất</p> </td>
                 </table>
             </div>
             <div className="sidebar-item">
-                <table>
-                    <td><DeleteOutlineOutlinedIcon style={{height: "18px"}}/></td>
-                    <td><p>Yêu cầu xóa tài khoản</p></td>
+                <table style={{display: "flex", alignItems: "center"}}>
+                    <td style={{position: "relative", top: "2px"}}><DeleteOutlineOutlinedIcon style={{height: "24px"}}/></td>
+                    <td style={{paddingLeft: "4px"}}><p>Yêu cầu xóa tài khoản</p></td>
                 </table>
             </div>
         </div>

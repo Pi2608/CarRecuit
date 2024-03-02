@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import { jwtDecode } from "jwt-decode"
 
 
 function Login() {
-  //const [ email, setEmail] = useState('')
-  //const [googleUser, setGoogleUser] = useState('')
+  //const [email, setEmail] = useState('')
+  const [googleUser, setGoogleUser] = useState('')
 
   function handleCallbackResponse(response) {
     //document.getElementById('google').hidden = true
@@ -14,6 +15,7 @@ function Login() {
     //setGoogleUser(userOject)
     //setEmail(userOject.email)
   }
+
 
   useEffect(() => {
     /*global google*/

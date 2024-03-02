@@ -1,0 +1,23 @@
+#mycar>.body{
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    background-color: #F6F6F6;
+    padding: 75px 120px;   
+}
+
+#mycar>.body>.sidebar{
+    position: sticky;
+    width: 380px;
+    top: 0;
+    height: fit-content;
+    background-color: #F6F6F6;
+}
+
+#mycar>.body>.content{
+    height: fit-content;
+    width: 890px;
+    overflow: visible;
+}

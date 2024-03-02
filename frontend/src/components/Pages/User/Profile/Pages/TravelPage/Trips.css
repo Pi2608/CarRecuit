@@ -1,8 +1,6 @@
 #trip>.body{
+    min-height: 100vh;
     position: relative;
-    /* display: grid;
-    grid-template-columns: 30% 64%;
-    gap: 1%; */
     display: flex;
     gap: 10px;
     width: 100%;

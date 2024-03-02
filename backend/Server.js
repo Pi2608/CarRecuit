@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const firebase = require('firebase')
 const config = require('./Source/Util/firebaseConfig')
 firebase.initializeApp(config);
@@ -14,6 +15,7 @@ const rentRouter = require('./Source/Routers/RentRouter')
 const app = express()
 
 const port = 4000
+app.use(cors())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 app.use("/user", userRouter)
