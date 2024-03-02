@@ -13,7 +13,7 @@ import ErrorPage from './components/Pages/ErrorPage/ErrorPage.jsx';
 import Home from './components/Pages/User/Home/Home.jsx';
 import CarList from './components/Pages/User/CarList/CarList.jsx';
 import CarDetail from './components/Pages/User/CarDetail/CarDetail.jsx';
-import Profile from './components/Pages/User/Profile/Profile.jsx';
+import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.jsx";
 import Dashboard from './components/Pages/Admin/Pages/DashBoard/Dashboard.jsx';
 import New from './components/Pages/Admin/Pages/New/New.jsx';
 import UserListPage from './components/Pages/Admin/Pages/UserListPage/UserListPage.jsx';
@@ -22,6 +22,7 @@ import VoucherListPage from './components/Pages/Admin/Pages/VoucherListPage/Vouc
 import StatisticPage from './components/Pages/Admin/Pages/StatisticPage/StatisticPage.jsx';
 import ConfirmInfoPage from './components/Pages/Admin/Pages/ConfirmInfoPage/ConfirmInfoPage.jsx';
 import { carInputs, userInputs, voucherInputs } from './components/Pages/Admin/Pages/formSource.js';
+import LoginForm from './components/Pages/Login/LoginForm/LoginForm.jsx';
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/">
           <Route index element={<Home/>}/>
           <Route path="login">
-            <Route index element={<Login/>}/>
+            <Route index element={<LoginForm/>}/>
           </Route>
           <Route path="carlist">
             <Route index element={<CarList/>}/>
