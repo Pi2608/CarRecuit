@@ -452,7 +452,7 @@ const checkLogin = async (email, password)=>{
 const createTransaction = async(userId, money, payerCode, pointGet, paymentMethod)=>{
     try {
         let poolConnection = await sql.connect(config);
-        const query = "Insert into [dbo].[transaction] (userId, time, money, payerCode, pointGet, paymentMethod) values (@userId, @time, @money, @payerCode, @pointGet, @paymentMethod)"
+        const query1 = "Insert into [dbo].[transaction] (userId, time, money, payerCode, pointGet, paymentMethod) values (@userId, @time, @money, @payerCode, @pointGet, @paymentMethod)"
         await poolConnection.request()
         .input('userId', sql.Int, userId)
         .input('time', sql.DateTime, await util.currentTime())
@@ -460,7 +460,12 @@ const createTransaction = async(userId, money, payerCode, pointGet, paymentMetho
         .input('payerCode', sql.NVarChar, payerCode)
         .input('pointGet', sql.Int, pointGet)
         .input('paymentMethod', sql.NVarChar, paymentMethod)
-        .query(query)
+        .query(query1)
+        const query2 = "Update [dbo].[user] set wallet = wallet + @pointGet where id = @userId"
+        await poolConnection.request()
+        .input('pointGet', sql.Int, pointGet)
+        .input('userId', sql.Int, userId)
+        .query(query2)
     } catch (error) {
         console.log("Error: ", error)
     }
