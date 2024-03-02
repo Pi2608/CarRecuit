@@ -107,6 +107,17 @@ const addCarRental = async (req, res)=>{
         
     }
 }
+const addCarAmenities = async(req,res)=>{
+    try {
+        const carId = req.params.carId
+        const amenities = req.body.amenities
+        console.log(amenities)
+        const response = await car.addCarAmenities(carId,amenities)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const updateCarRental = async (req, res)=>{
     try {
         const carId = req.params.carId
@@ -156,5 +167,6 @@ module.exports={
     updateCarRental,
     deleteCarRental,
     getBrandCar,
-    getCarType
+    getCarType,
+    addCarAmenities
 }

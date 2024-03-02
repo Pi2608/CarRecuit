@@ -177,7 +177,7 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     }
 }
 
-const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, year, typeOfFuels, ldescription, imgs)=>{
+const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, year, typeOfFuels, ldescription, imgs, amenities)=>{
     try{
         let poolConnection = await sql.connect(config)
         const query1 = 'Insert into [dbo].[car] (ownerId, carTypeId, CLP, price, discount, description, seats, year, typeOfFuels, status, isDeleted) Values (@OwnerId, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @year, @typeOfFuels, 1, 0)';
@@ -214,14 +214,28 @@ const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, 
             .input('carId', sql.Int, car.id)
             .query(query4)
         }
-        return {
-            message : "thêm xe thành công"
-        }
+        await addCarAmenities(carId, amenities)
     }catch(err){
         console.log(err)
     }
 }
-
+const addCarAmenities = async (carId, amenities)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        for (const amenity of amenities){
+            const query = `Insert into dbo.carAmenities (carId, amenitiesId) values (@carId, @amenity)`
+            await poolConnection.request()
+            .input('carId', sql.Int, carId)
+            .input('amenity', sql.Int, amenity)
+            .query(query)
+        }
+        return{
+            message:"Thêm amenities thành công"
+        }
+    } catch (error) {
+        
+    }
+}
 const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, year, typeOfFuels, status, ldescription, imgs) =>{
     try{
         let poolConnection = await sql.connect(config)
@@ -332,6 +346,7 @@ const getCarTypeByTypeId = async(typeId)=>{
 }
 
 
+
 module.exports={
     getAllCarsInUse,
     getCarTypeByTypeId,
@@ -347,5 +362,6 @@ module.exports={
     showCarFeedback,
     getAllCarsOfOwner,
     getBrandCar,
-    getCarType
+    getCarType,
+    addCarAmenities
 }
