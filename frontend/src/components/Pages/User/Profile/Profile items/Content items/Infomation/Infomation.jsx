@@ -13,7 +13,6 @@ export default function Infomation() {
     const [selectedFile1, setSelectedFile1] = useState(null);
     const [selectedFile2, setSelectedFile2] = useState(null);
     const [selectedFile3, setSelectedFile3] = useState(null);
-    const [fileUploadSuccess, setFileUploadSuccess] = useState(false);
     const [userName, setUserName] = useState('Pi26');
     const [userPoint, setUserPoint] = useState(0);
     const [userCredit, setUserCredit] = useState('0.0 đ');
@@ -37,10 +36,8 @@ export default function Infomation() {
           }
           console.log("File selected:", file.name);
           setSelectedFile1(file);
-          setFileUploadSuccess(true);
         } catch (error) {
           console.error("Error:", error.message);
-          setFileUploadSuccess(false);
         }
     };
 

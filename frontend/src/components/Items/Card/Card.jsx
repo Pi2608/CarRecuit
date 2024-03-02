@@ -6,7 +6,7 @@ import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import "./Card.css"
 
 // export default function Card({ itemId, shape, material, image, title, price, discount })
-export default function Card() {
+export default function Card({id, ownerId, carTypeId, image, discount, price}) {
 
     const navigate = useNavigate()
 
@@ -18,7 +18,7 @@ export default function Card() {
                     <div className="item-amenities">
 
                     </div>
-                    <div className="title">Hyundai accent 2022</div>
+                    <div className="title">{carTypeId} 2022</div>
                     <div className="location"><LocationOnIcon/> Quận 7, Hồ Chí Minh</div>
                     <hr/>
                     <div className="price-info">

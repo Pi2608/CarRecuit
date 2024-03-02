@@ -1,8 +1,3 @@
-:root {
-    --border-radius: 25px; /* Set default border-radius value */
-    --background-color: #fff; /* Set default background-color value */
-}
-
 #info{
     display: flex;
     flex-direction: column;
@@ -16,7 +11,7 @@
     height: fit-content;
     background-color: white;
     box-shadow: 0 2px 5px #ccc;
-    border-radius: var(--border-radius);
+    border-radius: 25px;
     padding: 24px;
 }
 
@@ -133,6 +128,6 @@
     align-items: center;
     justify-content: center;
     border: #565656 1px dashed;
-    border-radius: var(--border-radius);
+    border-radius: 25px;
 }   
 
