@@ -236,7 +236,7 @@ const addCarAmenities = async (carId, amenities)=>{
         
     }
 }
-const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, year, typeOfFuels, status, ldescription, imgs) =>{
+const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, year, typeOfFuels, status, ldescription, imgs, amenities) =>{
     try{
         let poolConnection = await sql.connect(config)
         const query1 = 'Update [dbo].[car] set carTypeId = @CarTypeId, CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, year = @year, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
@@ -257,6 +257,10 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
         .input('ldescription', sql.NVarChar, ldescription)
         .input('carId', sql.Int, carId)
         .query(query2)
+        const query3 = `Delete from dbo.image where carId = @carId`
+        await poolConnection.request()
+        .input('carId', sql.Int, carId)
+        .query(query3)
         for(let i = 0; i<imgs.length;i++){
             let id
             if(i==0){
@@ -264,26 +268,14 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
             }else{
                 id = 'C-'+carId+'-'+i
             }
-            const query3 =`Select * from dbo.image where id =@id`
-            const result = await poolConnection.request()
+            const query4 =`Insert into dbo.image (id, url, carId) values (@id, @imgUrl, @carId)`
+            await poolConnection.request()
             .input('id', sql.NVarChar, id)
-            .query(query3)
-            const image = result.recordset[0]
-            if(image!=null){
-                const query4 =`Update dbo.image set url =@imgUrl where id=@id`
-                await poolConnection.request()
-                .input('id', sql.NVarChar, id)
-                .input('imgUrl', sql.NVarChar, imgs[i])
-                .query(query4)
-            }else{
-                const query4 =`Insert into dbo.image (id, url, carId) values (@id, @imgUrl, @carId)`
-                await poolConnection.request()
-                .input('id', sql.NVarChar, id)
-                .input('imgUrl', sql.NVarChar, imgs[i])
-                .input('carId', sql.Int, carId)
-                .query(query4)
-            }
+            .input('imgUrl', sql.NVarChar, imgs[i])
+            .input('carId', sql.Int, carId)
+            .query(query4)
         }
+        updateCarAmenities (carId, amenities)
         return{
             message :"Update thành công"
         } 
@@ -291,7 +283,18 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
         console.log(err)
     }
 }
-
+const updateCarAmenities = async (carId, amenities)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = "Delete from dbo.carAmenities where carId= @carId"
+        await poolConnection.request()
+        .input('carId', sql.Int, carId)
+        .query(query1)
+        await addCarAmenities(carId, amenities)
+    } catch (error) {
+        console.log(error)
+    }
+}
 const deleteCarRental = async(carId)=>{
     try{
         let poolConnection = await sql.connect(config)
