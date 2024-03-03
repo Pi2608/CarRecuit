@@ -1,8 +1,8 @@
-.voucher {
+#voucher {
   height: 600px;
   padding: 20px;
-  
-  .voucherTitle{
+}
+#voucher> .voucherTitle{
     width: 100%;
     font-size: 24px;
     color: gray;
@@ -10,8 +10,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    .link{
+}
+#voucher>.voucherTitle>.link{
       text-decoration: none;
       color: green;
       font-size: 16px;
@@ -21,9 +21,11 @@
       border-radius: 5px;
       cursor: pointer;
     }
-  }
 
-  
+.tableHead{
+  background-color: lightgray;
+}
+
   .cellAction {
     display: flex;
     align-items: center;
@@ -43,4 +45,3 @@
        }
     }
   }
-}

@@ -1,59 +1,54 @@
 .cellAction {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 
   .confirmButton {
-      padding: 2px 5px;
-      border-radius: 5px;
-      color: darkblue;
-      border: 1px dotted rgba(0, 0, 139, 0.596);
-      cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: darkblue;
+    border: 1px dotted rgba(0, 0, 139, 0.596);
+    cursor: pointer;
 
-    &:hover{
-        background-color: #b5b4bd;
-       }
+    &:hover {
+      background-color: #b5b4bd;
     }
-
-    
-.rejectButton {
-      padding: 2px 5px;
-      border-radius: 5px;
-      color: crimson;
-      border: 1px dotted rgba(220, 20, 60, 0.6);
-      cursor: pointer;
-
-
-    &:hover{
-        background-color: #b5b4bd;
-       }
-    }
-  
   }
-  .confirm {
-  height: 600px;
-  padding: 20px;
-  
-  .confirmTitle{
-    width: 100%;
-    font-size: 24px;
-    color: gray;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 
-    
+  .rejectButton {
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: crimson;
+    border: 1px dotted rgba(220, 20, 60, 0.6);
+    cursor: pointer;
+
+    &:hover {
+      background-color: #b5b4bd;
+    }
   }
 }
-.cellImg {
-    display: flex;
-    align-items: center;
+#confirm {
+  height: 600px;
+  padding: 20px;
+}
+#confirm > .confirmTitle {
+  width: 100%;
+  font-size: 24px;
+  color: gray;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  .cellwImg {
-      width: 200px;
-      height: 100px;
-      object-fit: cover;
-      margin-right: 20px;
-    }
+.cellImg {
+  display: flex;
+  align-items: center;
+
+  .cellWImg {
+    width: 200px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
   }
+}

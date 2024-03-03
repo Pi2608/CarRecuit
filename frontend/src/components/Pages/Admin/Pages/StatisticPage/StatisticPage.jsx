@@ -5,7 +5,7 @@ import "./StatisticPage.css";
 
 const StatisticPage = () => {
   return (
-    <div className="list">
+    <div id="list">
         <Sidebar/>
         <div className="listContainer">
             <Navbar/>

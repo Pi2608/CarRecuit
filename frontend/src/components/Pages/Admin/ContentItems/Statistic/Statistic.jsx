@@ -24,7 +24,7 @@ const Statistic = () => {
   ];
 
   return (
-    <div className="statistic">
+    <div id="statistic">
       <div className="statisticTitle">Danh sách xe được thuê</div>
       <div>
         <label>

@@ -31,7 +31,7 @@ const TableTransaction = () => {
   return (
     <TableContainer component={Paper} className="table">
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
+        <TableHead className="tableHead">
           <TableRow>
             <TableCell className="tableCell">Mã giao dịch</TableCell>
             <TableCell className="tableCell">Xe</TableCell>
