@@ -18,7 +18,7 @@ const ConfirmInfo = () => {
   ];
 
   return (
-    <div className="confirm">
+    <div id="confirm">
       <div className="confirmTitle">Xác nhận thông tin</div>
 
       <TableContainer component={Paper} className="table">
@@ -37,12 +37,12 @@ const ConfirmInfo = () => {
                 <TableCell className="tableCell">{row.name}</TableCell>
                 <TableCell>
                   <div className="cellImg">
-                    <img className="cellwImg" src={row.cccd} alt="CCCD/CMND" />
+                    <img className="cellWImg" src={row.cccd} alt="CCCD/CMND" />
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="cellImg">
-                    <img className="cellwImg" src={row.gplx} alt="GPLX" />
+                    <img className="cellWImg" src={row.gplx} alt="GPLX" />
                   </div>
                 </TableCell>
                 <TableCell>

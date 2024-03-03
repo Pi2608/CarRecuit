@@ -53,7 +53,7 @@ const UserList = () => {
   };*/
 
   return (
-    <div className="user">
+    <div id="user">
       <div className="userTitle">
         Danh sách người dùng
         <Link to="/users/new" className="link">

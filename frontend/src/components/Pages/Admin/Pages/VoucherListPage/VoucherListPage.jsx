@@ -5,13 +5,12 @@ import "./VoucherListPage.css";
 
 const VoucherListPage = () => {
   return (
-    <div className="list">
-        <Sidebar/>
-        <div className="listContainer">
-            <Navbar/>
-            <VoucherList/>
-            
-        </div>
+    <div id="list">
+      <Sidebar />
+      <div className="listContainer">
+        <Navbar />
+        <VoucherList />
+      </div>
     </div>
   );
 };

@@ -5,7 +5,7 @@ import "react-circular-progressbar/dist/styles.css";
 
 const Featured = () => {
   return (
-    <div className='featured'>
+    <div id='featured'>
         <div className="top">
             <h1 className="title">Tổng doanh thu</h1>
             <MoreVertIcon fontSize="small" />

@@ -5,7 +5,7 @@ import Sidebar from "../../ContentItems/Sidebar/Sidebar";
 
 const UserListPage = () => {
   return (
-    <div className="list">
+    <div id="list">
         <Sidebar/>
         <div className="listContainer">
             <Navbar/>

@@ -5,7 +5,7 @@ import "./CarListPage.css";
 
 const CarListPage = () => {
   return (
-    <div className="list">
+    <div id="list">
         <Sidebar/>
         <div className="listContainer">
             <Navbar/>

@@ -8,7 +8,7 @@ const New = ({ inputs, title }) => {
   const [file, setFile] = useState("");
 
   return (
-    <div className="new">
+    <div id="new">
       <Sidebar />
       <div className="newContainer">
         <Navbar />
@@ -30,7 +30,8 @@ const New = ({ inputs, title }) => {
             <form>
               <div className="formInput">
                 <label htmlFor="file">
-                  Image: <DriveFolderUploadOutlinedIcon className="icon" />
+                  Hình ảnh:
+                  <DriveFolderUploadOutlinedIcon className="icon" />
                 </label>
                 <input
                   type="file"
