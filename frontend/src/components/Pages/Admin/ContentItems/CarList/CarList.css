@@ -1,0 +1,73 @@
+
+#car {
+  height: 600px;
+  padding: 20px;
+}
+
+#car > .carTitle {
+  width: 100%;
+  font-size: 24px;
+  color: gray;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#car > .carTitle > .link {
+  text-decoration: none;
+  color: green;
+  font-size: 16px;
+  font-weight: 400;
+  border: 1px solid green;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#car >.table> .tableHead {
+  background-color: lightgray;
+}
+
+/*#car > .table > .status >.tableCell {
+  padding: 5px;
+  border-radius: 5px;
+}
+
+#car > .table > .status > .tableCell.Active {
+  color: green;
+  background-color: rgba(0, 128, 0, 0.151);
+}
+
+#car > .table > .status > .tableCell.Inactive {
+  background-color: rgba(255, 0, 0, 0.05);
+  color: crimson;
+}*/
+
+#car > .table > .cellWithImg {
+  display: flex;
+  align-items: center;
+}
+#car > .table > .cellWithImg > .cellImg {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+#car > .table {
+  .status {
+    padding: 5px;
+    border-radius: 5px;
+
+    &.Active {
+      color: green;
+      background-color: rgba(0, 128, 0, 0.151);
+    }
+    &.Inactive {
+      background-color: rgba(255, 0, 0, 0.05);
+      color: crimson;
+    }
+  }
+}

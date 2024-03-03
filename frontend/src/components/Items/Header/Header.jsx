@@ -1,17 +1,20 @@
-import { React, useState} from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
-import LoginForm from "../../Pages/Login/LoginForm/LoginForm";
+import {useState} from "react";
+import { useNavigate, Link } from "react-router-dom";
+import LoginForm from "../../Pages/Login/LoginForm/LoginForm.jsx";
 import Popup from "reactjs-popup";
+import { Button } from "@mui/material";
 import "./Header.css";
 
 function Header() {
-
-    const navigate = useNavigate()
+     const [isTriggerClicked, setIsTriggerClicked] = useState(false);
 
     const handleLogin = () => {
         setIsTriggerClicked(true)
     }
+
+    const navigate = useNavigate()
+
+   
 
     return(
         <div id="header">
