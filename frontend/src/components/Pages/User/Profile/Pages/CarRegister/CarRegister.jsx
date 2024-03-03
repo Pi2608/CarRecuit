@@ -14,7 +14,11 @@ export default function CarRegister() {
     const [ carGearStick, setCarGearStick ] = useState("");
     const [ carFuel, setCarFuel ] = useState("");
 
-    
+    async function getAmenities() {}
+
+    useEffect(() => {
+
+    },[])
 
     return(
         <div id="carregister">

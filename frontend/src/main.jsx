@@ -14,6 +14,7 @@ import Home from './components/Pages/User/Home/Home.jsx';
 import CarList from './components/Pages/User/CarList/CarList.jsx';
 import CarDetail from './components/Pages/User/CarDetail/CarDetail.jsx';
 import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.jsx";
+import CarRegister from './components/Pages/User/Profile/Pages/CarRegister/CarRegister.jsx';
 import Dashboard from './components/Pages/Admin/Pages/DashBoard/Dashboard.jsx';
 import New from './components/Pages/Admin/Pages/New/New.jsx';
 import UserListPage from './components/Pages/Admin/Pages/UserListPage/UserListPage.jsx';
@@ -53,6 +54,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           </Route>
           <Route path="profile">
             <Route index element={<Profile/>}/>
+          </Route>
+          <Route path="carregister">
+            <Route index element={<CarRegister/>}/>
           </Route>
           <Route path="dashboard">
             <Route index element={<Dashboard/>}/>
