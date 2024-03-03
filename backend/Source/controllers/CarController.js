@@ -16,6 +16,7 @@ const uploadImgs = upload.array('images', 5)
 
 const getAllCarsInUse = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const response = await car.getAllCarsInUse()
         res.json(response)
     } catch (error) {
@@ -42,6 +43,7 @@ const getCarType = async (req, res)=>{
 }
 const getAllCarsOfOwner = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const ownerId = req.params.ownerId
         const response = await car.getAllCarsOfOwner(ownerId)
         res.json(response)
@@ -60,6 +62,7 @@ const showCarFeedback = async(req, res)=>{
 }
 const getCarById = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const carId = req.params.carId
         const response = await car.getCarById(carId)
         res.json(response)
@@ -82,17 +85,18 @@ const filterCars = async (req, res)=>{
 }
 const addCarRental = async (req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const ownerId = req.params.ownerId
-        const name = req.body.name
         const carTypeId = req.body.carTypeId
         const CLP = req.body.CLP
         const price = req.body.price
-        const discount = req.body.discount
         const description = req.body.description
         const seats = req.body.seats
+        const year = req.body.year
         const typeOfFuels = req.body.typeOfFuels
         const ldescription = req.body.ldescription
         const imagePaths = req.files.map(file=>file.path);
+        const amenities = JSON.parse(req.body.amenities)
         let imgs = [];
         for (const path of imagePaths) {
             try {
@@ -102,26 +106,29 @@ const addCarRental = async (req, res)=>{
                 console.error('Error encoding image:', error);
             }
         }
-        const response = await car.addCarRental(ownerId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, ldescription, imgs)
+        const response = await car.addCarRental(ownerId, carTypeId, CLP, price, description, seats, year, typeOfFuels, ldescription, imgs, amenities)
         res.json(response)
     } catch (error) {
         
     }
 }
+
 const updateCarRental = async (req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const carId = req.params.carId
-        const name = req.body.name
         const carTypeId = req.body.carTypeId
         const CLP = req.body.CLP
         const price = req.body.price
         const discount = req.body.discount
         const description = req.body.description
         const seats = req.body.seats
+        const year = req.body.year
         const typeOfFuels = req.body.typeOfFuels
         const status = req.body.status
         const ldescription = req.body.ldescription
         const imagePaths = req.files.map(file=>file.path);
+        const amenities = JSON.parse(req.body.amenities)
         let imgs = [];
         for (const path of imagePaths) {
             try {
@@ -131,7 +138,7 @@ const updateCarRental = async (req, res)=>{
                 console.error('Error encoding image:', error);
             }
         }
-        const response = await car.updateCarRental(carId, name, carTypeId, CLP, price, discount, description, seats, typeOfFuels, status, ldescription, imgs)
+        const response = await car.updateCarRental(carId, carTypeId, CLP, price, discount , description, seats, year, typeOfFuels, status, ldescription, imgs, amenities)
         res.json(response)
     } catch (error) {
         
@@ -157,5 +164,5 @@ module.exports={
     updateCarRental,
     deleteCarRental,
     getBrandCar,
-    getCarType
+    getCarType,
 }
