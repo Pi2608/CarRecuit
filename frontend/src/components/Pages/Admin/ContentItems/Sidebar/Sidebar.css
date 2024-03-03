@@ -1,4 +1,4 @@
-#sidebar {
+#adsidebar {
   flex: 1;
   border-right: 0.5px solid lightgray;
   min-height: 100vh;
@@ -7,37 +7,37 @@
   width: 200px;
 }
 
-#sidebar > .top {
+#adsidebar > .top {
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-#sidebar > .top > .logo {
+#adsidebar > .top > .logo {
   font-size: 20px;
   font-weight: bold;
   color: #6439ff;
 }
 
-#sidebar > hr {
+#adsidebar > hr {
   height: 0;
   border: 0.5px solid rgb(231, 228, 228);
 }
 
-#sidebar > .center {
+#adsidebar > .center {
   padding-left: 10px;
   margin-top: 70px;
 }
 
-#sidebar > .center ul {
+#adsidebar > .center ul {
   list-style: none;
   margin: 0;
   padding: 0;
   margin-top: 100px;
 }
 
-#sidebar > .center ul li {
+#adsidebar > .center ul li {
   display: flex;
   align-items: center;
   margin-top: 30px;
@@ -45,28 +45,28 @@
   padding: 5px;
   cursor: pointer;
 }
-#sidebar > .center ul li:hover{
+#adsidebar > .center ul li:hover{
   background-color: #cec9e0;
 }
 
-#sidebar > .center ul li:hover::before {
+#adsidebar > .center ul li:hover::before {
   content: "";
   display: inline-block;
 }
 
-#sidebar > .center ul li .icon {
+#adsidebar > .center ul li .icon {
   font-size: 18px;
   color: #7451f8;
 }
 
-#sidebar > .center ul li span {
+#adsidebar > .center ul li span {
   font-size: 15px;
   font-weight: 600;
   color: #888;
   margin-left: 10px;
 }
 
-#sidebar > .center > ul li >.item > .counters {
+#adsidebar > .center > ul li >.item > .counters {
   width: 12px;
   height: 12px;
   background-color: red;
@@ -82,7 +82,7 @@
   left: 20px;
   
 }
-#sidebar > .center ul li>.item> .icon {
+#adsidebar > .center ul li>.item> .icon {
   font-size: 18px;
   color: #7451f8;
 }

@@ -11,7 +11,7 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 const Sidebar = () => {
   const navigate = useNavigate();
   return (
-    <div id="sidebar">
+    <div id="adsidebar">
       <div className="top">
         <span className="logo">CarFlex</span>
       </div>
