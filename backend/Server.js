@@ -18,7 +18,6 @@ const voucher = require('./Source/models/Voucher')
 
 const firebaseConfig = require('./Source/config/firebaseConfig')
 const paypalConfig = require('./Source/config/paypalConfig');
-const { currentTime } = require('./Source/Util/Util');
 
 
 const app = express()

@@ -110,8 +110,8 @@ const createVoucher = async(discount, startDate, endDate)=>{
             await poolConnection.request()
             .input('voucherCode', sql.NVarChar, voucherCode)
             .input('discount', sql.Float, discount)
-            .input('startDate', sql.DateTime, startDate)
-            .input('endDate', sql.DateTime, endDate)
+            .input('startDate', sql.DateTime,await Util.inputDate(startDate))
+            .input('endDate', sql.DateTime,await Util.inputDate(endDate))
             .query(query)
             return{
                 message: "Tạo voucher thành công"
@@ -148,8 +148,8 @@ const updateVoucher = async(id, voucherCode, discount, startDate, endDate)=>{
             await poolConnection.request()
             .input('voucherCode', sql.NVarChar, voucherCode)
             .input('discount', sql.Float, discount)
-            .input('startDate', sql.DateTime, startDate)
-            .input('endDate', sql.DateTime, endDate)
+            .input('startDate', sql.DateTime,await Util.inputDate(startDate))
+            .input('endDate', sql.DateTime,await Util.inputDate(endDate))
             .input('id', sql.Int, id)
             .query(query)
             return{
