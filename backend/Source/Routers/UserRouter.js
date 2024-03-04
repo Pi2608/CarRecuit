@@ -31,8 +31,8 @@ userRouter.put("/NID/editStatus", userController.editStatusNID)
 userRouter.put("/NDL/editStatus", userController.editStatusNDL)
 userRouter.get("/NID/:userId", userController.getNIDinfoByUserId)
 userRouter.get("/NDL/:userId", userController.getNDLinfoByUserId)
-
-userRouter.get("/:email", userController.getUserByEmail)
 userRouter.post("/registerGG", userController.registerByGg)
+userRouter.get("/getByToken", userController.getUserByToken)
+userRouter.get("/:email", userController.getUserByEmail)
 
 module.exports = userRouter;

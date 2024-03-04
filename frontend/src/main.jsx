@@ -14,6 +14,7 @@ import Home from './components/Pages/User/Home/Home.jsx';
 import CarList from './components/Pages/User/CarList/CarList.jsx';
 import CarDetail from './components/Pages/User/CarDetail/CarDetail.jsx';
 import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.jsx";
+import CarRegister from './components/Pages/User/Profile/Pages/CarRegister/CarRegister.jsx';
 import Dashboard from './components/Pages/Admin/Pages/DashBoard/Dashboard.jsx';
 import New from './components/Pages/Admin/Pages/New/New.jsx';
 import UserListPage from './components/Pages/Admin/Pages/UserListPage/UserListPage.jsx';
@@ -23,6 +24,8 @@ import StatisticPage from './components/Pages/Admin/Pages/StatisticPage/Statisti
 import ConfirmInfoPage from './components/Pages/Admin/Pages/ConfirmInfoPage/ConfirmInfoPage.jsx';
 import { carInputs, userInputs, voucherInputs } from './components/Pages/Admin/Pages/formSource.js';
 import LoginForm from './components/Pages/Login/LoginForm/LoginForm.jsx';
+
+import Image from './image.jsx';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/">
           <Route index element={<Home/>}/>
+          {/* <Route index element={<Image/>}/> */}
           <Route path="login">
             <Route index element={<LoginForm/>}/>
           </Route>
@@ -53,6 +57,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           </Route>
           <Route path="profile">
             <Route index element={<Profile/>}/>
+          </Route>
+          <Route path="carregister">
+            <Route index element={<CarRegister/>}/>
           </Route>
           <Route path="dashboard">
             <Route index element={<Dashboard/>}/>

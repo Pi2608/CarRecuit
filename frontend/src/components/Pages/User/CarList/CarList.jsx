@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import Card from "../../../Items/Card/Card";
@@ -11,18 +12,20 @@ import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import TuneIcon from '@mui/icons-material/Tune';
 import LanguageIcon from '@mui/icons-material/Language';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import MapIcon from '@mui/icons-material/Map';
 import { GiGearStick } from "react-icons/gi";
 import axios from "axios";
 import "./CarList.css";
 
 export default function CarList(){
 
+    const navigate = useNavigate();
     const [carList, setCarList] = useState([]);
 
     const fetchCarList = async () => {
         try {
-          const response = await axios.get('http://localhost:4000/car/'); // Adjust the URL according to your API endpoint
-          setCarList(response.data); // Assuming the response contains an array of user data
+          const response = await axios.get('http://localhost:4000/car/');
+          setCarList(response.data); 
         } catch (error) {
           console.error('Error fetching data:', error);
         }
@@ -30,9 +33,12 @@ export default function CarList(){
     
     useEffect(() => {
         window.scrollTo(0, 0)
-
         fetchCarList();
     },[])
+
+    useEffect(() => {
+
+    },[carList])
 
     return (
         <div id="cars">
@@ -59,22 +65,11 @@ export default function CarList(){
                     </div>
                 </div>
                 <div className="car-list">
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
-                    <Card/>
+                    {carList.map((car) =>(
+                    <Card key={car.id} year={car.year} price={car.price} description={car.description} image={car.imgUrl} typeId={car.carTypeId}/>
+                    ))}
                 </div>
+                <div className="map-btn" onClick={()=>navigate("/")}><MapIcon/>Bản đồ</div>
             </div>
             <Footer/>
         </div>

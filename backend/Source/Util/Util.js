@@ -2,6 +2,7 @@ const firebase = require('firebase')
 const imageToBase64 = require('image-to-base64')
 const decode = require ('node-base64-image').decode
 const path = require('path');
+const fs = require('fs').promises
 
 const currentTime = async()=>{
     var date = new Date();
@@ -14,7 +15,6 @@ const currentTime = async()=>{
 const calculatePeriod= async(startDate, endDate)=> {
     const startDateTime = new Date(startDate);
     const endDateTime = new Date(endDate);
-
     // Tính toán số milliseconds giữa hai thời điểm
     const timeDifference = Math.abs(endDateTime - startDateTime);
 
@@ -68,6 +68,18 @@ const decodeImage = async (base64Code, name) => {
     }
 };
 
+const deleteAllImages = async() =>{
+    const projectPath = path.resolve();
+    const photos = projectPath + '/Source/photos/'
+    const files = await fs.readdir(photos);
+        for (const file of files) {
+            if (file !== 'note.txt') {
+                const filePath = path.join(photos, file);
+                await fs.unlink(filePath);
+            }
+        }
+}
+
 const generateRandomString = async(length)=> {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -89,6 +101,12 @@ const compareDates= async(startDate, endDate) =>{
     }
 }
 
+const inputDate = async(date)=>{
+    const newDate = new Date(date)
+    newDate.setHours(newDate.getHours()+7)
+    return newDate
+}
+
 module.exports={
     currentTime,
     getPositionCar,
@@ -96,5 +114,7 @@ module.exports={
     decodeImage,
     generateRandomString,
     calculatePeriod,
-    compareDates
+    compareDates,
+    deleteAllImages,
+    inputDate
 }

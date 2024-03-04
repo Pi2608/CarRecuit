@@ -1,6 +1,7 @@
 const User = require("../models/User")
 const multer = require("multer")
-const Uitl = require("../Util/Util")
+const Uitl = require("../Util/Util");
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -33,6 +34,7 @@ const getUserByEmail = async(req, res)=>{
 }
 const getNIDinfoByUserId = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNIDinfoByUserId(userId)
         res.json(response)
@@ -42,6 +44,7 @@ const getNIDinfoByUserId = async(req, res)=>{
 }
 const getNDLinfoByUserId = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNDLinfoByUserId(userId)
         res.json(response)
@@ -88,6 +91,7 @@ const updateUser = async(req, res)=>{
 
 const sendConfirmNID = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const NID = req.body.NID
         const name = req.body.name
@@ -114,6 +118,7 @@ const sendConfirmNID = async(req, res)=>{
 }
 const sendConfirmNDL = async(req, res)=>{
     try {
+        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const NDL = req.body.NDL
         const name = req.body.name
@@ -191,7 +196,6 @@ const sendNotification = async (req, res)=>{
 const getMemberShipByUserId= async (req, res)=>{
     try {
         const userId = req.params.userId
-        console.log(userId)
         const response = await User.getMemberShipByUserId(userId)
         res.json(response)
     } catch (error) {
@@ -205,7 +209,7 @@ const checkLogin = async (req, res)=>{
         const response = await User.checkLogin(email, password)
         res.json(response)
     } catch (error) {
-        
+        console.log(error)
     }
 }
 const getTransactionHistory = async(req, res)=>{
@@ -262,6 +266,59 @@ const registerByGg = async(req, res)=>{
         
     }
 }
+
+const getUserByToken = async(req,res)=>{
+    try {
+        const token = req.query.token
+        const response = await User.getUserByToken(token)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const checkCustomer = async(req,res,next)=>{
+    try {
+        const userId = req.query.userId
+        const role = (await User.getRoleByUserId(userId)).name
+        console.log(role)
+        if(role === 'Customer'){
+            next();
+        }else{
+            res.json("bạn không đủ thẩm quyền")
+        }
+    } catch (error) {
+        
+    }
+}
+const checkStaff = async(req,res,next)=>{
+    try {
+        const userId = req.query.userId
+        const role = (await User.getRoleByUserId(userId)).name
+        console.log(role)
+        if(role === 'Staff'){
+            next();
+        }else{
+            res.json("bạn không đủ thẩm quyền")
+        }
+    } catch (error) {
+        
+    }
+}
+const checkAdmin = async(req,res,next)=>{
+    try {
+        const userId = req.query.userId
+        const role = (await User.getRoleByUserId(userId)).name
+        console.log(role)
+        if(role === 'System Administator'){
+            next();
+        }else{
+            res.json("bạn không đủ thẩm quyền")
+        }
+    } catch (error) {
+        
+    }
+}
+
 module.exports={
     getAllUser,
     getUserByEmail,
@@ -285,5 +342,9 @@ module.exports={
     editStatusNDL,
     showRequestConfirmNDL,
     showRequestConfirmNID,
-    registerByGg
+    registerByGg,
+    getUserByToken,
+    checkCustomer,
+    checkStaff,
+    checkAdmin,
 }

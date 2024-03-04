@@ -175,7 +175,7 @@ const updateUser = async (name, phone, dateOfBirth, userId)=>{
         await poolConnection.request()
         .input('name', sql.NVarChar, name)
         .input('phone', sql.NVarChar, phone)
-        .input('dateOfBirth', sql.DateTime, dateOfBirth)
+        .input('dateOfBirth', sql.DateTime, await util.inputDate(dateOfBirth))
         .input('userId', sql.Int, userId)
         .query(query);
         return {
@@ -198,10 +198,10 @@ const sendConfirmNID = async (userId, NID, name, dateOfBirth, native, address, d
         await poolConnection.request()
         .input('NID', sql.NVarChar, NID)
         .input('name', sql.NVarChar, name)
-        .input('dateOfBirth', sql.DateTime, dateOfBirth)
+        .input('dateOfBirth', sql.DateTime, await util.inputDate(dateOfBirth))
         .input('native', sql.NVarChar, native)
         .input('address', sql.NVarChar, address)
-        .input('dateProvide', sql.DateTime, dateProvide)
+        .input('dateProvide', sql.DateTime, await util.inputDate(dateProvide))
         .input('provider', sql.NVarChar, provider)
         .input('NIDId', sql.Int, user.NIDId)
         .query(query)
@@ -226,7 +226,7 @@ const sendConfirmNDL = async (userId, NDL, name, dateOfBirth, imgbase64)=>{
         await poolConnection.request()
         .input('NDL', sql.NVarChar, NDL)
         .input('name', sql.NVarChar, name)
-        .input('dateOfBirth', sql.DateTime, dateOfBirth)
+        .input('dateOfBirth', sql.DateTime, await util.inputDate(dateOfBirth))
         .input('NDLId', sql.Int, user.NDLId)
         .query(query)
         addKindImgUser('NDLF', imgbase64[0], userId)
@@ -378,18 +378,24 @@ const autoPromotedMembership = async (userId)=>{
             const memberShipId = (await getMemberShipUserCurrent(userId)).memberShipId;
             const newMemberShipId = memberShipId+1;
             let poolConnection = await sql.connect(config)
-            const query1 ='Select pointRequire From [dbo].[memberShip] where id = %id'
+            const query1 ='Select pointRequire From [dbo].[memberShip] where id = @id'
             const result = await poolConnection.request()
             .input('id', sql.Int, newMemberShipId)
             .query(query1)
-            const pointRequire = result.recordset.pointRequire
+            const pointRequire = result.recordset[0].pointRequire
             if(userPoint>=pointRequire){
                 const query2 = 'Insert into [dbo].[memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
                 await poolConnection.request()
                 .input('UserId', sql.Int, userId)
                 .input('MemberShipId', sql.Int, newMemberShipId)
-                .input('TimeChanged', sql.DateTime, util.currentTime)
+                .input('TimeChanged', sql.DateTime,await util.currentTime())
                 .query(query2)
+                return{
+                    message: "cập nhật thành công"
+                }
+            }
+            return{
+                message:"chưa đủ điểm"
             }
     }catch(err){
         console.log(err)
@@ -449,19 +455,23 @@ const checkLogin = async (email, password)=>{
     }
 }
 
-const createTransaction = async(userId, time, money, payerCode, currency, pointGet, paymentMethod)=>{
+const createTransaction = async(userId, money, payerCode, pointGet, paymentMethod)=>{
     try {
         let poolConnection = await sql.connect(config);
-        const query = "Insert into [dbo].[transaction] (userId, time, money, payerCode, currency, pointGet, paymentMethod) values (@userId, @time, @money, @payerCode, @currency, @pointGet, @paymentMethod)"
+        const query1 = "Insert into [dbo].[transaction] (userId, time, money, payerCode, pointGet, paymentMethod) values (@userId, @time, @money, @payerCode, @pointGet, @paymentMethod)"
         await poolConnection.request()
         .input('userId', sql.Int, userId)
-        .input('time', sql.DateTime, time)
+        .input('time', sql.DateTime, await util.currentTime())
         .input('money', sql.Float, money)
         .input('payerCode', sql.NVarChar, payerCode)
-        .input('currency', sql.NVarChar, currency)
         .input('pointGet', sql.Int, pointGet)
         .input('paymentMethod', sql.NVarChar, paymentMethod)
-        .query(query)
+        .query(query1)
+        const query2 = "Update [dbo].[user] set wallet = wallet + @pointGet where id = @userId"
+        await poolConnection.request()
+        .input('pointGet', sql.Int, pointGet)
+        .input('userId', sql.Int, userId)
+        .query(query2)
     } catch (error) {
         console.log("Error: ", error)
     }
@@ -472,7 +482,7 @@ const getTransactionHistory = async(userId)=>{
         let poolConnection = await sql.connect(config);
         const user = await getUserById(userId)
         console.log(user)
-        if (user.roleId != 5){
+        if (user.roleId != 3){
             const query = "Select * From [dbo].[transaction] where userId = @userId"
             const result = await poolConnection.request()
             .input('userId', sql.Int, userId)
@@ -488,7 +498,6 @@ const getTransactionHistory = async(userId)=>{
         console.log(error)
     }
 }
-
 const editStatusNID = async (userId, isConfirm)=>{
     try {
         let poolConnection = await sql.connect(config)
@@ -559,6 +568,27 @@ const registerByGg = async (email)=>{
         console.log(error)   
     }
 }
+
+const getUserByToken = async (token)=>{
+    try {
+        return jwt.verify(token, 'carFlex2024')
+    } catch (error) {
+        
+    }
+}
+const getRoleByUserId = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select * from dbo.role where id = (Select roleId from [dbo].[user]
+                        where id = @userId)`
+        const result = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query1)
+        return result.recordset[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports={
     getAllUser,
     getUserById,
@@ -584,6 +614,8 @@ module.exports={
     getMemberShipByUserId,
     showRequestConfirmNID,
     showRequestConfirmNDL,
-    registerByGg
+    registerByGg,
+    getUserByToken,
+    getRoleByUserId
 }
 

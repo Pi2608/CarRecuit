@@ -10,15 +10,15 @@ const checkVoucher = async(userId, code)=>{
         const result1 = await poolConnection.request()
         .input('code', sql.NVarChar, code)
         .query(query1)
-        const info = result1.recordset
-        const query2 = `Select * from dbo.voucherUser where 
-                        voucherId = @voucherId and user = @userId`
-        const result2 = await poolConnection.request()
-        .input('voucherId', sql.Int, info.id)
-        .input('userId', sql.Int, userId)
-        .query(query2)
-        const voucherUser = result2.recordset
+        const info = result1.recordset[0]
         if(info !=null){
+            const query2 = `Select * from dbo.voucherUser where 
+                        voucherId = @voucherId and userId = @userId`
+            const result2 = await poolConnection.request()
+            .input('voucherId', sql.Int, info.id)
+            .input('userId', sql.Int, userId)
+            .query(query2)
+            const voucherUser = result2.recordset[0]
             if(voucherUser == null){
                 if(info.isDeleted == false){
                     const currentTime = await Util.currentTime()
@@ -53,7 +53,7 @@ const checkVoucher = async(userId, code)=>{
             }
         }
     } catch (error) {
-        
+        console.log(error)
     }
 }
 const getVoucherByCode = async(code)=>{
@@ -105,14 +105,13 @@ const createVoucher = async(discount, startDate, endDate)=>{
                 status = false
             } 
         }
-        console.log(voucherCode)
         if(await Util.compareDates(startDate, endDate)){
             const query = `Insert into dbo.voucher (voucherCode, discount, startDate, endDate, isDeleted) values (@voucherCode, @discount, @startDate, @endDate, 0)`
             await poolConnection.request()
             .input('voucherCode', sql.NVarChar, voucherCode)
             .input('discount', sql.Float, discount)
-            .input('startDate', sql.DateTime, startDate)
-            .input('endDate', sql.DateTime, endDate)
+            .input('startDate', sql.DateTime,await Util.inputDate(startDate))
+            .input('endDate', sql.DateTime,await Util.inputDate(endDate))
             .query(query)
             return{
                 message: "Tạo voucher thành công"
@@ -149,8 +148,8 @@ const updateVoucher = async(id, voucherCode, discount, startDate, endDate)=>{
             await poolConnection.request()
             .input('voucherCode', sql.NVarChar, voucherCode)
             .input('discount', sql.Float, discount)
-            .input('startDate', sql.DateTime, startDate)
-            .input('endDate', sql.DateTime, endDate)
+            .input('startDate', sql.DateTime,await Util.inputDate(startDate))
+            .input('endDate', sql.DateTime,await Util.inputDate(endDate))
             .input('id', sql.Int, id)
             .query(query)
             return{
@@ -165,6 +164,13 @@ const updateVoucher = async(id, voucherCode, discount, startDate, endDate)=>{
         console.log(error)
     }
 } 
+const createVoucherAWeek = async(discount)=>{
+    const startDate = await Util.currentTime()
+    var date = new Date(startDate)
+    date.setDate(date.getDate()+7)
+    const endDate = date
+    await createVoucher(discount, startDate, endDate)
+}
 module.exports= {
     checkVoucher,
     getVoucherByCode,
@@ -172,5 +178,6 @@ module.exports= {
     getAllVoucher,
     createVoucher,
     deleteVoucher,
-    updateVoucher
+    updateVoucher,
+    createVoucherAWeek
 }
