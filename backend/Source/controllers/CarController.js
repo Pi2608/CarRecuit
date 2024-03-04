@@ -41,6 +41,15 @@ const getCarType = async (req, res)=>{
         
     }
 }
+const getCarTypeByTypeId = async (req,res)=>{
+    try {
+        const typeId = req.params.typeId
+        const response = await car.getCarTypeByTypeId (typeId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const getAllCarsOfOwner = async(req, res)=>{
     try {
         await Uitl.deleteAllImages()
@@ -165,4 +174,5 @@ module.exports={
     deleteCarRental,
     getBrandCar,
     getCarType,
+    getCarTypeByTypeId
 }
