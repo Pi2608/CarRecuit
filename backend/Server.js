@@ -37,7 +37,7 @@ app.use("/location", locationRouter)
 app.use("/car", carRouter)
 app.use("/rent", rentRouter)
 app.use("/transaction", transactionRouter)
-app.use("/img", express.static('Source/photos'))
+app.use("/img",  express.static('Source/photos'))
 //set rule vào 7H thứ 2 hàng tuần
 const rule = new schedule.RecurrenceRule();
 rule.dayOfWeek=1

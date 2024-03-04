@@ -25,6 +25,8 @@ import ConfirmInfoPage from './components/Pages/Admin/Pages/ConfirmInfoPage/Conf
 import { carInputs, userInputs, voucherInputs } from './components/Pages/Admin/Pages/formSource.js';
 import LoginForm from './components/Pages/Login/LoginForm/LoginForm.jsx';
 
+import Image from './image.jsx';
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -43,6 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/">
           <Route index element={<Home/>}/>
+          {/* <Route index element={<Image/>}/> */}
           <Route path="login">
             <Route index element={<LoginForm/>}/>
           </Route>

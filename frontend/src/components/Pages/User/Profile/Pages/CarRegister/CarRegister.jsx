@@ -14,11 +14,22 @@ export default function CarRegister() {
     const [ carGearStick, setCarGearStick ] = useState("");
     const [ carFuel, setCarFuel ] = useState("");
 
-    async function getAmenities() {}
+    const [ amenities,  setAmenities ] = useState([]);
 
-    useEffect(() => {
-
-    },[])
+    async function getAmenities() {
+        try {
+          const response = await fetch('http://localhost:4000/amenities/');
+          const data = await response.json();
+          setAmenities(data); 
+        } catch (error) {
+          console.error('Error fetching amenities:', error);
+        }
+      }
+    
+      useEffect(() => {
+        getAmenities();
+        console.log(amenities);
+      }, []);
 
     return(
         <div id="carregister">
@@ -134,115 +145,16 @@ export default function CarRegister() {
                         <br />
                         <br />
                         <p style={{fontWeight: "500", fontSize: "18px"}}>Các tính năng</p>
+                        <br />
                         <div className="amenity-container">
-                            <label htmlFor="amenity1" className="toggle-btn">
+                        {amenities.map((amenity) => (
+                            <label className="toggle-btn">
                                 <div className="amenity">
                                     <div className="icon"></div>
-                                    <p>Chức năng</p>
+                                    <p>{amenity.name}</p>
                                 </div>
                             </label>
-                            <label htmlFor="amenity2" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity3" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity4" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity5" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity6" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity7" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity8" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity9" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity10" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity11" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity12" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity13" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity14" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity15" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity16" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity17" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>
-                            <label htmlFor="amenity18" className="toggle-btn">
-                                <div className="amenity">
-                                    <div className="icon"></div>
-                                    <p>Chức năng</p>
-                                </div>
-                            </label>                            
+                        ))}             
                         </div>
                     </div>
                 </div>

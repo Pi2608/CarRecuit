@@ -16,11 +16,21 @@
     padding: 20px;
 }
 
-#item>.container>.img{
-    height: auto;
+#item>.container>.img-container{
     width: 100%;
-    border: #c7c7c7;
+    height: 175px;
+    display: flex;   
+    justify-content: center;
+    align-items: center;
     border-radius: 25px;
+    overflow: hidden;
+    border: #c7c7c7;
+}
+
+#item > .container > .img-container img {
+    width: 100%;
+    height: auto;
+    flex: 1;
 }
 
 #item>.container>.item-detail>.title{
