@@ -101,6 +101,12 @@ const compareDates= async(startDate, endDate) =>{
     }
 }
 
+const inputDate = async(date)=>{
+    const newDate = new Date(date)
+    newDate.setHours(newDate.getHours()+7)
+    return newDate
+}
+
 module.exports={
     currentTime,
     getPositionCar,
@@ -109,5 +115,6 @@ module.exports={
     generateRandomString,
     calculatePeriod,
     compareDates,
-    deleteAllImages
+    deleteAllImages,
+    inputDate
 }
