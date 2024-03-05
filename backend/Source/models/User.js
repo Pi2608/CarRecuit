@@ -438,7 +438,7 @@ const checkLogin = async (email, password)=>{
         const users = await getAllUser()
         const user = users.find(user => user.email==email&& user.password==password)
         if (user != null && user.status == 1 && user.idDeleted != true){
-            const payload ={userid: user.id, email: user.email};
+            const payload ={userid: user.id, email: user.email, roleId : user.roleId};
             const secretKey = 'carFlex2024'
             const token = jwt.sign(payload, secretKey)
             return {

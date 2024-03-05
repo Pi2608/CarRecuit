@@ -24,7 +24,17 @@ const addCarRentLocation = async(req, res)=>{
     }
 }
 
+const getLocationAll = async(req, res)=>{
+    try {
+        const response = await location.getLocationAll()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
 module.exports={
     getCarLocation,
-    addCarRentLocation
+    addCarRentLocation,
+    getLocationAll
 }
