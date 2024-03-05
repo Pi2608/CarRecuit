@@ -11,7 +11,6 @@ const getAllCarsInUse= async()=>{
         const result = await poolConnection.request().query(query1);
         const cars= result.recordset;
         for (let car of cars){
-            console.log(car.id)
             const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
             const result2 = await poolConnection.request()
             .input('carId', sql.Int, car.id)
