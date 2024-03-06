@@ -1,27 +1,87 @@
-import React from 'react';
-import {FaUser, FaLock } from 'react-icons/fa';
+import React,{ useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Login from "../Login/Login.jsx";
+import { useAuth } from '../../../../Context/AuthProvider.jsx';
+import {FaUser, FaLock, FaCookie } from 'react-icons/fa';
+import axios from 'axios';
 import "./LoginForm.css";
 
 const LoginForm = () => {
+  const userRef = useRef()
+
+  const navigate = useNavigate()
+  const { login } = useAuth();
+  const [user, setUser] = useState("");
+  const [pwd, setPwd] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+
+  useEffect(()=> {
+    userRef.current.focus();
+  },[])
+
+  useEffect(()=> {
+    setErrMsg("");
+  },[user, pwd])
+
+  async function handleSubmit(e){
+    e.preventDefault();
+    try {
+      const postData = {
+        email: user,
+        password: pwd,
+      }
+      const response1 = await axios.get(`http://localhost:4000/user/${user}`)
+      if(response1.data){
+        const response2 = await axios.post(
+          "http://localhost:4000/user/login",
+          postData
+        );
+        const token = response2.data.token;
+        // console.log(token)
+        // Set the token in a cookie and update the authentication state
+        login(token)
+
+        setUser("")
+        setPwd("")
+      }
+    }catch (err) {
+      if(!err?.reponse){
+        setErrMsg('No Sever Response')
+      }else if(err.response?.status === 400){
+        setErrMsg('Missing Usename or Password')
+      }else if(err.response?.status === 401){
+        setErrMsg('Unauthorized')
+      }else{
+        setErrMsg('Login Failed')
+      }
+    }
+  }
+
   return (
     <div className="wrapper">
-      <form action="">
+      <form onSubmit={handleSubmit}>
         <h1>Đăng nhập</h1>
         <div className="input-box">
-          <input type="text" placeholder="Email/Số điện thoại" required />
+          <input
+            type="text" 
+            placeholder="Email/Số điện thoại" 
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setUser(e.target.value)}
+            value={user}
+            required 
+            />
           <FaUser className="icon" />
         </div>
         <div className="input-box">
-          <input type="password" placeholder="Mật khẩu" required />
+          <input 
+            type="password" 
+            placeholder="Mật khẩu"
+            onChange={(e) => setPwd(e.target.value)}
+            value={pwd}
+            required 
+            />
           <FaLock className="icon" />
-        </div>
-        <div className="remember-forgot">
-          <label>
-            <input type="checkbox" />
-            Ghi nhớ
-          </label>
-          <a href="#">Quên mật khẩu?</a>
         </div>
         <button type="submit">Đăng nhập</button>
         <div className="register-link">

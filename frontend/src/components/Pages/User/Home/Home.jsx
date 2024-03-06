@@ -9,29 +9,23 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
+import { useAuth } from '../../../../Context/AuthProvider.jsx';
+import Cookies from "js-cookie";
 import axios from "axios";
-import ReactAxios from 'react-axios';
 import "./Home.css"
 
 export default function Home() {
 
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const { auth, login } = useAuth();
   
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchData();
   },[])
   
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:4000/user/'); // Adjust the URL according to your API endpoint
-      setUsers(response.data); // Assuming the response contains an array of user data
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  }
+  useEffect(() => {
+    if(auth) console.log("Login:", auth);
+  }, [auth]);
 
   return (
     <div id="home">
