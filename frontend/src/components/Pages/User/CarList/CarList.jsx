@@ -24,13 +24,26 @@ export default function CarList(){
 
     const fetchCarList = async () => {
         try {
-          const response = await axios.get('http://localhost:4000/car/');
-          setCarList(response.data); 
+            const response = await axios.get('http://localhost:4000/car/');
+            const carListData = response.data;
+
+            // Create an array of promises for each image loading
+            const imagePromises = carListData.map((car) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = car.imgUrl;
+                    img.onload = () => resolve({ ...car, loaded: true });
+                });
+            });
+
+            // Wait for all images to be loaded before updating state
+            const loadedCarList = await Promise.all(imagePromises);
+            setCarList(loadedCarList);
         } catch (error) {
-          console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error);
         }
-      };
-    
+        };
+
     useEffect(() => {
         window.scrollTo(0, 0)
         fetchCarList();

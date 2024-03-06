@@ -5,7 +5,7 @@ import Sidebar from "../../Profile items/Sidebar/Sidebar";
 import ResetPw from "../../Profile items/Content items/ResetPwPage/ResetPw";
 import "./ChangePw.css"
 
-export default function Profile() {
+export default function ChangePw() {
 
     useEffect(()=>{
         window.scrollTo(0,0);
