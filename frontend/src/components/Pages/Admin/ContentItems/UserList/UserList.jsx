@@ -1,6 +1,6 @@
 import "./UserList.css";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,9 +8,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { Button, TextField } from "@mui/material";
+import axios from "axios";
+import Popup from "reactjs-popup";
+import SettingsIcon from "@mui/icons-material/Settings";
 
-const UserList = () => {
-  const rows = [
+export default function UserList() {
+  /*const rows = [
     {
       id: 1,
       name: "Tuyết",
@@ -20,18 +24,40 @@ const UserList = () => {
       depositAmount: 20225454884,
       point: 25,
     },
-  ];
-  const [data, setData] = useState(rows);
+  ];*/
+  const [page, setPage] = useState(1);
+  const [users, setUsers] = useState([]);
+  const [pageList, setPageList] = useState([]);
+
+  const handleSwitchPage = (page) => {
+    setPage(page);
+  };
+
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get(`http://localhost:4000/user/`);
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetch data", error);
+    }
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchUser();
+  }, []);
+
+  useEffect(() => {}, [users]);
 
   const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
+    setUsers(users.filter((item) => item.id !== id));
   };
   /*const handleDelete = (id) => {
     const updatedUsers = data.filter(item => item.id !== id);
     setData(updatedUsers);
   };*/
   const handleBan = (id) => {
-    setData((prevData) => {
+    setUsers((prevData) => {
       return prevData.map((item) => {
         if (item.id === id) {
           const updatedItem = { ...item, banned: true };
@@ -65,54 +91,89 @@ const UserList = () => {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead className="tableHead">
             <TableRow>
-              <TableCell className="tableCell">Mã số</TableCell>
-              <TableCell className="tableCell">Hình ảnh</TableCell>
-              <TableCell className="tableCell">Tên</TableCell>
-              <TableCell className="tableCell">Email</TableCell>
-              <TableCell className="tableCell">SĐT</TableCell>
-              <TableCell className="tableCell">Số tiền đã nạp</TableCell>
-              <TableCell className="tableCell">Point</TableCell>
-              <TableCell className="tableCell">Hành động</TableCell>
+              <TableCell>
+                <div className="font-bold text-lg">Mã số</div>
+              </TableCell>
+              <TableCell>
+                <div className="font-bold text-lg">Tên</div>
+              </TableCell>
+              <TableCell>
+                <div className="font-bold text-lg w-1/2">Email</div>
+              </TableCell>
+              <TableCell>
+                <div className="font-bold text-lg">SĐT</div>
+              </TableCell>
+              <TableCell>
+                <div className="font-bold text-lg">Số tiền đã nạp</div>
+              </TableCell>
+              <TableCell>
+                <div className="font-bold text-lg">Point</div>
+              </TableCell>
+              <TableCell>
+                <div className="font-bold text-lg">Hành động</div>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell className="tableCell">{row.id}</TableCell>
-                <TableCell>
-                  <div className="cellWithImg">
-                    <img className="cellImg" src={row.img} alt="avatar" />
-                  </div>
-                </TableCell>
-                <TableCell className="tableCell">{row.name}</TableCell>
-                <TableCell className="tableCell">{row.email}</TableCell>
-                <TableCell className="tableCell">{row.phone}</TableCell>
-                <TableCell className="tableCell">{row.depositAmount}</TableCell>
-                <TableCell className="tableCell">{row.point}</TableCell>
-                <TableCell>
-                  <div className="cellAction">
-                    <div
-                      className="banButton"
-                      onClick={() => handleBan(row.id)}
-                      style={{ backgroundColor: row.buttonColor }}
-                    >
-                      Cấm
-                    </div>
-                    <div
-                      className="deleteButton"
-                      onClick={() => handleDelete(row.id)}
-                    >
-                      Xóa
-                    </div>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {users &&
+              users.map((row) => (
+                <>
+                  <TableRow>
+                    <TableCell>
+                      <div className="text-lg">{row.id}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-lg">{row.name}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="truncate text-lg">{row.email}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-lg">{row.phone}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-lg">{row.wallet}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-lg">{row.point}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="cellAction">
+                        <div
+                          className="banButton"
+                          onClick={() => handleBan(row.id)}
+                          style={{ backgroundColor: row.buttonColor }}
+                        >
+                          Cấm
+                        </div>
+                        <div
+                          className="deleteButton"
+                          onClick={() => handleDelete(row.id)}
+                        >
+                          Xóa
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <div className="flex justify-center my-4">
+        {pageList.map((pg, index) => (
+          <td key={index}>
+            <div className="items-center">
+              <Button
+                variant={index + 1 === page ? "contained" : "outlined"}
+                onClick={() => handleSwitchPage(index + 1)}
+              >
+                {index + 1}
+              </Button>
+            </div>
+          </td>
+        ))}
+      </div>
     </div>
   );
-};
-
-export default UserList;
+}
