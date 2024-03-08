@@ -166,16 +166,17 @@ const changePassword = async(oldPass, newPass, userId)=>{
     }
 }
 
-const updateUser = async (name, phone, dateOfBirth, userId)=>{
+const updateUser = async (name, phone, dateOfBirth, gender, userId)=>{
     try{
         let poolConnection = await sql.connect(config)
         const query =`Update [dbo].[user] 
-                    set name=@name, phone=@phone, dateOfBirth= @dateOfBirth
+                    set name=@name, phone=@phone, dateOfBirth= @dateOfBirth, gender= @gender
                     where id = @userId` 
         await poolConnection.request()
         .input('name', sql.NVarChar, name)
         .input('phone', sql.NVarChar, phone)
         .input('dateOfBirth', sql.DateTime, await util.inputDate(dateOfBirth))
+        .input('gender', sql.NVarChar, gender)
         .input('userId', sql.Int, userId)
         .query(query);
         return {
@@ -438,7 +439,7 @@ const checkLogin = async (email, password)=>{
         const users = await getAllUser()
         const user = users.find(user => user.email==email&& user.password==password)
         if (user != null && user.status == 1 && user.idDeleted != true){
-            const payload ={userid: user.id, email: user.email};
+            const payload ={userid: user.id, email: user.email, roleId : user.roleId};
             const secretKey = 'carFlex2024'
             const token = jwt.sign(payload, secretKey)
             return {

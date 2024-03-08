@@ -1,6 +1,7 @@
 const sql = require('mssql');
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
+const Location = require("./Location")
 
 
 const getAllCarsInUse= async()=>{
@@ -16,6 +17,8 @@ const getAllCarsInUse= async()=>{
             .query(query2)
             const img = result2.recordset[0]
             car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.description
         }
         return cars
     }catch(err){
@@ -37,7 +40,6 @@ const getAllCarsOfOwner = async(ownnerId)=>{
             .input('carId', sql.Int, car.id)
             .query(query2)
             const img = result2.recordset[0]
-            console.log(img)
             car.imgUrl = await util.decodeImage(img.url, img.id)
         }
         return cars
@@ -141,13 +143,6 @@ const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
 
 const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     try{
-        console.log({
-            carTypeId:carTypeId,
-            maxPrice: maxPrice,
-            minPrice:minPrice,
-            seats:seats,
-            typeOfFuels:typeOfFuels,
-        })
         const Cars = await getAllCarsInUse();
         const filteredCars = Cars.filter(car => {
             if (carTypeId && car.carTypeId.toString() !== carTypeId) {

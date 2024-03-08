@@ -14,7 +14,9 @@ import ErrorPage from './components/Pages/ErrorPage/ErrorPage.jsx';
 import Home from './components/Pages/User/Home/Home.jsx';
 import CarList from './components/Pages/User/CarList/CarList.jsx';
 import CarDetail from './components/Pages/User/CarDetail/CarDetail.jsx';
+import Map from './components/Pages/User/Map/Map.jsx';
 import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.jsx";
+import Transaction from './components/Pages/User/Profile/Pages/TransactionPage/Transaction.jsx';
 import Trips from './components/Pages/User/Profile/Pages/TravelPage/Trips.jsx';
 import MyCars from './components/Pages/User/Profile/Pages/MyCarsPage/MyCars.jsx';
 import Address from './components/Pages/User/Profile/Pages/AddressPage/Address.jsx';
@@ -54,6 +56,9 @@ function App(){
                 <Route index element={<CarDetail/>}/>
               </Route>
             </Route>
+            <Route path="map">
+              <Route index element={<Map/>}/>
+            </Route>
             <Route path="user">
               <Route path="profile">
                 <Route index element={<Profile/>}/>
@@ -69,6 +74,9 @@ function App(){
               </Route>
               <Route path="resetpw">
                 <Route index element={<ChangePw/>}/>
+              </Route>
+              <Route path="transaction">
+                <Route index element={<Transaction/>}/>
               </Route>
             </Route>
             {/* admin */}
