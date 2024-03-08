@@ -10,6 +10,7 @@ const LoginForm = () => {
   const userRef = useRef()
 
   const navigate = useNavigate()
+
   const { login } = useAuth();
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
@@ -56,7 +57,7 @@ const LoginForm = () => {
       }
     }
   }
-
+  
   return (
     <div className="wrapper">
       <form onSubmit={handleSubmit}>

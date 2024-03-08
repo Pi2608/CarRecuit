@@ -8,6 +8,8 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
+// import { LocalizationProvider } from '@mui/x-date-pickers';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import ErrorPage from './components/Pages/ErrorPage/ErrorPage.jsx';
 import Home from './components/Pages/User/Home/Home.jsx';
 import CarList from './components/Pages/User/CarList/CarList.jsx';
@@ -33,6 +35,7 @@ import LoginForm from './components/Pages/Login/LoginForm/LoginForm.jsx';
 function App(){
   return (
     <div>
+      {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
         <Routes>
           <Route path="/">
             {/* user */}
@@ -40,14 +43,16 @@ function App(){
             <Route path="login">
               <Route index element={<LoginForm/>}/>
             </Route>
-            <Route path="carregister">
-              <Route index element={<CarRegister/>}/>
-            </Route>
-            <Route path="carlist">
-              <Route index element={<CarList/>}/>
-            </Route>
-            <Route path="cardetail">
-              <Route index element={<CarDetail/>}/>
+            <Route path="car">
+              <Route path="carregister">
+                <Route index element={<CarRegister/>}/>
+              </Route>
+              <Route path="carlist">
+                <Route index element={<CarList/>}/>
+              </Route>
+              <Route path="cardetail/:carId">
+                <Route index element={<CarDetail/>}/>
+              </Route>
             </Route>
             <Route path="user">
               <Route path="profile">
@@ -67,29 +72,32 @@ function App(){
               </Route>
             </Route>
             {/* admin */}
-            <Route path="dashboard">
-              <Route index element={<Dashboard/>}/>
-            </Route>
-            <Route path="users">
-              <Route index element={<UserListPage/>}/>
-              <Route path="new" element={<New inputs={userInputs} title="Thêm người dùng mới"/>}/>
-            </Route>
-            <Route path="cars">
-              <Route index element={<CarListPage/>}/>
-              <Route path="new" element={<New inputs={carInputs} title="Thêm xe mới"/>}/>
-            </Route>
-            <Route path="voucher">
-              <Route index element={<VoucherListPage/>}/>
-              <Route path="new" element={<New inputs={voucherInputs} title="Thêm voucher mới"/>}/>
-            </Route>
-            <Route path="statistic">
-              <Route index element={<StatisticPage/>}/>
-            </Route>
-            <Route path="confirm">
-              <Route index element={<ConfirmInfoPage/>}/>
+            <Route path="admin">
+              <Route path="dashboard">
+                <Route index element={<Dashboard/>}/>
+              </Route>
+              <Route path="users">
+                <Route index element={<UserListPage/>}/>
+                <Route path="new" element={<New inputs={userInputs} title="Thêm người dùng mới"/>}/>
+              </Route>
+              <Route path="cars">
+                <Route index element={<CarListPage/>}/>
+                <Route path="new" element={<New inputs={carInputs} title="Thêm xe mới"/>}/>
+              </Route>
+              <Route path="voucher">
+                <Route index element={<VoucherListPage/>}/>
+                <Route path="new" element={<New inputs={voucherInputs} title="Thêm voucher mới"/>}/>
+              </Route>
+              <Route path="statistic">
+                <Route index element={<StatisticPage/>}/>
+              </Route>
+              <Route path="confirm">
+                <Route index element={<ConfirmInfoPage/>}/>
+              </Route>
             </Route>
           </Route>
         </Routes>
+      {/* </LocalizationProvider> */}
     </div>
   )
 }

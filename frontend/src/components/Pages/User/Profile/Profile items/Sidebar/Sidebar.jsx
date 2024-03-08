@@ -22,7 +22,7 @@ export default function Sidebar() {
 
     return (
         <div id="sidebar">
-            <h1>Xin chào user</h1>
+            <h1>Xin chào bạn!</h1>
             <div className="sidebar-item" onClick={() => navigate("/user/profile")}>
                 <table style={{display: "flex", alignItems: "center"}}>
                     <td style={{position: "relative", top: "2px"}}><PermIdentityOutlinedIcon style={{height: "24px"}}/></td>

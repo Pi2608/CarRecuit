@@ -25,6 +25,8 @@ export default function Home() {
   
   useEffect(() => {
     if(auth) console.log("Login:", auth);
+    const token = Cookies.get('token')
+    console.log(token)
   }, [auth]);
 
   return (
@@ -70,7 +72,7 @@ export default function Home() {
                             color: "#00BF54", 
                             fontWeight: "bold"
                           }}
-                    onClick={()=>navigate("/carlist")}>
+                    onClick={()=>navigate("/car/carlist")}>
                             Tìm xe
                             </Button>
                 </div>

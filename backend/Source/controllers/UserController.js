@@ -81,6 +81,7 @@ const updateUser = async(req, res)=>{
         const name = req.body.name
         const phone = req.body.phone
         const dateOfBirth = req.body.dateOfBirth
+        console.log(name, phone, dateOfBirth)
         const userId = req.params.userId
         const response = await User.updateUser(name, phone, dateOfBirth, userId)
         res.json(response)

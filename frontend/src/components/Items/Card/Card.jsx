@@ -7,7 +7,7 @@ import axios from "axios";
 import "./Card.css"
 
 // export default function Card({ itemId, shape, material, image, title, price, discount })
-export default function Card({image, year, price, description, typeId}) {
+export default function Card({id, image, year, price, description, typeId}) {
 
     const navigate = useNavigate()
     const [carName, setCarName] = useState([])
@@ -26,7 +26,7 @@ export default function Card({image, year, price, description, typeId}) {
     },[])
     
     return (
-        <div id="item" onClick={()=>navigate("/cardetail")}>
+        <div id="item" onClick={()=>navigate(`/car/cardetail/${id}`)}>
             <div className="container">
                 <div className="img-container">
                     <img className="img" src={image}  loading="lazy"/>

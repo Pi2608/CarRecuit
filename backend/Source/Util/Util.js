@@ -102,6 +102,7 @@ const compareDates= async(startDate, endDate) =>{
 }
 
 const inputDate = async(date)=>{
+    console.log(date)
     const newDate = new Date(date)
     newDate.setHours(newDate.getHours()+7)
     return newDate
