@@ -24,17 +24,37 @@ const recordCarLocation = async (carId)=>{
 const addCarRentLocation = async (carId, typeLocationId, latitude, longitude, description)=>{
     try {
         let poolConnection = await sql.connect(config);
+        const query2 = `Select * from [dbo].[location] where carId = @carId and typeLocationId = @typeLocationId`
+        const result2 = await poolConnection.request()
+        .input('carId', sql.Int, carId)
+        .input('typeLocationId',sql.Int, typeLocationId)
+        .query(query2)
+        const location = result2.recordset[0]
         if (typeLocationId<=2 && typeLocationId>=1){
-            const query = 'Insert into [dbo].[location] (carId, typeLocationId, time, latitude, longitude, description) values (@carId, @typeLocationId, null, @latitude, @longitude, @description)'
-            await poolConnection.request()
-            .input('carId', sql.NVarChar, carId)
-            .input('typeLocationId', sql.Int, typeLocationId)
-            .input('latitude', sql.Float, latitude)
-            .input('longitude', sql.Float, longitude)
-            .input('description', sql.NVarChar, description)
-            .query(query)
-            return{
-                message: "thêm thành công"
+            if(location==null){
+                const query = 'Insert into [dbo].[location] (carId, typeLocationId, time, latitude, longitude, description) values (@carId, @typeLocationId, null, @latitude, @longitude, @description)'
+                await poolConnection.request()
+                .input('carId', sql.NVarChar, carId)
+                .input('typeLocationId', sql.Int, typeLocationId)
+                .input('latitude', sql.Float, latitude)
+                .input('longitude', sql.Float, longitude)
+                .input('description', sql.NVarChar, description)
+                .query(query)
+                return{
+                    message: "thêm thành công"
+                }
+            }else{
+                const query3 = `Update [dbo].[location] set latitude = @latitude ,longitude = @longitude,description = @description where carId = @carId and typeLocationId= @typeLocationId`
+                await poolConnection.request()
+                .input('carId', sql.NVarChar, carId)
+                .input('typeLocationId', sql.Int, typeLocationId)
+                .input('latitude', sql.Float, latitude)
+                .input('longitude', sql.Float, longitude)
+                .input('description', sql.NVarChar, description)
+                .query(query3)
+                return{
+                    message: "thêm thành công"
+                }
             }
         }
     } catch (error) {
@@ -50,7 +70,7 @@ const getCarLocation = async(carId, typeLocationId)=>{
         }
         const query = 'Select TOP 1 * From [dbo].[location] where carId = @carId and typeLocationId = @typeLocationId  Order By id DESC'
         const result = await poolConnection.request()
-        .input('carId', sql.NVarChar, carId)
+        .input('carId', sql.Int, carId)
         .input('typeLocationId', sql.Int, typeLocationId)
         .query(query)
         return result.recordset[0]
@@ -58,11 +78,22 @@ const getCarLocation = async(carId, typeLocationId)=>{
         console.log(error)
     }
 }
-
+const getLocationAll = async()=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select * from [dbo].[location] where typeLocationId = 1`
+        const result = await poolConnection.request()
+        .query(query)
+        return result.recordset
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports={
     recordCarLocation,
     addCarRentLocation,
-    getCarLocation
+    getCarLocation,
+    getLocationAll
 }
 
 

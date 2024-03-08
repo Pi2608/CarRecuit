@@ -81,8 +81,9 @@ const updateUser = async(req, res)=>{
         const name = req.body.name
         const phone = req.body.phone
         const dateOfBirth = req.body.dateOfBirth
+        const gender = req.body.gender
         const userId = req.params.userId
-        const response = await User.updateUser(name, phone, dateOfBirth, userId)
+        const response = await User.updateUser(name, phone, dateOfBirth, gender, userId)
         res.json(response)
     } catch (error) {
         

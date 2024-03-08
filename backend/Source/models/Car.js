@@ -1,6 +1,7 @@
 const sql = require('mssql');
 const config = require("../config/dbconfig");
 const util = require("../Util/Util");
+const Location = require("./Location")
 
 
 const getAllCarsInUse= async()=>{
@@ -16,6 +17,8 @@ const getAllCarsInUse= async()=>{
             .query(query2)
             const img = result2.recordset[0]
             car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.description
         }
         return cars
     }catch(err){
