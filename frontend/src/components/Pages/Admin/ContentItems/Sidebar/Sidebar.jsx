@@ -5,11 +5,21 @@ import TimeToLeaveIcon from "@mui/icons-material/TimeToLeave";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import { useNavigate } from "react-router-dom";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../../Context/AuthProvider";
 
 const Sidebar = () => {
+
   const navigate = useNavigate();
+
+  const { logout } = useAuth();
+
+  const handleLogout = () =>{
+    logout();
+    navigate("/");
+  }
+  
   return (
     <div id="adsidebar">
       <div className="top">
@@ -18,35 +28,35 @@ const Sidebar = () => {
       <hr />
       <div className="center">
         <ul>
-          <li onClick={() => navigate("/dashboard")}>
+          <li onClick={() => navigate("/admin/dashboard")}>
             <DashboardIcon className="icon" />
             <span>Dashboard</span>
           </li>
-          <li onClick={() => navigate("/users")}>
+          <li onClick={() => navigate("/admin/users")}>
             <PersonOutlineIcon className="icon" />
             <span>Người dùng</span>
           </li>
-          <li onClick={() => navigate("/cars")}>
+          <li onClick={() => navigate("/admin/cars")}>
             <TimeToLeaveIcon className="icon" />
             <span>Danh sách xe</span>
           </li>
 
-          <li onClick={() => navigate("/voucher")}>
+          <li onClick={() => navigate("/admin/voucher")}>
             <CardGiftcardIcon className="icon" />
             <span>Voucher</span>
           </li>
-          <li onClick={() => navigate("/statistic")}>
+          <li onClick={() => navigate("/admin/statistic")}>
             <AssessmentOutlinedIcon className="icon" />
             <span>Thống kê</span>
           </li>
-          <li onClick={() => navigate("/confirm")}>
+          <li onClick={() => navigate("/admin/confirm")}>
             <div className="item">
               <NotificationsNoneOutlinedIcon className="icon" />
               <div className="counters">1</div>
             </div>
             <span>Xác nhận thông tin</span>
           </li>
-          <li>
+          <li onClick={() => handleLogout()}>
             <LogoutOutlinedIcon className="icon" />
             <span>Đăng xuất</span>
           </li>
