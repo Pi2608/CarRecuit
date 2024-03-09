@@ -1,6 +1,7 @@
 const User = require("../models/User")
 const multer = require("multer")
 const Uitl = require("../Util/Util");
+const { response } = require("express");
 
 
 const storage = multer.diskStorage({
@@ -21,6 +22,16 @@ const getAllUser = async(req, res)=>{
         res.json(response);
     }catch(err){
         res.status(500).json({message: err.message})
+    }
+}
+const getUserById = async (req, res)=>{
+    try {
+        await Uitl.deleteAllImages()
+        const userId = req.params.userId
+        const response = await User.getUserById(userId)
+        res.json(response)
+    } catch (error) {
+        
     }
 }
 const getUserByEmail = async(req, res)=>{
@@ -83,7 +94,17 @@ const updateUser = async(req, res)=>{
         const dateOfBirth = req.body.dateOfBirth
         const gender = req.body.gender
         const userId = req.params.userId
-        const response = await User.updateUser(name, phone, dateOfBirth, gender, userId)
+        const imagePaths = req.files.map(file=>file.path);
+        let imgs = [];
+        for (const path of imagePaths) {
+            try {
+                const base64Code = await Uitl.encodeImage(path);
+                imgs.push(base64Code);
+            } catch (error) {
+                console.error('Error encoding image:', error);
+            }
+        }
+        const response = await User.updateUser(name, phone, dateOfBirth, gender, userId, imgs[0])
         res.json(response)
     } catch (error) {
         
@@ -92,7 +113,6 @@ const updateUser = async(req, res)=>{
 
 const sendConfirmNID = async(req, res)=>{
     try {
-        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const NID = req.body.NID
         const name = req.body.name
@@ -119,7 +139,6 @@ const sendConfirmNID = async(req, res)=>{
 }
 const sendConfirmNDL = async(req, res)=>{
     try {
-        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const NDL = req.body.NDL
         const name = req.body.name
@@ -348,4 +367,5 @@ module.exports={
     checkCustomer,
     checkStaff,
     checkAdmin,
+    getUserById
 }

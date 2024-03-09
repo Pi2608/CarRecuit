@@ -12,7 +12,7 @@ userRouter.post("/login", userController.checkLogin)
 userRouter.post("/register", userController.createUser)
 
 userRouter.post("/changePass/:userId", userController.changePassword)
-userRouter.post("/update/:userId", userController.updateUser)
+userRouter.post("/update/:userId", userController.uploadImgs, userController.updateUser)
 userRouter.put("/delete/:userId", userController.deleteUserById)
 userRouter.put("/editStatus", userController.editStatusUser)
 
@@ -33,6 +33,7 @@ userRouter.get("/NID/:userId", userController.getNIDinfoByUserId)
 userRouter.get("/NDL/:userId", userController.getNDLinfoByUserId)
 userRouter.post("/registerGG", userController.registerByGg)
 userRouter.get("/getByToken", userController.getUserByToken)
-userRouter.get("/:email", userController.getUserByEmail)
+userRouter.get("/email/:email", userController.getUserByEmail)
+userRouter.get("/:userId", userController.getUserById)
 
 module.exports = userRouter;

@@ -7,7 +7,9 @@ const Location = require("./Location")
 const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Select * From [dbo].[car] Where status = 1 and isDeleted = 0'
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id`
         const result = await poolConnection.request().query(query1);
         const cars= result.recordset;
         for (let car of cars){
@@ -94,7 +96,15 @@ const getCarById= async(id)=>{
         for(let i=0; i< imgs.length; i++){
             imgs[i].url = await util.decodeImage(imgs[i].url, imgs[i].id)
         }
-        return [car, imgs];
+        const query1 = `Select amenities.* from dbo.amenities
+                        inner join dbo.carAmenities 
+                        on carAmenities.amenitiesId = amenities.id
+                        where carAmenities.carId = @carId`
+        const result1 = await poolConnection.request()
+        .input('carId', sql.Int, id)
+        .query(query1)
+        const amenities = result1.recordset
+        return [car , imgs, amenities];
     }catch(err){
         console.log(err)
     }
