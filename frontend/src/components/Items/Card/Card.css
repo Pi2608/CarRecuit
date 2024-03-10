@@ -13,7 +13,7 @@
 }
 
 #item>.container{
-    padding: 20px;
+    padding: 20px 20px 10px 20px;
 }
 
 #item>.container>.img-container{
@@ -36,11 +36,12 @@
 
 #item>.container>.item-detail>.title{
     font-weight: 600;
-    font-size: x-large;
-    padding-bottom: 10px;
+    font-size: 1.3em;
+    padding: 10px 0px;
 }
 
 #item>.container>.item-detail>.location{
+    display: flex;
     padding-bottom: 10px;
 }
 

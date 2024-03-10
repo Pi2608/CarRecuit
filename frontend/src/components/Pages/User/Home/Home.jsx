@@ -17,17 +17,53 @@ import "./Home.css"
 export default function Home() {
 
   const navigate = useNavigate();
-  const { auth, login } = useAuth();
-  
+  const { auth, id, role  } = useAuth();
+
+  const [ carList, setCarList ] = useState([]);
+
+  const fetchCarList = async () => {
+    try {
+        const response = await axios.get('http://localhost:4000/car/');
+        const carListData = response.data;
+
+        // Create an array of promises for each image loading
+        const imagePromises = carListData.map((car) => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = car.imgUrl;
+                img.onload = () => resolve({ ...car, loaded: true });
+            });
+        });
+
+        // Wait for all images to be loaded before updating state
+        const loadedCarList = await Promise.all(imagePromises);
+        setCarList(loadedCarList);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+  };
+
+  const getRandomItems = (arr, count) => {
+    const shuffled = arr.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchCarList();
   },[])
   
   useEffect(() => {
     if(auth) console.log("Login:", auth);
     const token = Cookies.get('token')
     console.log(token)
+    console.log(id)
+    console.log(role)
   }, [auth]);
+
+  useEffect(() => {
+
+  },[carList])
 
   return (
     <div id="home">
@@ -41,7 +77,7 @@ export default function Home() {
                   <table style={{width: "100%"}}>
                     <tr style={{color:""}}>
                       <td><LocationOnIcon/></td>
-                      <td> Địa điểm</td>
+                      <td style={{textAlign: "left"}}>Địa điểm</td>
                     </tr>
                     <tr>
                       <td></td>
@@ -54,7 +90,7 @@ export default function Home() {
                 <table style={{width: "100%"}}>
                     <tr>
                       <td><CalendarMonthIcon/></td>
-                      <td> Thời gian thuê</td>
+                      <td style={{textAlign: "left"}}>Thời gian thuê</td>
                     </tr>
                     <tr>
                       <td></td>
@@ -89,14 +125,9 @@ export default function Home() {
           <div className="car-section">
             <p>Xe Dành Cho Bạn</p>
             <div className="car-container">
-              <Card />
-              <Card />
-              <Card />
-              <Card />
-              <Card />
-              <Card />
-              <Card />
-              <Card />
+              {getRandomItems(carList, 8).map((car) => (
+                <Card key={car.id} id={car.id} year={car.year} price={car.price} description={car.description} image={car.imgUrl} typeId={car.carTypeId} />
+              ))}
             </div>
           </div>
           <div className="explorer-section">

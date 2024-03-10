@@ -125,10 +125,9 @@ export default function CarDetail(){
             <Header/>
             <div className="body">
                 <div className="img-container">
-                    <img src={carImage1.url} alt="" className="item-1"/>
-                    <img src={carImage2.url} alt="" className="item-2"/>
-                    <img src={carImage3.url} alt="" className="item-3"/>
-                    <img src={carImage4.url} alt="" className="item-4"/>
+                    {carImages.map((img, index) => (
+                        <img src={img.url} alt="" className={`item-${index + 1}`}/>
+                    ))}
                 </div>
                 <div className="car-info">
                     <div className="info">
