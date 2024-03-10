@@ -96,7 +96,14 @@ const getUserById= async(id) => {
         const result = await poolConnection.request()
         .input('id', sql.Int, id)
         .query(query);
-        return result.recordset[0]
+        const user = result.recordset[0]
+        const query1 = `Select * from [dbo].[image] where userId = @id and id like '%F%'`
+        const result1 = await poolConnection.request()
+        .input('id', sql.Int, id)
+        .query(query1)
+        const image = result1.recordset[0]
+        user.imgUrl = await util.decodeImage(image.url, image.id)
+        return user
     }catch(err){
         console.log(err);
     }
@@ -166,7 +173,7 @@ const changePassword = async(oldPass, newPass, userId)=>{
     }
 }
 
-const updateUser = async (name, phone, dateOfBirth, gender, userId)=>{
+const updateUser = async (name, phone, dateOfBirth, gender, userId, imgUrl)=>{
     try{
         let poolConnection = await sql.connect(config)
         const query =`Update [dbo].[user] 
@@ -179,6 +186,25 @@ const updateUser = async (name, phone, dateOfBirth, gender, userId)=>{
         .input('gender', sql.NVarChar, gender)
         .input('userId', sql.Int, userId)
         .query(query);
+        let imgId = 'F-'+userId
+        const images = await getImageByUserId(userId);
+        const img = images.find(img => img.id === imgId);
+        console.log(img)
+        if(img){
+            const query1 = `Update [dbo].[image] set url = @imgUrl where id = @imgId`
+            await poolConnection.request()
+            .input('imgUrl', sql.NVarChar, imgUrl)
+            .input('imgId', sql.NVarChar, imgId)
+            .query(query1)
+        }
+        else{
+            const query2 = `Insert into [dbo].[image] (id, url, userId) values (@imgId, @imgUrl, @userId)`
+            await poolConnection.request()
+            .input('imgUrl', sql.NVarChar, imgUrl)
+            .input('imgId', sql.NVarChar, imgId)
+            .input('userId', sql.Int, userId)
+            .query(query2)
+        }
         return {
             message: "Cập nhật thông tin cá nhân thành công"
         }

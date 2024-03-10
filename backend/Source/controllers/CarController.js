@@ -94,7 +94,6 @@ const filterCars = async (req, res)=>{
 }
 const addCarRental = async (req, res)=>{
     try {
-        await Uitl.deleteAllImages()
         const ownerId = req.params.ownerId
         const carTypeId = req.body.carTypeId
         const CLP = req.body.CLP
@@ -124,7 +123,6 @@ const addCarRental = async (req, res)=>{
 
 const updateCarRental = async (req, res)=>{
     try {
-        await Uitl.deleteAllImages()
         const carId = req.params.carId
         const carTypeId = req.body.carTypeId
         const CLP = req.body.CLP
