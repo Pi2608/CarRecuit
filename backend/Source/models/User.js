@@ -102,7 +102,7 @@ const getUserById = async (id) => {
             .input('id', sql.Int, id)
             .query(query1)
         const image = result1.recordset[0]
-        if (image!== undefined){
+        if (image !== undefined) {
             user.imgUrl = await util.decodeImage(image.url, image.id)
         }
         return user
@@ -197,27 +197,31 @@ const updateUser = async (name, phone, dateOfBirth, gender, userId) => {
 }
 
 const updateImageUser = async (userId, imgUrl) => {
-    let imgId = 'F-' + userId
-    const images = await getImageByUserId(userId);
-    const img = images.find(img => img.id === imgId);
-    console.log(img)
-    if (img) {
-        const query1 = `Update [dbo].[image] set url = @imgUrl where id = @imgId`
-        await poolConnection.request()
-            .input('imgUrl', sql.NVarChar, imgUrl)
-            .input('imgId', sql.NVarChar, imgId)
-            .query(query1)
-    }
-    else {
-        const query2 = `Insert into [dbo].[image] (id, url, userId) values (@imgId, @imgUrl, @userId)`
-        await poolConnection.request()
-            .input('imgUrl', sql.NVarChar, imgUrl)
-            .input('imgId', sql.NVarChar, imgId)
-            .input('userId', sql.Int, userId)
-            .query(query2)
-    }
-    return{
-        message : "cập nhật ảnh thành công"
+    try {
+        let poolConnection = await sql.connect(config);
+        let imgId = 'F-' + userId
+        const images = await getImageByUserId(userId);
+        const img = images.find(img => img.id === imgId);
+        if (img) {
+            const query1 = `Update [dbo].[image] set url = @imgUrl where id = @imgId`
+            await poolConnection.request()
+                .input('imgUrl', sql.NVarChar, imgUrl)
+                .input('imgId', sql.NVarChar, imgId)
+                .query(query1)
+        }
+        else {
+            const query2 = `Insert into [dbo].[image] (id, url, userId) values (@imgId, @imgUrl, @userId)`
+            await poolConnection.request()
+                .input('imgUrl', sql.NVarChar, imgUrl)
+                .input('imgId', sql.NVarChar, imgId)
+                .input('userId', sql.Int, userId)
+                .query(query2)
+        }
+        return {
+            message: "cập nhật ảnh thành công"
+        }
+    } catch (error) {
+        console.log(error)
     }
 }
 

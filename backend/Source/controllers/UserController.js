@@ -114,6 +114,7 @@ const updateImageUser = async (req, res) => {
         }
     }
     const response = await User.updateImageUser(userId, imgs[0])
+    res.json(response)
 }
 
 const sendConfirmNID = async (req, res) => {
