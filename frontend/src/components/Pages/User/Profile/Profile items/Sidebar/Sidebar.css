@@ -6,16 +6,55 @@
     padding : 15px 0px 15px 20px
 }
 
-#sidebar>.sidebar-item{
+#sidebar>.sidebar-item,
+#sidebar>.logout-popup>.sidebar-item{
     padding: 15px 0 15px 25px;
     border-top: 1px solid #ccc;
     cursor: pointer;
 }
 
-#sidebar>.sidebar-item:hover{
+#sidebar>.sidebar-item:hover,
+#sidebar>.logout-popup>.sidebar-item:hover{
     background: radial-gradient(circle, rgba(200,200,200,1) 0%, rgba(246,246,246,1) 90%);
 }
 
 #sidebar>.sidebar-item p{
     font-size: 20px;
+}
+
+#logout-container,
+#delete-account-container>.dlt-ctn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#logout-container>.btn-ctn,
+#delete-account-container>.btn-ctn{
+    display: flex;
+    gap: 1em;
+}
+
+#logout-container>.btn-ctn>.btn,
+#delete-account-container>.btn-ctn>.btn{
+    text-align: center;
+    padding: 1em 2em;
+    border-radius: 5px;    
+    cursor: pointer;
+}
+
+#logout-container>.btn-ctn>.apt-btn,
+#delete-account-container>.btn-ctn>.apt-btn{
+    background-color: #5fcf86;
+}
+
+#logout-container>.btn-ctn>.apt-btn:hover,
+#delete-account-container>.btn-ctn>.apt-btn:hover{
+    background-color: #469963;
+}
+
+#logout-container>.btn-ctn>.ccl-btn:hover
+#delete-account-container>.btn-ctn>.ccl-btn:hover{
+    background-color: #c0c0c0;
 }

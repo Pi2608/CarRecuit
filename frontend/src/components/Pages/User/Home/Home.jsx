@@ -51,14 +51,13 @@ export default function Home() {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchCarList();
+    console.log(id)
   },[])
   
   useEffect(() => {
     if(auth) console.log("Login:", auth);
     const token = Cookies.get('token')
     console.log(token)
-    console.log(id)
-    console.log(role)
   }, [auth]);
 
   useEffect(() => {

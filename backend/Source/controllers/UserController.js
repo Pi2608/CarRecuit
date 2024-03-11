@@ -77,8 +77,8 @@ const createUser = async(req, res)=>{
 }
 const changePassword = async(req,res)=>{
     try {
-        const newPass = req.body.newPass
         const oldPass = req.body.oldPass
+        const newPass = req.body.newPass
         const userId = req.params.userId
         const response = await User.changePassword(oldPass, newPass, userId)
         res.json(response)

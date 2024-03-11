@@ -19,7 +19,7 @@ import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.j
 import Transaction from './components/Pages/User/Profile/Pages/TransactionPage/Transaction.jsx';
 import Trips from './components/Pages/User/Profile/Pages/TravelPage/Trips.jsx';
 import MyCars from './components/Pages/User/Profile/Pages/MyCarsPage/MyCars.jsx';
-import Address from './components/Pages/User/Profile/Pages/AddressPage/Address.jsx';
+// import Address from './components/Pages/User/Profile/Pages/AddressPage/Address.jsx';
 import ChangePw from './components/Pages/User/Profile/Pages/ChangePwPage/ChangePw.jsx';
 import CarRegister from './components/Pages/User/Profile/Pages/CarRegister/CarRegister.jsx';
 
@@ -69,9 +69,9 @@ function App(){
               <Route path="mytrips">
                 <Route index element={<Trips/>}/>
               </Route>
-              <Route path="myaddress">
+              {/* <Route path="myaddress">
                 <Route index element={<Address/>}/>
-              </Route>
+              </Route> */}
               <Route path="resetpw">
                 <Route index element={<ChangePw/>}/>
               </Route>

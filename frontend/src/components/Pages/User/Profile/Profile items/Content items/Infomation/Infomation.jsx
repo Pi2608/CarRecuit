@@ -16,10 +16,11 @@ import Cookies from "js-cookie";
 import "./Infomation.css";
 import axios from "axios";
 import dayjs from "dayjs";
+import { FaBorderNone } from "react-icons/fa";
 
 export default function Infomation() {
 
-    const { auth } = useAuth(); 
+    const { auth, id } = useAuth(); 
     const [ token, setToken ] = useState(Cookies.get('token'));
 
     const fileInputRef = useRef(null);
@@ -63,20 +64,20 @@ export default function Infomation() {
 
     const navigate = useNavigate();
 
-    async function getUser(){
-        try {
-            const response = await axios.get(`http://localhost:4000/user/getByToken/?token=${token}`);
-            const data = response.data;
-            setUserId(data.userid);
-            return data.email;
-        } catch (error) {
-            console.error("Error fetching User: " + error);
-        }
-    }
+    // async function getUser(){
+    //     try {
+    //         const response = await axios.get(`http://localhost:4000/user/getByToken/?token=${token}`);
+    //         const data = response.data;
+    //         setUserId(data.userid);
+    //         return data.userid;
+    //     } catch (error) {
+    //         console.error("Error fetching User: " + error);
+    //     }
+    // }
 
-    async function getUserInfo(email){
+    async function getUserInfo(){
         try {
-            const response = await axios.get(`http://localhost:4000/user/${email}`)
+            const response = await axios.get(`http://localhost:4000/user/${id}`)
             const data = response.data;
             setUserInfo(data)
             return data.id
@@ -109,11 +110,11 @@ export default function Infomation() {
 
     useEffect(() => {
         const fetchData = () => {
-            getUser()
-                .then((email) => getUserInfo(email))
-                .then((id) =>   {
-                    getUserNid(id);
-                    getUserNdl(id)
+            getUserInfo()
+                // .then((email) => getUserInfo(email))
+                .then((id) =>   { if (id) {
+                    return Promise.all([getUserNid(id), getUserNdl(id)]);
+                }    
                 })
                 .catch((error) => console.error('Error fetching data:', error));
         }
@@ -242,7 +243,7 @@ export default function Infomation() {
         console.log(postData)
         try {
             const response = await axios.post(`
-            http://localhost:4000/user/update/${userId}`, 
+            http://localhost:4000/user/update/${id}`, 
             postData);
             await getUserInfo(userEmail)
         } catch (error) {
@@ -275,27 +276,6 @@ export default function Infomation() {
         setUserPhoneNumber(event.target.value.trim())
     }
 
-    // function convertToDateFormat(input) {
-    //     // Remove any existing "/"
-    //     input = input.replace(/\//g, '');
-    
-    //     // Add "/" after the first two digits and the next two digits
-    //     input = input.replace(/(\d{2})(\d{2})/, '$1/$2');
-    
-    //     // Check if the resulting date is valid
-    //     const dateArray = input.split('/');
-    //     const day = parseInt(dateArray[0], 10);
-    //     const month = parseInt(dateArray[1], 10);
-    //     const year = parseInt(dateArray[2], 10);
-    
-    //     // Check if the date is valid
-    //     if (isNaN(day) || isNaN(month) || isNaN(year) || month < 1 || month > 12 || day < 1 || day > 31) {
-    //         // Invalid date, return the original input
-    //         return input;
-    //     }
-    //     return input;
-    // }
-
     function handleNameChange(e) {
         const input = e.target.value;
         setUserName(input);
@@ -307,7 +287,7 @@ export default function Infomation() {
                     <h2>Thông tin tài khoản 
                         <Popup
                             trigger={
-                                <EditOutlinedIcon style={{height: "20px"}}/>
+                                <EditOutlinedIcon style={{height: "20px", cursor: "pointer"}}/>
                             }
                             contentStyle={{
                                 height: "fit-content", 
@@ -384,7 +364,8 @@ export default function Infomation() {
                                                     borderRadius: "5px",
                                                     fontWeight: "500",
                                                     color: "white",
-                                                    cursor: "pointer"
+                                                    cursor: "pointer",
+                                                    border: "none"
                                                 }}
                                                 onMouseOut={(e) => {
                                                     e.target.style.backgroundColor = "#5fcf86";
@@ -421,7 +402,7 @@ export default function Infomation() {
                             </div>
                             <div className="info-box-item">
                                 <p>Giới tính</p>
-                                <p className="main">Nam</p>
+                                <p className="main">{userInfo.gender ? userInfo.gender : ""}</p>
                             </div>
                         </div>
                         <div className="info-desc">
@@ -484,7 +465,7 @@ export default function Infomation() {
                     <h3>Thông tin chung</h3>
                         <h4 style={{color: "#767676"}}>Số CCCD/CMND</h4>                        
                         <TextField 
-                            placeholder={userNIDInfo.NID ? userNIDInfo.NID : "Số CCCD/CMND"}
+                            placeholder={userNIDInfo?.NID ? userNIDInfo.NID : "Số CCCD/CMND"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -493,7 +474,7 @@ export default function Infomation() {
                             />
                         <h4 style={{color: "#767676"}}>Họ và tên</h4>
                         <TextField 
-                            placeholder={userNIDInfo.name ? userNIDInfo.name : "Họ và tên"}
+                            placeholder={userNIDInfo?.name ? userNIDInfo.name : "Họ và tên"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -502,7 +483,7 @@ export default function Infomation() {
                             />
                             <h4 style={{color: "#767676"}}>Ngày sinh</h4>
                             <TextField 
-                                placeholder={userNIDInfo.dateOfBirth ? handleDate(userNIDInfo.dateOfBirth) : "--/--/----"}
+                                placeholder={userNIDInfo?.dateOfBirth ? handleDate(userNIDInfo.dateOfBirth) : "--/--/----"}
                                 size="small"
                                 sx={{
                                     width: "400px",
@@ -511,7 +492,7 @@ export default function Infomation() {
                                 />
                             <h4 style={{color: "#767676"}}>Quê quán</h4>
                             <TextField 
-                                placeholder={userNIDInfo.native ? userNIDInfo.native : "Quê quán"}
+                                placeholder={userNIDInfo?.native ? userNIDInfo.native : "Quê quán"}
                                 size="small"
                                 sx={{
                                     width: "400px",
@@ -521,7 +502,7 @@ export default function Infomation() {
                             
                         <h4 style={{color: "#767676"}}>Nơi thường trú</h4>
                         <TextField 
-                            placeholder={userNIDInfo.address ? userNIDInfo.address : "Nơi thường trú"}
+                            placeholder={userNIDInfo?.address ? userNIDInfo.address : "Nơi thường trú"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -531,7 +512,7 @@ export default function Infomation() {
                         
                         <h4 style={{color: "#767676"}}>Ngày cấp</h4>
                         <TextField 
-                            placeholder={userNIDInfo.dateProvide ? handleDate(userNIDInfo.dateProvide) : "--/--/----"}
+                            placeholder={userNIDInfo?.dateProvide ? handleDate(userNIDInfo.dateProvide) : "--/--/----"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -541,7 +522,7 @@ export default function Infomation() {
                         
                         <h4 style={{color: "#767676"}}>Nơi cấp</h4>
                         <TextField 
-                            placeholder={userNIDInfo.provider ? userNIDInfo.provider : "Nơi cấp"}
+                            placeholder={userNIDInfo?.provider ? userNIDInfo.provider : "Nơi cấp"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -694,7 +675,7 @@ export default function Infomation() {
                         <h3>Thông tin chung</h3>
                         <h4 style={{color: "#767676"}}>Số GPLX</h4>                        
                         <TextField 
-                            placeholder={userNDLInfo.NDL ? userNDLInfo.NDL : "Số GPLX"}
+                            placeholder={userNDLInfo?.NDL ? userNDLInfo.NDL : "Số GPLX"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -703,7 +684,7 @@ export default function Infomation() {
                             />
                         <h4 style={{color: "#767676"}}>Họ và tên</h4>
                         <TextField 
-                            placeholder={userNDLInfo.name ? userNDLInfo.name : "Họ và tên"}
+                            placeholder={userNDLInfo?.name ? userNDLInfo.name : "Họ và tên"}
                             size="small"
                             sx={{
                                 width: "400px",
@@ -712,7 +693,7 @@ export default function Infomation() {
                             />
                         <h4 style={{color: "#767676"}}>Ngày sinh</h4>
                         <TextField 
-                            placeholder={userNDLInfo.dateOfBirth ? handleDate(userNDLInfo.dateOfBirth) : "--/--/----"}
+                            placeholder={userNDLInfo?.dateOfBirth ? handleDate(userNDLInfo.dateOfBirth) : "--/--/----"}
                             size="small"
                             sx={{
                                 width: "400px",

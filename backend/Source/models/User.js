@@ -102,7 +102,9 @@ const getUserById= async(id) => {
         .input('id', sql.Int, id)
         .query(query1)
         const image = result1.recordset[0]
-        user.imgUrl = await util.decodeImage(image.url, image.id)
+        if (image !== undefined) {
+            user.imgUrl = await util.decodeImage(image.url, image.id)
+        }
         return user
     }catch(err){
         console.log(err);

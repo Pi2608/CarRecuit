@@ -6,14 +6,13 @@ const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState(Cookies.get('token') ? true : false)
-    const [role, setRole] = useState(0)
+    const [roleId, setRoleId] = useState(0)
     const [id, setId] = useState('')
 
     const getAuth = async (token) => {
         try {
-            const response = await axios.get(`http://localhost:4000/user/getByToken${token}`);
+            const response = await axios.get(`http://localhost:4000/user/getByToken/?token=${token}`);
             const data = response.data;
-            console.log(data.userid, data.role);
             return data
         } catch (error) {
             console.error("Authentication error: " + error.message);
@@ -22,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = (token) => {
         setAuth(true)
-        Cookies.set('token', token, { expires: 7 })
+        Cookies.set('token', token, { expires: 1 })
     };
     
     const logout = () => {
@@ -31,14 +30,22 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        getAuth(auth).then((data) => {
-            setId(data.userid);
-            setRole(data.role)
-        })
-    },[])
+        const token = Cookies.get('token');
+        if (token) {
+            getAuth(token).then((data) => {
+                setId(data.userid);
+                setRoleId(data.roleId);
+
+            }).catch((error) => {
+                // Handle authentication error, e.g., redirect to login page
+                console.error("Authentication error: " + error.message);
+                // Optionally, you can redirect to the login page or perform other actions
+            });
+        }
+    }, []);
 
     return (
-        <AuthContext.Provider value={{ auth, login, logout, id, role }}>
+        <AuthContext.Provider value={{ auth, login, logout, id, roleId }}>
             {children}
         </AuthContext.Provider>
     );
