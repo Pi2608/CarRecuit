@@ -10,7 +10,8 @@ userRouter.post("/register", userController.createUser)
 userRouter.post("/registerGG", userController.registerByGg)
 
 userRouter.post("/changePass/:userId", userController.changePassword)
-userRouter.post("/update/:userId", userController.uploadImgs, userController.updateUser)
+userRouter.post("/update/img/:userId", userController.uploadImgs, userController.updateImageUser)
+userRouter.post("/update/:userId", userController.updateUser)
 userRouter.put("/delete/:userId", userController.deleteUserById)
 userRouter.put("/editStatus", userController.editStatusUser)
 

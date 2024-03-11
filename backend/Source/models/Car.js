@@ -9,7 +9,7 @@ const getAllCarsInUse= async()=>{
         let poolConnection = await sql.connect(config)
         const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
                         FROM dbo.car
-                        INNER JOIN dbo.carType ON car.carTypeId = carType.id`
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.status = 1 and car.isDeleted = 0 and car.isAccepted = 1`
         const result = await poolConnection.request().query(query1);
         const cars= result.recordset;
         for (let car of cars){
@@ -31,7 +31,9 @@ const getAllCarsInUse= async()=>{
 const getAllCarsOfOwner = async(ownnerId)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Select * From [dbo].[car] Where ownerId=@ownerId'
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isDeleted = 0 and car.isAccepted = 1 and ownerId = @ownerId`
         const result = await poolConnection.request()
         .input('ownerId', sql.Int, ownnerId)
         .query(query1);
@@ -47,6 +49,80 @@ const getAllCarsOfOwner = async(ownnerId)=>{
         return cars
     }catch(err){
         console.log(err)
+    }
+}
+
+const recomendCar = async(numberItems)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.status = 1 and car.isDeleted = 0 and car.isAccepted = 1`
+        const result = await poolConnection.request().query(query1);
+        const cars= result.recordset;
+        const getRandomInt = (min, max) => {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        };
+        const recommendedCars = [];
+        const numItems = Math.min(numberItems, cars.length);
+        for (let i = 0; i < numItems; i++) {
+            const randomIndex = getRandomInt(0, cars.length - 1);
+            recommendedCars.push(cars[randomIndex]);
+        }
+        for (let car of recommendedCars){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const img = result2.recordset[0]
+            car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.description
+        }
+        return recommendedCars
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const requestAcceptedCar = async ()=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isAccepted is NULL`
+        const result1 = await poolConnection.request()
+        .query(query1)
+        const cars = result1.recordset
+        for (let car of cars){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const img = result2.recordset[0]
+            car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.description
+        }
+        return cars
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const editAcceptedCar = async(isAccepted, carId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query =`Update dbo.car set isAccepted = @isAccepted where id = @carId`
+        await poolConnection.request()
+        .input('isAccepted', sql.Int, isAccepted)
+        .input('carId', sql.Int, carId)
+        .query(query)
+        return{
+            message: "Cập nhật status thành công"
+        }
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -87,7 +163,9 @@ const getCarRating = async(carId)=>{
 const getCarById= async(id)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query = 'Select * From [dbo].[car] Where id = @id'
+        const query = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.id = @id`
         const result = await poolConnection.request()
         .input("id", sql.Int, id)
         .query(query);
@@ -186,7 +264,7 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
 const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, year, typeOfFuels, ldescription, imgs, amenities)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Insert into [dbo].[car] (ownerId, carTypeId, CLP, price, discount, description, seats, year, typeOfFuels, status, isDeleted) Values (@OwnerId, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @year, @typeOfFuels, 1, 0)';
+        const query1 = 'Insert into [dbo].[car] (ownerId, carTypeId, CLP, price, discount, description, seats, year, typeOfFuels, status, isDeleted, isAccepted) Values (@OwnerId, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @year, @typeOfFuels, 1, 0, null)';
         await poolConnection.request()
         .input('OwnerId', sql.Int, ownerId)
         .input('CarTypeId', sql.Int, carTypeId)
@@ -371,5 +449,8 @@ module.exports={
     showCarFeedback,
     getAllCarsOfOwner,
     getBrandCar,
-    getCarType
+    getCarType,
+    recomendCar,
+    requestAcceptedCar,
+    editAcceptedCar
 }

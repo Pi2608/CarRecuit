@@ -12,70 +12,70 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);
     }
 });
-const upload = multer({storage});
+const upload = multer({ storage });
 
 const uploadImgs = upload.array('images', 5)
 
-const getAllUser = async(req, res)=>{
-    try{
+const getAllUser = async (req, res) => {
+    try {
         const response = await User.getAllUser()
         res.json(response);
-    }catch(err){
-        res.status(500).json({message: err.message})
+    } catch (err) {
+        res.status(500).json({ message: err.message })
     }
 }
-const getUserById = async (req, res)=>{
+const getUserById = async (req, res) => {
     try {
         await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getUserById(userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const getUserByEmail = async(req, res)=>{
+const getUserByEmail = async (req, res) => {
     try {
         const email = req.params.email
         const response = await User.getUserByEmail(email)
         res.json(response);
     } catch (error) {
-        
+
     }
 }
-const getNIDinfoByUserId = async(req, res)=>{
+const getNIDinfoByUserId = async (req, res) => {
     try {
         await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNIDinfoByUserId(userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const getNDLinfoByUserId = async(req, res)=>{
+const getNDLinfoByUserId = async (req, res) => {
     try {
         await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNDLinfoByUserId(userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
 
-const createUser = async(req, res)=>{
+const createUser = async (req, res) => {
     try {
         const email = req.body.email
         const password = req.body.password
-        console.log(email+password)
+        console.log(email + password)
         const response = await User.createUser(email, password)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const changePassword = async(req,res)=>{
+const changePassword = async (req, res) => {
     try {
         const oldPass = req.body.oldPass
         const newPass = req.body.newPass
@@ -83,35 +83,41 @@ const changePassword = async(req,res)=>{
         const response = await User.changePassword(oldPass, newPass, userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
 
-const updateUser = async(req, res)=>{
+const updateUser = async (req, res) => {
     try {
         const name = req.body.name
         const phone = req.body.phone
         const dateOfBirth = req.body.dateOfBirth
         const gender = req.body.gender
         const userId = req.params.userId
-        const imagePaths = req.files.map(file=>file.path);
-        let imgs = [];
-        for (const path of imagePaths) {
-            try {
-                const base64Code = await Uitl.encodeImage(path);
-                imgs.push(base64Code);
-            } catch (error) {
-                console.error('Error encoding image:', error);
-            }
-        }
-        const response = await User.updateUser(name, phone, dateOfBirth, gender, userId, imgs[0])
+        const response = await User.updateUser(name, phone, dateOfBirth, gender, userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
 
-const sendConfirmNID = async(req, res)=>{
+const updateImageUser = async (req, res) => {
+    const userId = req.params.userId
+    const imagePaths = req.files.map(file => file.path);
+    let imgs = [];
+    for (const path of imagePaths) {
+        try {
+            const base64Code = await Uitl.encodeImage(path);
+            imgs.push(base64Code);
+        } catch (error) {
+            console.error('Error encoding image:', error);
+        }
+    }
+    const response = await User.updateImageUser(userId, imgs[0])
+    res.json(response)
+}
+
+const sendConfirmNID = async (req, res) => {
     try {
         const userId = req.params.userId
         const NID = req.body.NID
@@ -121,7 +127,7 @@ const sendConfirmNID = async(req, res)=>{
         const address = req.body.address
         const dateProvide = req.body.dateProvide
         const provider = req.body.provider
-        const imagePaths = req.files.map(file=>file.path);
+        const imagePaths = req.files.map(file => file.path);
         let imgs = [];
         for (const path of imagePaths) {
             try {
@@ -131,19 +137,19 @@ const sendConfirmNID = async(req, res)=>{
                 console.error('Error encoding image:', error);
             }
         }
-        const response = await User.sendConfirmNID(userId,NID,name,dateOfBirth,native,address,dateProvide,provider,imgs)
+        const response = await User.sendConfirmNID(userId, NID, name, dateOfBirth, native, address, dateProvide, provider, imgs)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const sendConfirmNDL = async(req, res)=>{
+const sendConfirmNDL = async (req, res) => {
     try {
         const userId = req.params.userId
         const NDL = req.body.NDL
         const name = req.body.name
         const dateOfBirth = req.body.dateOfBirth
-        const imagePaths = req.files.map(file=>file.path);
+        const imagePaths = req.files.map(file => file.path);
         let imgs = [];
         for (const path of imagePaths) {
             try {
@@ -153,55 +159,55 @@ const sendConfirmNDL = async(req, res)=>{
                 console.error('Error encoding image:', error);
             }
         }
-        const response = await User.sendConfirmNDL(userId,NDL,name,dateOfBirth,imgs)
+        const response = await User.sendConfirmNDL(userId, NDL, name, dateOfBirth, imgs)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
 
-const deleteUserById = async(req, res)=>{
+const deleteUserById = async (req, res) => {
     try {
         const userId = req.params.userId
         const response = await User.deleteUserById(userId)
-        res.json(response) 
+        res.json(response)
     } catch (error) {
-        
+
     }
 }
 
-const replyFeedback = async(req,res)=>{
+const replyFeedback = async (req, res) => {
     try {
         const userId = req.query.userId
         const message = req.body.message
         const carId = req.query.carId
         const rating = req.body.rating
-        const response =await User.replyFeedback(userId,carId,message,rating)
+        const response = await User.replyFeedback(userId, carId, message, rating)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const editStatusUser = async(req,res)=>{
+const editStatusUser = async (req, res) => {
     try {
         const userId = req.query.userId
         const status = req.query.status
-        const response= await User.editStatusUser(userId,status)
+        const response = await User.editStatusUser(userId, status)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const getNotification = async(req,res)=>{
+const getNotification = async (req, res) => {
     try {
         const userId = req.params.userId
         const response = await User.getNotification(userId)
-        res.json(response) 
+        res.json(response)
     } catch (error) {
-        
+
     }
 }
-const sendNotification = async (req, res)=>{
+const sendNotification = async (req, res) => {
     try {
         const senderId = req.params.userId
         const receivedId = req.body.receivedId
@@ -210,19 +216,19 @@ const sendNotification = async (req, res)=>{
         const response = await User.sendNotification(receivedId, title, message, senderId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const getMemberShipByUserId= async (req, res)=>{
+const getMemberShipByUserId = async (req, res) => {
     try {
         const userId = req.params.userId
         const response = await User.getMemberShipByUserId(userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const checkLogin = async (req, res)=>{
+const checkLogin = async (req, res) => {
     try {
         const email = req.body.email
         const password = req.body.password
@@ -232,114 +238,114 @@ const checkLogin = async (req, res)=>{
         console.log(error)
     }
 }
-const getTransactionHistory = async(req, res)=>{
+const getTransactionHistory = async (req, res) => {
     try {
         const userId = req.params.userId
         const response = await User.getTransactionHistory(userId)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const editStatusNID = async(req, res)=>{
+const editStatusNID = async (req, res) => {
     try {
         const userId = req.query.userId
         const status = req.query.status
         const response = await User.editStatusNID(userId, status)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const editStatusNDL = async(req, res)=>{
+const editStatusNDL = async (req, res) => {
     try {
         const userId = req.query.userId
         const status = req.query.status
         const response = await User.editStatusNDL(userId, status)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const showRequestConfirmNID = async(req, res)=>{
+const showRequestConfirmNID = async (req, res) => {
     try {
         const response = await User.showRequestConfirmNID()
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const showRequestConfirmNDL = async(req,res)=>{
+const showRequestConfirmNDL = async (req, res) => {
     try {
         const response = await User.showRequestConfirmNDL()
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const registerByGg = async(req, res)=>{
+const registerByGg = async (req, res) => {
     try {
         const email = req.body.email
         const response = await User.registerByGg(email)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
 
-const getUserByToken = async(req,res)=>{
+const getUserByToken = async (req, res) => {
     try {
         const token = req.query.token
         const response = await User.getUserByToken(token)
         res.json(response)
     } catch (error) {
-        
+
     }
 }
-const checkCustomer = async(req,res,next)=>{
+const checkCustomer = async (req, res, next) => {
     try {
         const userId = req.query.userId
         const role = (await User.getRoleByUserId(userId)).name
         console.log(role)
-        if(role === 'Customer'){
+        if (role === 'Customer') {
             next();
-        }else{
+        } else {
             res.json("bạn không đủ thẩm quyền")
         }
     } catch (error) {
-        
+
     }
 }
-const checkStaff = async(req,res,next)=>{
+const checkStaff = async (req, res, next) => {
     try {
         const userId = req.query.userId
         const role = (await User.getRoleByUserId(userId)).name
         console.log(role)
-        if(role === 'Staff'){
+        if (role === 'Staff') {
             next();
-        }else{
+        } else {
             res.json("bạn không đủ thẩm quyền")
         }
     } catch (error) {
-        
+
     }
 }
-const checkAdmin = async(req,res,next)=>{
+const checkAdmin = async (req, res, next) => {
     try {
         const userId = req.query.userId
         const role = (await User.getRoleByUserId(userId)).name
         console.log(role)
-        if(role === 'System Administator'){
+        if (role === 'System Administator') {
             next();
-        }else{
+        } else {
             res.json("bạn không đủ thẩm quyền")
         }
     } catch (error) {
-        
+
     }
 }
 
-module.exports={
+module.exports = {
     getAllUser,
     getUserByEmail,
     getNIDinfoByUserId,
@@ -367,5 +373,6 @@ module.exports={
     checkCustomer,
     checkStaff,
     checkAdmin,
-    getUserById
+    getUserById,
+    updateImageUser
 }

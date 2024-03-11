@@ -23,6 +23,16 @@ const getAllCarsInUse = async(req, res)=>{
         
     }
 }
+const recomendCar = async (req, res)=>{
+    try {
+        await Uitl.deleteAllImages()
+        const items = req.query.items
+        const response = await car.recomendCar(items)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const getBrandCar = async (req, res)=>{
     try {
         const response = await car.getBrandCar()
@@ -160,6 +170,25 @@ const deleteCarRental = async (req, res)=>{
         
     }
 }
+
+const requestAcceptedCar = async (req, res)=>{
+    try {
+        const response = await car.requestAcceptedCar()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const editAcceptedCar = async (req,res)=>{
+    try {
+        const status = req.query.status
+        const carId = req.query.carId
+        const response = await car.editAcceptedCar(status, carId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 module.exports={
     uploadImgs,
     getAllCarsInUse,
@@ -172,5 +201,8 @@ module.exports={
     deleteCarRental,
     getBrandCar,
     getCarType,
-    getCarTypeByTypeId
+    getCarTypeByTypeId,
+    recomendCar,
+    requestAcceptedCar,
+    editAcceptedCar
 }
