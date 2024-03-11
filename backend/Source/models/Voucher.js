@@ -92,6 +92,25 @@ const getAllVoucher = async()=>{
     }
 }
 
+const getAllVoucherInUse = async()=>{
+    try {
+        let poolConnection = await sql.connect (config)
+        const query1 = `Select * from dbo.voucher where isDeleted = 0`
+        const result1 = await poolConnection.request()
+        .query(query1)
+        const vouchers = result1.recordset
+        const voucherInUse = []
+        for (let voucher of vouchers){
+            if (await Util.compareDates(voucher.startDate, await Util.currentTime()) && await Util.compareDates(await Util.currentTime(), voucher.endDate)){
+                voucherInUse.push(voucher)
+            }
+        }
+        return voucherInUse
+    } catch (error) {
+        
+    }
+}
+
 const createVoucher = async(discount, startDate, endDate)=>{
     try {
         let poolConnection = await sql.connect(config)
@@ -171,6 +190,7 @@ const createVoucherAWeek = async(discount)=>{
     const endDate = date
     await createVoucher(discount, startDate, endDate)
 }
+
 module.exports= {
     checkVoucher,
     getVoucherByCode,
@@ -179,5 +199,6 @@ module.exports= {
     createVoucher,
     deleteVoucher,
     updateVoucher,
-    createVoucherAWeek
+    createVoucherAWeek,
+    getAllVoucherInUse
 }

@@ -50,10 +50,19 @@ const updateVoucher = async(req, res)=>{
         
     }
 }
+const getAllCarsInUse = async(req, res)=>{
+    try {
+        const response = await voucher.getAllVoucherInUse()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 module.exports={
     getVoucherById,
     getAllVoucher,
     createVoucher,
     deleteVoucher,
-    updateVoucher
+    updateVoucher,
+    getAllCarsInUse
 }
