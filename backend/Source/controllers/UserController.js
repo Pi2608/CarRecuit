@@ -238,6 +238,15 @@ const checkLogin = async (req, res) => {
         console.log(error)
     }
 }
+const totalTransactionUser = async (req,res)=>{
+    try {
+        const userId = req.params.userId
+        const response =await User.totalTransactionUser(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const getTransactionHistory = async (req, res) => {
     try {
         const userId = req.params.userId
@@ -345,6 +354,7 @@ const checkAdmin = async (req, res, next) => {
     }
 }
 
+
 module.exports = {
     getAllUser,
     getUserByEmail,
@@ -374,5 +384,6 @@ module.exports = {
     checkStaff,
     checkAdmin,
     getUserById,
-    updateImageUser
+    updateImageUser,
+    totalTransactionUser
 }

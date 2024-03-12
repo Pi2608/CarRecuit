@@ -21,6 +21,7 @@ userRouter.get("/notification/:userId", userController.getNotification)
 userRouter.put("/notification/send/:userId", userController.sendNotification)
 
 userRouter.get("/membership/:userId", userController.getMemberShipByUserId)
+userRouter.get("/transaction/total/:userId", userController.totalTransactionUser)
 userRouter.get("/transaction/:userId", userController.getTransactionHistory)
 
 userRouter.get("/NID", userController.showRequestConfirmNID)

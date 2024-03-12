@@ -261,10 +261,10 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
     }
 }
 
-const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, year, typeOfFuels, ldescription, imgs, amenities)=>{
+const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, year, gearStick, typeOfFuels, ldescription, imgs, amenities)=>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Insert into [dbo].[car] (ownerId, carTypeId, CLP, price, discount, description, seats, year, typeOfFuels, status, isDeleted, isAccepted) Values (@OwnerId, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @year, @typeOfFuels, 1, 0, null)';
+        const query1 = 'Insert into [dbo].[car] (ownerId, carTypeId, CLP, price, discount, description, seats, year, gearStick, typeOfFuels, status, isDeleted, isAccepted) Values (@OwnerId, @CarTypeId, @CLP, @Price, 0, @Description, @Seats, @year, @gearStick, @typeOfFuels, 1, 0, null)';
         await poolConnection.request()
         .input('OwnerId', sql.Int, ownerId)
         .input('CarTypeId', sql.Int, carTypeId)
@@ -273,6 +273,7 @@ const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, 
         .input('Description', sql.NVarChar, description)
         .input('Seats', sql.Int, seats)
         .input('year', sql.Int, year)
+        .input('gearStick', sql.NVarChar, gearStick)
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
         .query(query1);
         const query2 =`Select MAX(id) as id from dbo.car`
@@ -320,10 +321,10 @@ const addCarAmenities = async (carId, amenities)=>{
         
     }
 }
-const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, year, typeOfFuels, status, ldescription, imgs, amenities) =>{
+const updateCarRental = async (carId, carTypeId, CLP, price, discount , description, seats, year, gearStick, typeOfFuels, status, ldescription, imgs, amenities) =>{
     try{
         let poolConnection = await sql.connect(config)
-        const query1 = 'Update [dbo].[car] set carTypeId = @CarTypeId, CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, year = @year, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
+        const query1 = 'Update [dbo].[car] set carTypeId = @CarTypeId, CLP = @CLP, price = @Price,discount = @Discount, description = @Description, seats = @Seats, year = @year, gearStick=@gearStick, typeOfFuels = @TypeOfFuels, status = @Status where id = @CarId'
         await poolConnection.request()
         .input('CarId', sql.Int, carId)
         .input('CarTypeId', sql.Int, carTypeId)
@@ -333,6 +334,7 @@ const updateCarRental = async (carId, carTypeId, CLP, price, discount , descript
         .input('Description', sql.NVarChar, description)
         .input('Seats', sql.Int, seats)
         .input('year', sql.Int, year)
+        .input('gearStick', sql.NVarChar, gearStick)
         .input('TypeOfFuels', sql.NVarChar, typeOfFuels)
         .input('Status', sql.Int, status)
         .query(query1);

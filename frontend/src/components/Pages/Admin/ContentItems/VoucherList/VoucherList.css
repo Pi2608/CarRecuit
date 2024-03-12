@@ -45,3 +45,21 @@
        }
     }
   }
+  .popup-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 1px solid #ccc; /* Viền xung quanh khung popup */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Hiệu ứng bóng đổ */
+    padding: 20px; /* Khoảng cách giữa nội dung và viền */
+    max-width: 400px; /* Chiều rộng tối đa của popup */
+    z-index: 999; /* Đảm bảo popup hiển thị trên các phần khác */
+  }
+
+  .popup-inner label
+  {
+    display: flex;
+    justify-content: space-between;
+  }
