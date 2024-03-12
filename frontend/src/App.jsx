@@ -88,7 +88,7 @@ function App(){
             </Route>
             <Route path="voucher">
               <Route index element={<VoucherListPage/>}/>
-              <Route path="new" element={<New inputs={voucherInputs} title="Thêm voucher mới"/>}/>
+              {/* <Route path="new" element={<New inputs={voucherInputs} title="Thêm voucher mới"/>}/> */}
             </Route>
             <Route path="statistic">
               <Route index element={<StatisticPage/>}/>

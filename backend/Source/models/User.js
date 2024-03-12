@@ -516,6 +516,26 @@ const createTransaction = async (userId, money, payerCode, pointGet, paymentMeth
     }
 }
 
+const totalTransactionUser = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config);
+        const query = `Select SUM(money) as total from [dbo].[transaction] where userId = @userId`
+        const result = await poolConnection.request()
+            .input('userId', sql.Int, userId)
+            .query(query)
+        const transaction = result.recordset[0]
+        if (transaction.total ==null){
+            return {
+                total : 0
+            };
+        }else{
+            return transaction
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const getTransactionHistory = async (userId) => {
     try {
         let poolConnection = await sql.connect(config);
@@ -656,6 +676,7 @@ module.exports = {
     registerByGg,
     getUserByToken,
     getRoleByUserId,
-    updateImageUser
+    updateImageUser,
+    totalTransactionUser
 }
 
