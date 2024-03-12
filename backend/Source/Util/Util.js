@@ -61,8 +61,8 @@ const decodeImage = async (base64Code, name) => {
     const projectPath = path.resolve();
     const savePath = projectPath + '/Source/photos/' + name
     try {
-        await decode(base64Code, { fname: savePath, ext: 'jpeg' });
-        return 'http://localhost:4000/img/'+name+'.jpeg'
+        await decode(base64Code, { fname: savePath, ext: 'png' });
+        return 'http://localhost:4000/img/'+name+'.png'
     } catch (error) {
         console.error('Error decoding image:', error);
     }
@@ -102,6 +102,7 @@ const compareDates= async(startDate, endDate) =>{
 }
 
 const inputDate = async(date)=>{
+    console.log(date)
     const newDate = new Date(date)
     newDate.setHours(newDate.getHours()+7)
     return newDate

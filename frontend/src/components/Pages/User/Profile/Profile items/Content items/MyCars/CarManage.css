@@ -1,5 +1,5 @@
 #carmanage>.container>.head h1{
-    padding : 15px 0px 15px 0;
+    padding : 20px 0px 15px 0;
 }
 
 #carmanage>.container>.head{
@@ -44,6 +44,10 @@
 .tbl>.img-container{
     height: 120px;
     width: 120px;
+    display: flex;
+    justify-content: center;
+    border-radius: 25px;
+    overflow: hidden;
 }
 
 table{

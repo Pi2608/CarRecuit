@@ -1,4 +1,4 @@
-#reset-pw>.container{
+#reset-pw > .container {
     width: 842px;
     min-height: 200px;
     height: fit-content;
@@ -6,24 +6,27 @@
     background-color: white;
     box-shadow: 0 2px 5px #ccc;
     border-radius: var(--border-radius);
-    padding: 24px;
+    padding: 20px 30px;
+    display: flex; /* Add flex container */
+    flex-direction: column; /* Set flex direction to column */
+    justify-content: space-between; /* Align items with space-between */
 }
 
-#reset-pw>.title{
-    padding : 15px 0px 15px 20px;
+#reset-pw > .title {
+    padding: 15px 0px 15px 30px;
 }
 
-#reset-pw>.container>.pw-container{
-    position: relative;
-}
-
-#reset-pw>.container>.pw-container>.box-container>.box>.box-inner{
-    color: #767676;
-}
-
-#reset-pw>.container>.pw-container>.submit{
+#reset-pw > .container > .pw-container {
     position: relative;
     display: flex;
-    left: 80%;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+}
+
+#reset-pw > .container > .pw-container > .submit {
+    display: flex;
     gap: 10px;
+    justify-content: flex-end; 
+    align-items: center; 
 }

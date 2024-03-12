@@ -42,16 +42,12 @@ export default function CarList(){
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-        };
+    };
 
     useEffect(() => {
         window.scrollTo(0, 0)
         fetchCarList();
     },[])
-
-    useEffect(() => {
-
-    },[carList])
 
     return (
         <div id="cars">
@@ -63,10 +59,6 @@ export default function CarList(){
                         <CalendarMonthOutlinedIcon style={{height: "20px", width: "auto", paddingLeft: "25px"}}/><p>07:00, 02/02/2024 - 08:00, 03/02/2024</p>
                     </div>
                     <div className="amenities">
-                    <label class="switch">
-                        <input type="checkbox"/>
-                        <span class="slider"><div className="amenity reset-btn"><RotateLeftIcon/></div></span>
-                    </label>
                         <div className="amenity reset-btn"><RotateLeftIcon/></div>
                         <div className="amenity car-tpye"><div className="icon"><AirportShuttleOutlinedIcon/></div><p>Loại xe</p></div>
                         <div className="amenity car-brand"><div className="icon"><LanguageIcon/></div><p>Hãng xe</p></div>
@@ -79,7 +71,7 @@ export default function CarList(){
                 </div>
                 <div className="car-list">
                     {carList.map((car) =>(
-                    <Card key={car.id} year={car.year} price={car.price} description={car.description} image={car.imgUrl} typeId={car.carTypeId}/>
+                    <Card key={car.id} id={car.id} year={car.year} price={car.price} description={car.description} image={car.imgUrl} typeId={car.carTypeId}/>
                     ))}
                 </div>
                 <div className="map-btn" onClick={()=>navigate("/")}><MapIcon/>Bản đồ</div>

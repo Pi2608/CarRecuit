@@ -9,9 +9,8 @@ import "./LoginForm.css";
 const LoginForm = () => {
   const userRef = useRef()
 
-  const navigate = useNavigate()
   const { login } = useAuth();
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
@@ -21,16 +20,16 @@ const LoginForm = () => {
 
   useEffect(()=> {
     setErrMsg("");
-  },[user, pwd])
+  },[email, pwd])
 
   async function handleSubmit(e){
     e.preventDefault();
     try {
       const postData = {
-        email: user,
+        email: email,
         password: pwd,
       }
-      const response1 = await axios.get(`http://localhost:4000/user/${user}`)
+      const response1 = await axios.get(`http://localhost:4000/user/email/${email}`)
       if(response1.data){
         const response2 = await axios.post(
           "http://localhost:4000/user/login",
@@ -56,7 +55,7 @@ const LoginForm = () => {
       }
     }
   }
-
+  
   return (
     <div className="wrapper">
       <form onSubmit={handleSubmit}>
@@ -67,8 +66,8 @@ const LoginForm = () => {
             placeholder="Email/Số điện thoại" 
             ref={userRef}
             autoComplete="off"
-            onChange={(e) => setUser(e.target.value)}
-            value={user}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
             required 
             />
           <FaUser className="icon" />
