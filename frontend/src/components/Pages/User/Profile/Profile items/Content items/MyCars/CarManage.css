@@ -44,6 +44,10 @@
 .tbl>.img-container{
     height: 120px;
     width: 120px;
+    display: flex;
+    justify-content: center;
+    border-radius: 25px;
+    overflow: hidden;
 }
 
 table{

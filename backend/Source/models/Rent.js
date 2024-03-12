@@ -20,7 +20,11 @@ const countRentalCar = async (carId)=>{
         const result = await poolConnection.request()
         .input('carId', sql.Int, carId)
         .query(query)
-        return result.recordset[0]
+        if( result.recordset[0]==null){
+            return 0
+        }else{
+            return result.recordset[0]
+        }
     } catch (error) {
         console.log(error)
     }

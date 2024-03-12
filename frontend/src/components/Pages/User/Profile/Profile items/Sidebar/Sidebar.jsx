@@ -109,7 +109,7 @@ export default function Sidebar() {
             </Popup>
             <Popup
                 trigger={
-                    <div className="sidebar-item" onClick={console.log("1")}>
+                    <div className="sidebar-item">
                         <table style={{display: "flex", alignItems: "center"}}>
                             <td style={{position: "relative", top: "2px"}}><DeleteOutlineOutlinedIcon style={{height: "24px"}}/></td>
                             <td style={{paddingLeft: "4px"}}><p>Yêu cầu xóa tài khoản</p></td>
