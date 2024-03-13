@@ -22,7 +22,7 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  const { auth, id, role  } = useAuth();
+  const { auth, id, roleUserId  } = useAuth();
 
   const [ carList, setCarList ] = useState([]);
   const [location, setLocation] = useState(null);
@@ -31,13 +31,16 @@ export default function Home() {
 
   const [startDateTime, setStartDateTime] = useState(new Date());
   const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('');
+  const [startTime, setStartTime] = useState('20:00');
 
   const [endDateTime, endStartDateTime] = useState(new Date());
   const [endDate, endStartDate] = useState('');
-  const [endTime, endStartTime] = useState('');
+  const [endTime, endStartTime] = useState('21:00');
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [nextDateTime, setNextDateTime] = useState(new Date());
+
+  const [filterDateTime,setFilterDateTime] = useState("");
 
   async function fetchCarList(){
     try {
@@ -85,29 +88,30 @@ export default function Home() {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchCarList();
-    console.log(handleDate(currentDateTime))
-    const a = "3-12-2024 15:21:13";
-    const b = new Date(a)
-    const c = new Date()
-    console.log(b)
-    console.log(c)
+    let tomorrow = new Date();//
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setNextDateTime(tomorrow);
+    displayPeriod();
+    // setFilterDateTime(
+    // console.log(filterDateTime);
+    // const a = "3-12-2024 15:21:13";
+    // const b = new Date(a)
+    // const c = new Date()
+    // console.log(b)
+    // console.log(c)
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
       return;
     }
   },[])
 
-  useEffect(() => {
-    if(auth) console.log("Login:", auth);
-    const token = Cookies.get('token')
-    console.log(token)
-    console.log(id)
-    console.log(role)
-  }, [auth, id]);
+  useEffect(() => {}, [auth]);
+  
+  useEffect(() => {},[id, roleUserId])
   
   useEffect(() => {
-    console.log(location)
-    console.log(address)
+    // console.log(location)
+    // console.log(address)
   },[carList,location,address])
 
   function handleDate(d){
@@ -119,10 +123,26 @@ export default function Home() {
     return formattedDate
   }
 
-  function combineDateTime(date, time){
-    const dateTimeString = `${date} ${time}`;
-    const combineDT = new DateTime(dateTimeString);
+  function combineDateTime(time, date){
+    const dateTimeString = `${time}, ${date}`;
+    // const combineDT = new DateTime(dateTimeString);
+    // return combineDT;
+    return dateTimeString
+  }
 
+  function combineDateString(date1, date2){
+    const dateString = `${date1} - ${date2}`;
+    return dateString;
+  }
+
+  function displayPeriod(){
+    const tempCurDate = combineDateTime(startTime, handleDate(currentDateTime));
+    // console.log(tempCurDate)
+    const tempNextDate = combineDateTime(endTime, handleDate(nextDateTime));
+    // console.log(tempNextDate)
+    const rs = combineDateString(tempCurDate, tempNextDate);
+    // console.log(rs)
+    setFilterDateTime(rs)
   }
 
   return (
@@ -134,18 +154,20 @@ export default function Home() {
             <form className="search-option">
               <div className="option">
                 <div className="sub-option location">
-                  <table style={{width: "100%"}}>
-                    <tr style={{color:""}}>
-                      <td><LocationOnIcon/></td>
-                      <td style={{textAlign: "left"}}>Địa điểm</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                        {/* <Popup
-                          trigger={*/}
-                            <td style={{cursor: "pointer", overflow: "hidden"}}>
-                              <p style={{textAlign: "left", fontWeight: "500"}}>{address ? address : "Hồ Chí Minh"}</p>
-                            </td>
+                  {/* <Popup
+                    trigger={*/}
+                              <table style={{width: "100%"}}>
+                                <tr style={{color:""}}>
+                                  <td style={{display: "flex", justifyContent: "right"}}><LocationOnIcon style={{height: "20px"}}/></td>
+                                  <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Địa điểm</td>
+                                </tr>
+                                <tr>
+                                  <td></td>
+                                  <td style={{cursor: "pointer", overflow: "hidden"}}>
+                                    <p style={{textAlign: "left", fontWeight: "500", fontSize: "18px"}}>{address ? address : "Hồ Chí Minh"}</p>
+                                  </td>
+                                </tr>
+                              </table>
                         {/*}  }
                           contentStyle={{
                             height: "fit-content", 
@@ -157,26 +179,56 @@ export default function Home() {
                           modal
                         >
                           <div id="home-adr-container">
-                            <h3>Địa điểm</h3>
+                            <p style={{fontSize: "22px", fontWeight: "500"}>Địa điểm</p>
                             <hr />
 
                           </div>
                         </Popup> */}
-                    </tr>
-                  </table>
                 </div>
                 <div class="vertical-line"></div>
                 <div className="sub-option period">
-                <table style={{width: "100%"}}>
-                    <tr>
-                      <td><CalendarMonthIcon/></td>
-                      <td style={{textAlign: "left"}}>Thời gian thuê</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td><TextField select fullWidth variant="standard"/></td>
-                    </tr>
-                  </table>
+                  <Popup
+                    trigger={
+                            <table style={{width: "100%"}}>
+                              <tr>
+                                <td><CalendarMonthIcon style={{height: "20px"}}/></td>
+                                <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Thời gian thuê</td>
+                              </tr>
+                              <tr>
+                                <td></td>
+                                {/* <td><TextField select fullWidth variant="standard"/></td> */}
+                                <td style={{cursor: "pointer"}}>
+                                  <p style={{textAlign: "left", fontWeight: "500", fontSize: "18px"}}>{filterDateTime}</p>
+                                </td>
+                              </tr>
+                            </table>
+                    }
+                    contentStyle={{
+                      height: "fit-content",
+                      width: "60%",
+                      backgroundColor: "white",
+                      padding: "1em 2em 1.5em 2em",
+                      borderRadius: "15px"
+                    }}
+                    modal
+                  >
+                    <div id="home-datetime-container">
+                      <p style={{fontSize: "22px", fontWeight: "500"}}>Thời gian</p>
+                      <hr style={{width: "100%"}}/>
+                      <p style={{color: "#ccc"}}>*Giới hạn thời gian thuê xe tối đa 30 ngày. Bạn vui lòng điều chỉnh lại thời gian phù hợp</p>
+                      <div className="datetime-modify">
+                        <div className="date-modify">
+
+                        </div>
+                        <div className="time-modify">
+
+                        </div>
+                      </div>
+                      <div className="conclude">
+                        
+                      </div>
+                    </div>
+                  </Popup>
                 </div>
                 <div className="search-button">
                   <Button 

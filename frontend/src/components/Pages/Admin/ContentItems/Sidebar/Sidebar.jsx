@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <div id="adsidebar">
       <div className="top">
-        <span className="logo">CarFlex</span>
+        <span className="logo" onClick={() => navigate("/")}>CarFlex</span>
       </div>
       <hr />
       <div className="center">

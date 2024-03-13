@@ -22,6 +22,16 @@ const LoginForm = () => {
     setErrMsg("");
   },[email, pwd])
 
+  const getAuth = async (token) => {
+    try {
+        const response = await axios.get(`http://localhost:4000/user/getByToken?token=${token}`);
+        const data = response.data;
+        return data;
+    } catch (error) {
+        console.error("Authentication error: " + error.message);
+    }
+  } 
+
   async function handleSubmit(e){
     e.preventDefault();
     try {
@@ -30,18 +40,26 @@ const LoginForm = () => {
         password: pwd,
       }
       const response1 = await axios.get(`http://localhost:4000/user/email/${email}`)
+      // console.log(response1)
       if(response1.data){
-        const response2 = await axios.post(
+        let token
+        const authentication = await axios.post(
           "http://localhost:4000/user/login",
           postData
         );
-        const token = response2.data.token;
-        // console.log(token)
-        // Set the token in a cookie and update the authentication state
-        login(token)
-
-        setUser("")
-        setPwd("")
+        // console.log(authentication.data.message);
+        if (authentication.data.message !== "Đăng Nhập thất bại"){ 
+          token = authentication.data.token;
+          const authorization = await axios.get(`http://localhost:4000/user/getByToken?token=${token}`);
+          const role = authorization.data.roleId;
+          // console.log(role);
+          login(token,role);
+          setUser("")
+          setPwd("")
+          setErrMsg("")
+        }else{
+          setErrMsg("Sai mật khẩu")
+        }
       }
     }catch (err) {
       if(!err?.reponse){
@@ -83,10 +101,11 @@ const LoginForm = () => {
           <FaLock className="icon" />
         </div>
         <button type="submit">Đăng nhập</button>
+        <p style={{color: "red"}}>{errMsg ? errMsg : ""}</p>
         <div className="register-link">
-          <p>
+          {/* <p>
             Bạn chưa là thành viên? <a href="#">Đăng ký</a>
-          </p>
+          </p> */}
         </div>
         <Login/>
       </form>
