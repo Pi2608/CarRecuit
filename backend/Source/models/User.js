@@ -475,18 +475,24 @@ const getMemberShipByUserId = async (userId) => {
 const checkLogin = async (email, password) => {
     try {
         const users = await getAllUser()
+        const userForgetPass = users.find(user => user.email == email && user.password != password)
+        if (userForgetPass != null) {
+            return{
+                status : 2
+            }
+        }
         const user = users.find(user => user.email == email && user.password == password)
         if (user != null && user.status == 1 && user.idDeleted != true) {
             const payload = { userid: user.id, email: user.email, roleId: user.roleId };
             const secretKey = 'carFlex2024'
             const token = jwt.sign(payload, secretKey)
             return {
-                message: 'Đăng Nhập thành công',
+                status: 3,
                 token: token
             }
         } else {
             return {
-                message: 'Đăng Nhập thất bại',
+                status: 1,
             }
         }
     } catch (err) {
@@ -516,7 +522,7 @@ const createTransaction = async (userId, money, payerCode, pointGet, paymentMeth
     }
 }
 
-const totalTransactionUser = async(userId)=>{
+const totalTransactionUser = async (userId) => {
     try {
         let poolConnection = await sql.connect(config);
         const query = `Select SUM(money) as total from [dbo].[transaction] where userId = @userId`
@@ -524,11 +530,11 @@ const totalTransactionUser = async(userId)=>{
             .input('userId', sql.Int, userId)
             .query(query)
         const transaction = result.recordset[0]
-        if (transaction.total ==null){
+        if (transaction.total == null) {
             return {
-                total : 0
+                total: 0
             };
-        }else{
+        } else {
             return transaction
         }
     } catch (error) {
@@ -557,15 +563,14 @@ const getTransactionHistory = async (userId) => {
         console.log(error)
     }
 }
-const editStatusNID = async (userId, isConfirm) => {
+const editStatusNID = async (NIDId, isConfirm) => {
     try {
         let poolConnection = await sql.connect(config)
         const query = `Update dbo.NID set isConfirm =@isConfirm
-                    where id = (select NIDId 
-                    from [dbo].[user] where id = @userId) `
+                    where id = @NIDId`
         await poolConnection.request()
             .input("isConfirm", sql.Int, isConfirm)
-            .input("userId", sql.Int, userId)
+            .input("NIDId", sql.Int, NIDId)
             .query(query)
         return {
             message: "đổi status thành công"
@@ -576,15 +581,14 @@ const editStatusNID = async (userId, isConfirm) => {
 }
 
 
-const editStatusNDL = async (userId, isConfirm) => {
+const editStatusNDL = async (NDLId, isConfirm) => {
     try {
         let poolConnection = await sql.connect(config)
         const query = `Update dbo.NDL set isConfirm = @isConfirm
-                        where id = (select NDLId 
-                        from [dbo].[user] where id = @userId)`
+                        where id = @NDLId`
         await poolConnection.request()
             .input("isConfirm", sql.Int, isConfirm)
-            .input("userId", sql.Int, userId)
+            .input("NDLId", sql.Int, NDLId)
             .query(query)
         return {
             message: "đổi status thành công"
@@ -599,7 +603,22 @@ const showRequestConfirmNID = async () => {
         const query = `Select * from dbo.NID where isConfirm is null`
         const result = await poolConnection.request()
             .query(query)
-        return result.recordset
+        const NIDs = result.recordset
+        let NIDsReturn = []
+        for (let NID of NIDs) {
+            const query1 = `Select * from dbo.image where id like '%NID%'
+                        and userId = (Select id from [dbo].[user] where NIDId = @NIDId)`
+            const result1 = await poolConnection.request()
+                .input('NIDId', sql.Int, NID.id)
+                .query(query1)
+            const imgs = result1.recordset
+            for (let i = 0; i < imgs.length; i++) {
+                imgs[i].url = await util.decodeImage(imgs[i].url, imgs[i].id)
+            }
+            NID.imgs = imgs
+            NIDsReturn.push(NID)
+        }
+        return NIDsReturn
     } catch (error) {
         console.log(error)
     }
@@ -610,7 +629,22 @@ const showRequestConfirmNDL = async () => {
         const query = `Select * from dbo.NDL where isConfirm is null`
         const result = await poolConnection.request()
             .query(query)
-        return result.recordset
+        const NDLs = result.recordset
+        let NDLsReturn = []
+        for (let NDL of NDLs) {
+            const query1 = `Select * from dbo.image where id like '%NDL%'
+                                    and userId = (Select id from [dbo].[user] where NDLId = @NDLId)`
+            const result1 = await poolConnection.request()
+                .input('NDLId', sql.Int, NDL.id)
+                .query(query1)
+            const imgs = result1.recordset
+            for (let i = 0; i < imgs.length; i++) {
+                imgs[i].url = await util.decodeImage(imgs[i].url, imgs[i].id)
+            }
+            NDL.imgs = imgs
+            NDLsReturn.push(NDL)
+        }
+        return NDLsReturn
     } catch (error) {
         console.log(error)
     }
@@ -648,6 +682,17 @@ const getRoleByUserId = async (userId) => {
         console.log(error)
     }
 }
+const getCountUser = async ()=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query = `Select COUNT(*) as amount from [dbo].[user] where roleId = 1 and isDeleted = 0 and status =1`
+        const result = await poolConnection.request()
+        .query(query)
+        return result.recordset[0]
+    } catch (error) {
+        
+    }
+}
 module.exports = {
     getAllUser,
     getUserById,
@@ -677,6 +722,7 @@ module.exports = {
     getUserByToken,
     getRoleByUserId,
     updateImageUser,
-    totalTransactionUser
+    totalTransactionUser,
+    getCountUser
 }
 

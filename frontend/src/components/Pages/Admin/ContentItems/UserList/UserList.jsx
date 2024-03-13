@@ -21,6 +21,7 @@ const UserList = () => {
     try {
       const response = await axios.get("http://localhost:4000/user/");
       const userData = response.data;
+      console.log(userData)
       setData(await totalTransactionUser(userData));
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -41,20 +42,14 @@ const UserList = () => {
     }
   }
 
-  const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
-  };
 
-  const handleBan = (id) => {
-    setData((prevData) => {
-      return prevData.map((item) => {
-        if (item.id === id) {
-          const updatedItem = { ...item, banned: true };
-          return { ...updatedItem, buttonColor: "lightGray" };
-        }
-        return item;
-      });
-    });
+  async function handleBan(id) {
+    try {
+      await axios.put(`http://localhost:4000/user/editStatus?userId=${id}&status=0`); 
+      fetchUser();
+    } catch (error) {
+      
+    }
   };
 
   return (
@@ -98,12 +93,6 @@ const UserList = () => {
                       style={{ backgroundColor: row.buttonColor }}
                     >
                       Cấm
-                    </div>
-                    <div
-                      className="deleteButton"
-                      onClick={() => handleDelete(row.id)}
-                    >
-                      Xóa
                     </div>
                   </div>
                 </TableCell>

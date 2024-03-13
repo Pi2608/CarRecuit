@@ -9,7 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
-
+import Popup from "reactjs-popup";
 const VoucherList = () => {
   
   const [data, setData] = useState([]);
@@ -48,6 +48,7 @@ const VoucherList = () => {
       
     }
   }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // Xử lý dữ liệu đã nhập ở đây
@@ -55,12 +56,32 @@ const VoucherList = () => {
     // Sau khi xử lý xong, có thể đóng popup
     togglePopup();
   };
+
+  const handleDate = (d) => {
+    const date = new Date(d)
+    // Extract date components
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const day = String(date.getDate()).padStart(2, '0');
+    // Format as "--/--/----"
+    const formattedDate = `${day}/${month}/${year}`;
+    return formattedDate
+  }
+
   return (
     <div id="voucher">
       <div className="voucherTitle">
         Danh sách vouchers
-        <button className="head" onClick={togglePopup}>Open Popup</button>
-        {isOpen && (
+        <Popup 
+          trigger={
+            <button className="head" >Open Popup</button>
+          }
+          contentStyle={{
+            backgroundColor: "white",
+            padding: "2em"
+          }}
+          modal
+        >
           <div className="popup-content">
             <div className="popup-inner">
               <div onClick={togglePopup} style={{cursor: 'pointer'}}>x</div>
@@ -93,7 +114,10 @@ const VoucherList = () => {
               </form>
             </div>
           </div>
-        )}
+        </Popup>
+
+
+      
       </div>
       <TableContainer component={Paper} className="table">
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -111,8 +135,8 @@ const VoucherList = () => {
               <TableRow key={row.id}>
                 <TableCell className="tableCell">{row.voucherCode}</TableCell>
                 <TableCell className="tableCell">{parseFloat(row.discount) * 100}</TableCell>
-                <TableCell className="tableCell">{row.startDate}</TableCell>
-                <TableCell className="tableCell">{row.endDate}</TableCell>
+                <TableCell className="tableCell">{handleDate(row.startDate)}</TableCell>
+                <TableCell className="tableCell">{handleDate(row.endDate)}</TableCell>
                 <TableCell>
                   <div className="cellAction">
                     <div

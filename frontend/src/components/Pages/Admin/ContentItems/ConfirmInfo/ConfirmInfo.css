@@ -41,6 +41,29 @@
   justify-content: space-between;
 }
 
+#confirm > .confirmTitle > .toggle-part{
+  display: flex;
+}
+
+#confirm > .confirmTitle > .toggle-part > .choice {
+  position: relative;
+  padding: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+#confirm > .confirmTitle > .toggle-part > .choice.active::before {
+  content: "";
+  position: absolute;
+  background-color: #5fcf86;
+  height: 5px;
+  width: 100%;
+  bottom: 0px;
+  transform: translateY(-50%);
+  left: -10px;
+  margin-left: 10px;
+  transition: 1s;
+}
+
 .cellImg {
   display: flex;
   align-items: center;
@@ -52,3 +75,4 @@
     margin-right: 20px;
   }
 }
+

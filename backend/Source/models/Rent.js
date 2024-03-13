@@ -61,6 +61,10 @@ const statisticRentalByYear = async (year)=>{
                             COUNT(*) as total
                         From
                             dbo.rent
+                        Inner join
+                            dbo.rentDetail
+                        On
+                            rentDetail.rentId=rent.id
                         Where
                             dbo.rent.paymentId is not null AND
                             YEAR(dbo.rent.time) = @year
@@ -75,6 +79,49 @@ const statisticRentalByYear = async (year)=>{
     }catch(error){
         console.log(error)
     }
+}
+
+const statisticRentalByMonthYear = async (month,year)=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query = `SELECT 
+                            YEAR(dbo.rent.time) as year,
+                            MONTH(dbo.rent.time) as month,
+                            COUNT(*) as total
+                        From
+                            dbo.rent
+                        Inner join
+                            dbo.rentDetail
+                        On
+                            rentDetail.rentId=rent.id
+                        Where
+                            dbo.rent.paymentId is not null AND
+                            YEAR(dbo.rent.time) = @year AND
+                            MONTH(dbo.rent.time) = @month
+                        Group By
+                            YEAR(dbo.rent.time), MONTH(dbo.rent.time)
+                        Order By
+                            year, month`
+        const result = await poolConnection.request()
+        .input('year', sql.Int, year)
+        .input('month', sql.Int, month)
+        .query(query)
+        return result.recordset[0]
+    }catch(error){
+        console.log(error)
+    }
+}
+
+const statisticRentalThisMonth = async()=>{
+    const current = new Date (await Util.currentTime())
+    const thisMonth = current.getMonth()+1
+    const thisYear = current.getFullYear()
+    const statistic = await statisticRentalByMonthYear(thisMonth, thisYear)
+    const statisticBefore = await statisticRentalByMonthYear(thisMonth-1, thisYear)
+    if(statisticBefore != null && statistic !=null){
+        statistic.diff = (statistic.total-statisticBefore.total)/statisticBefore.total
+    }
+    return statistic
 }
 
 const createRent = async (userId)=>{
@@ -606,5 +653,7 @@ module.exports = {
     cancelRentDetailByUser,
     cancelRentDetailByOwner,
     getRentAlreadyPayment,
-    getRentDetailByRentId
+    getRentDetailByRentId,
+    statisticRentalByMonthYear,
+    statisticRentalThisMonth
 }
