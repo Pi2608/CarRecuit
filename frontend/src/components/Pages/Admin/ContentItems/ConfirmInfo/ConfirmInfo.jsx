@@ -7,6 +7,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 import axios from "axios";
 
 
@@ -29,18 +31,33 @@ const ConfirmInfo = () => {
 
     }
   }
-  
+
   const handleDate = (d) => {
     const date = new Date(d)
     // Extract date components
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     // Format as "--/--/----"
     const formattedDate = `${day}/${month}/${year}`;
     return formattedDate
   }
+  async function editStatusNID(NIDId, status) {
+    try {
+      await axios.put(`http://localhost:4000/user/NID/editStatus?NIDId=${NIDId}&status=${status}`)
+      fetchData()
+    } catch (error) {
 
+    }
+  }
+  async function editStatusNDL(NDLId, status){
+    try {
+      await axios.put(`http://localhost:4000/user/NDL/editStatus?NDLId=${NDLId}&status=${status}`)
+      fetchData()
+    } catch (error) {
+      
+    }
+  }
   return (
     <div id="confirm">
       <div className="confirmTitle">
@@ -55,7 +72,7 @@ const ConfirmInfo = () => {
       </div>
 
       <TableContainer component={Paper} className="table">
-        <Table sx={{ minWidth: 650 }} style={togglePart ?  {}: {display:"none"}} aria-label="simple table">
+        <Table sx={{ minWidth: 650 }} style={togglePart ? {} : { display: "none" }} aria-label="simple table">
           <TableHead className="tableHead">
             <TableRow>
               <TableCell className="tableCell">Id</TableCell>
@@ -71,12 +88,12 @@ const ConfirmInfo = () => {
                 <TableCell className="tableCell">{row.id}</TableCell>
                 <TableCell>
                   <div className="cellImg">
-                    <img className="cellWImg" src={(row.imgs[0]?.id.includes("NIDF")) ? (row.imgs[0]?.url) : (row.imgs[1]?.url)} alt="CCCD/CMND" />
+                    <img className="cellWImg" src={(row.imgs[0]?.id.includes("NIDF")) ? (row.imgs[0]?.url) : (row.imgs[1]?.url)} alt="Image" />
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="cellImg">
-                    <img className="cellWImg" src={(row.imgs[0]?.id.includes("NIDB")) ? (row.imgs[0]?.url) : (row.imgs[1]?.url)} alt="GPLX" />
+                    <img className="cellWImg" src={(row.imgs[0]?.id.includes("NIDB")) ? (row.imgs[0]?.url) : (row.imgs[1]?.url)} alt="Image" />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -92,41 +109,47 @@ const ConfirmInfo = () => {
                 </TableCell>
                 <TableCell>
                   <div className="cellAction">
-                    <div className="confirmButton">Xác nhận</div>
-                    <div className="rejectButton">Từ chối</div>
+                    <Stack spacing={3} direction="row">
+                      <Button variant="outlined" onClick={() => editStatusNID(row.id, 1)}>Xác nhận</Button>
+                      <Button variant="outlined" onClick={() => editStatusNID(row.id, 0)}>Từ chối</Button>
+                    </Stack>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Table sx={{ minWidth: 650 }} style={togglePart ?  {display:"none"} : {}} aria-label="simple table">
+        <Table sx={{ minWidth: 650 }} style={togglePart ? { display: "none" } : {}} aria-label="simple table">
           <TableHead className="tableHead">
             <TableRow>
-              <TableCell className="tableCell">Tên</TableCell>
-              <TableCell className="tableCell">Ảnh CCCD/CMND</TableCell>
+              <TableCell className="tableCell">Id</TableCell>
               <TableCell className="tableCell">Ảnh GPLX</TableCell>
+              <TableCell className="tableCell">Thông tin</TableCell>
               <TableCell className="tableCell">Trạng thái</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {NDL.map((row) => (
               <TableRow key={row.id}>
-                <TableCell className="tableCell">{row.name}</TableCell>
+                <TableCell className="tableCell">{row.Id}</TableCell>
                 <TableCell>
                   <div className="cellImg">
-                    <img className="cellWImg" src={row.cccd} alt="CCCD/CMND" />
+                    <img className="cellWImg" src={row.imgs[0]?.url} alt="Image" />
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="cellImg">
-                    <img className="cellWImg" src={row.gplx} alt="GPLX" />
+                  <div>
+                    <p>Tên : {row.name}</p>
+                    <p>Số GPLX : {row.NDL}</p>
+                    <p>Ngày/tháng/năm sinh : {handleDate(row.dateOfBirth)}</p>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="cellAction">
-                    <div className="confirmButton">Xác nhận</div>
-                    <div className="rejectButton">Từ chối</div>
+                    <Stack spacing={3} direction="row">
+                      <Button variant="outlined" onClick={() => editStatusNDL(row.id, 1)}>Xác nhận</Button>
+                      <Button variant="outlined" onClick={() => editStatusNDL(row.id, 0)}>Từ chối</Button>
+                    </Stack>
                   </div>
                 </TableCell>
               </TableRow>

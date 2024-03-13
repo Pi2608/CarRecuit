@@ -5,13 +5,11 @@ import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import { useNavigate } from "react-router-dom";
 
-const Widget = ({ type }) => {
+const Widget = ({ type, amount, diff }) => {
   const navigate = useNavigate();
   let data;
 
   //temporary
-  const amount = 100;
-  const diff = 20;
 
   switch (type) {
     case "user":
@@ -19,7 +17,7 @@ const Widget = ({ type }) => {
         title: "Người dùng",
         isMoney: false,
         link: "Xem tất cả",
-        path: "/users",
+        path: "admin/users",
         icon: (
           <PersonOutlinedIcon
             className="icon"
@@ -33,7 +31,7 @@ const Widget = ({ type }) => {
       break;
     case "order":
       data = {
-        title: "Xe Thuê",
+        title: "Chuyến xe trong tháng",
         isMoney: false,
         link: "Xem tất cả",
 
@@ -77,7 +75,7 @@ const Widget = ({ type }) => {
         <span className="link" onClick={() => navigate(data.path)}>{data.link}</span>
       </div>
       <div className="right">
-        <div className="percentage positive">
+        <div className="percentage positive" style={diff ? {} : { display: "none" }}>
           <KeyboardArrowUpIcon />
           {diff} %
         </div>

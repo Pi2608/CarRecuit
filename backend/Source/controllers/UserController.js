@@ -258,9 +258,9 @@ const getTransactionHistory = async (req, res) => {
 }
 const editStatusNID = async (req, res) => {
     try {
-        const userId = req.query.userId
+        const NIDId = req.query.NIDId
         const status = req.query.status
-        const response = await User.editStatusNID(userId, status)
+        const response = await User.editStatusNID(NIDId, status)
         res.json(response)
     } catch (error) {
 
@@ -268,9 +268,9 @@ const editStatusNID = async (req, res) => {
 }
 const editStatusNDL = async (req, res) => {
     try {
-        const userId = req.query.userId
+        const NDLId = req.query.NDLId
         const status = req.query.status
-        const response = await User.editStatusNDL(userId, status)
+        const response = await User.editStatusNDL(NDLId, status)
         res.json(response)
     } catch (error) {
 
@@ -353,6 +353,14 @@ const checkAdmin = async (req, res, next) => {
 
     }
 }
+const getCountUser = async (req, res)=>{
+    try {
+        const response = await User.getCountUser()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 
 
 module.exports = {
@@ -385,5 +393,6 @@ module.exports = {
     checkAdmin,
     getUserById,
     updateImageUser,
-    totalTransactionUser
+    totalTransactionUser,
+    getCountUser
 }

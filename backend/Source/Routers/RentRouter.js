@@ -7,6 +7,7 @@ rentRouter.get('/rented/:userId', rentController.getRentAlreadyPayment)// tất 
 rentRouter.get('/counting/:carId', rentController.getCountRentalCar)
 rentRouter.get('/schedule/:carId', rentController.getCarRentalSchedule)
 rentRouter.post('/statistic', rentController.statisticRentalByYear)
+rentRouter.get('/statisticCurrent', rentController.statisticRentalThisMonth)
 rentRouter.get('/detail/:rentId', rentController.getRentDetailByRentId)
 rentRouter.get('/detailCurrent/:userId', rentController.getRentDetailCurrent) // lấy rent Detail của hiện tại chưa thanh toán
 rentRouter.post('/addCar', rentController.addRentDetail)

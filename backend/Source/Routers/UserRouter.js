@@ -35,6 +35,7 @@ userRouter.post("/NDL/sendConfirm/:userId", userController.uploadImgs, userContr
 
 userRouter.get("/getByToken", userController.getUserByToken)
 userRouter.get("/email/:email", userController.getUserByEmail)
+userRouter.get("/counting/", userController.getCountUser)
 userRouter.get("/:userId", userController.getUserById)
 
 module.exports = userRouter;
