@@ -23,6 +23,15 @@ const getAllCarsInUse = async(req, res)=>{
         
     }
 }
+const getAllCars = async(req, res)=>{
+    try {
+        await Uitl.deleteAllImages()
+        const response =await car.getAllCars()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const recomendCar = async (req, res)=>{
     try {
         await Uitl.deleteAllImages()
@@ -209,5 +218,6 @@ module.exports={
     getCarTypeByTypeId,
     recomendCar,
     requestAcceptedCar,
-    editAcceptedCar
+    editAcceptedCar,
+    getAllCars
 }

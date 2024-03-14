@@ -16,7 +16,7 @@ const Widget = ({ type, amount, diff }) => {
         title: "Người dùng",
         isMoney: false,
         link: "Xem tất cả",
-        path: "admin/users",
+        path: "/admin/users",
         icon: (
           <PersonOutlinedIcon
             className="icon"

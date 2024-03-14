@@ -69,10 +69,6 @@ const DashBoard = () => {
           <Featured />
           <Chart title={chartTitle} aspect={2 / 1} type={chartType}/>
         </div>
-        <div className="listContainer">
-          <div className="listTitle">Giao dịch</div>
-          <TableTransaction />
-        </div>
       </div>
     </div>
   );

@@ -170,6 +170,54 @@ const statisticEarningByMonthYear = async(month, year)=>{
     }
 }
 
+const statisticEarningByDayMonthYear= async(day, month, year)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select						
+                            DAY (dbo.payment.paymentDate) as day,
+                            YEAR(payment.paymentDate) as year,
+                            MONTH(payment.paymentDate) as month,
+                            (Sum(rent.total)-IsNull((Select 
+                                                                        Sum(refund.total)
+                                                                        From  dbo.payment
+                                                                        Inner join dbo.refund
+                                                                        on refund.paymentId = payment.id
+                                                                        where DAY (payment.paymentDate) = 14 AND
+                                                                        YEAR(payment.paymentDate) = 2024 AND
+                                                                                MONTH(payment.paymentDate) = 3
+                                                                        Group By
+                                                                        YEAR(payment.paymentDate), MONTH(payment.paymentDate)),0))*0.2 as earning
+                            From  dbo.payment
+                            Inner join dbo.rent
+                            on rent.paymentId = payment.id
+                            where  DAY (payment.paymentDate) = 14 AND
+                            YEAR(payment.paymentDate) = 2024 AND
+                                    MONTH(payment.paymentDate) = 3
+                            Group By
+                                YEAR(payment.paymentDate), MONTH(payment.paymentDate), DAY (payment.paymentDate)
+                            Order By
+                                year, month , day`
+        const result1 = await poolConnection.request()
+        .input ('day', sql.Int, day)
+        .input('year', sql.Int, year)
+        .input('month', sql.Int, month)
+        .query(query1)
+        return result1.recordset[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const statisticEarningToday = async ()=>{
+    const current = new Date (await Util.currentTime())
+    const thisMonth = current.getMonth()+1
+    const thisYear = current.getFullYear()
+    const thisDay = current.getDate()-1
+    console.log(thisDay, thisMonth, thisYear)
+    const statistic = await statisticEarningByDayMonthYear(thisDay,thisMonth, thisYear)
+    return statistic
+}
+
 const statisticEarningThisMonth = async()=>{
     const current = new Date (await Util.currentTime())
     const thisMonth = current.getMonth()+1
@@ -732,5 +780,6 @@ module.exports = {
     statisticRentalByMonthYear,
     statisticRentalThisMonth,
     statisticEarningThisMonth,
-    statisticEarningByYear
+    statisticEarningByYear,
+    statisticEarningToday
 }

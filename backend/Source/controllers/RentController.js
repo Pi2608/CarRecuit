@@ -53,6 +53,14 @@ const statisticEarningByYear = async(req, res)=>{
         
     }
 }
+const statisticEarningToday = async (req, res)=>{
+    try {
+        const response = await rent.statisticEarningToday()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const getRentDetailCurrent = async(req, res)=>{
     try {
         const userId = req.params.userId
@@ -161,5 +169,6 @@ module.exports= {
     getRentDetailByRentId,
     statisticRentalThisMonth,
     statisticEarningThisMonth,
-    statisticEarningByYear
+    statisticEarningByYear,
+    statisticEarningToday
 }

@@ -5,6 +5,7 @@ const carController = require('../controllers/CarController')
 const carRouter = express.Router()
 
 carRouter.get('/' ,carController.getAllCarsInUse)
+carRouter.get('/all', carController.getAllCars)
 carRouter.get('/brand', carController.getBrandCar)
 carRouter.get('/type/brand/:carBrandId', carController.getCarType)
 carRouter.get('/type/:typeId', carController.getCarTypeByTypeId)

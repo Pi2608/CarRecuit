@@ -4,6 +4,29 @@ const util = require("../Util/Util");
 const Location = require("./Location")
 
 
+const getAllCars = async ()=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id`
+        const result = await poolConnection.request().query(query1);
+        const cars= result.recordset;
+        for (let car of cars){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const img = result2.recordset[0]
+            car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.description
+        }
+        return cars
+    }catch(err){
+        console.log(err)
+    }
+}
 const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
@@ -170,6 +193,8 @@ const getCarById= async(id)=>{
         .input("id", sql.Int, id)
         .query(query);
         const car =  result.recordset[0];
+        const location = await Location.getCarLocation(car.id, 1)
+        car.ldescription = location.description
         const imgs = await getImgsCarById(id)
         for(let i=0; i< imgs.length; i++){
             imgs[i].url = await util.decodeImage(imgs[i].url, imgs[i].id)
@@ -458,5 +483,6 @@ module.exports={
     getCarType,
     recomendCar,
     requestAcceptedCar,
-    editAcceptedCar
+    editAcceptedCar,
+    getAllCars
 }
