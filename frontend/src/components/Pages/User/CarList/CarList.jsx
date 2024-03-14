@@ -21,12 +21,12 @@ export default function CarList(){
 
     const navigate = useNavigate();
     const [carList, setCarList] = useState([]);
+    const [filterList, setFilterList]= useState([])
 
     const fetchCarList = async () => {
         try {
             const response = await axios.get('http://localhost:4000/car/');
             const carListData = response.data;
-
             // Create an array of promises for each image loading
             const imagePromises = carListData.map((car) => {
                 return new Promise((resolve) => {
@@ -39,6 +39,7 @@ export default function CarList(){
             // Wait for all images to be loaded before updating state
             const loadedCarList = await Promise.all(imagePromises);
             setCarList(loadedCarList);
+            return loadedCarList
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -46,8 +47,35 @@ export default function CarList(){
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        fetchCarList();
+        const fetchData = async () => {
+            fetchCarList()
+            .then((carlist) => carFilterList(carlist));
+        }
+        fetchData()
     },[])
+
+    useEffect(() => {
+        setCarList(filterList)
+    },[filterList])
+
+    const carFilterList = async(carFList)=>{
+        try {
+            const postData = {
+                cars: carFList,
+                carTypeId: "111",
+                minPrice: "900", 
+                maxPrice: "1100",
+                seats: "4",
+                typeOfFuels: "Xăng",
+                gearStick : "Số tự động"
+            }    
+            const response2 = await axios.post('http://localhost:4000/car/filter', postData)
+            setFilterList(response2.data)
+            console.log(response2.data)
+        } catch (error) {
+            
+        }
+    }
 
     return (
         <div id="cars">

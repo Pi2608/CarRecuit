@@ -36,6 +36,23 @@ const statisticRentalThisMonth = async(req,res)=>{
         
     }
 }
+const statisticEarningThisMonth = async(req, res)=>{
+    try {
+        const response = await rent.statisticEarningThisMonth()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const statisticEarningByYear = async(req, res)=>{
+    try {
+        const year = req.body.year
+        const response = await rent.statisticEarningByYear(year)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const getRentDetailCurrent = async(req, res)=>{
     try {
         const userId = req.params.userId
@@ -142,5 +159,7 @@ module.exports= {
     cancelRentDetailByUser,
     getRentAlreadyPayment,
     getRentDetailByRentId,
-    statisticRentalThisMonth
+    statisticRentalThisMonth,
+    statisticEarningThisMonth,
+    statisticEarningByYear
 }

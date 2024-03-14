@@ -229,19 +229,19 @@ const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
     }
 };
 
-const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
+const filterCars=async(Cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick)=>{
     try{
-        const Cars = await getAllCarsInUse();
+        console.log(carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick)
         const filteredCars = Cars.filter(car => {
             if (carTypeId && car.carTypeId.toString() !== carTypeId) {
                 return false;
             }
 
-            if (minPrice && car.price < minPrice) {
+            if (minPrice && car.price < parseInt(minPrice)) {
                 return false;
             }
 
-            if (maxPrice && car.price > maxPrice) {
+            if (maxPrice && car.price > parseInt(maxPrice)) {
                 return false;
             }
 
@@ -250,6 +250,10 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
             }
 
             if (typeOfFuels && car.typeOfFuels !== typeOfFuels) {
+                return false;
+            }
+
+            if (gearStick && car.gearStick !== gearStick){
                 return false;
             }
             return true;

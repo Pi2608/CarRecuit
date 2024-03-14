@@ -52,34 +52,46 @@ const carRentalSchedule = async(carId)=>{
     }
 }
 
-const statisticRentalByYear = async (year)=>{
-    try{
-        let poolConnection = await sql.connect(config)
+const statisticRentalByYear = async (year) => {
+    try {
+        let poolConnection = await sql.connect(config);
         const query = `SELECT 
                             YEAR(dbo.rent.time) as year,
                             MONTH(dbo.rent.time) as month,
-                            COUNT(*) as total
-                        From
+                            ISNULL(COUNT(*), 0) as total
+                        FROM
                             dbo.rent
-                        Inner join
+                        INNER JOIN
                             dbo.rentDetail
-                        On
-                            rentDetail.rentId=rent.id
-                        Where
-                            dbo.rent.paymentId is not null AND
+                        ON
+                            rentDetail.rentId = rent.id
+                        WHERE
+                            dbo.rent.paymentId IS NOT NULL AND
                             YEAR(dbo.rent.time) = @year
-                        Group By
+                        GROUP BY
                             YEAR(dbo.rent.time), MONTH(dbo.rent.time)
-                        Order By
-                            year, month`
+                        ORDER BY
+                            year, month`;
         const result = await poolConnection.request()
-        .input('year', sql.Int, year)
-        .query(query)
-        return result.recordset
-    }catch(error){
-        console.log(error)
+            .input('year', sql.Int, year)
+            .query(query);
+        
+        // Creating an object to store rental statistics for each month
+        const rentalStats = {
+            T1: 0, T2: 0, T3: 0, T4: 0, T5: 0, T6: 0,
+            T7: 0, T8: 0, T9: 0, T10: 0, T11: 0, T12: 0
+        };
+
+        // Populating rental statistics object with fetched data
+        result.recordset.forEach(row => {
+            rentalStats[`T${row.month}`] = row.total || 0;
+        });
+
+        return rentalStats;
+    } catch (error) {
+        console.log(error);
     }
-}
+};
 
 const statisticRentalByMonthYear = async (month,year)=>{
     try{
@@ -123,6 +135,61 @@ const statisticRentalThisMonth = async()=>{
     }
     return statistic
 }
+
+const statisticEarningByMonthYear = async(month, year)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select 
+                            YEAR(payment.paymentDate) as year,
+                            MONTH(payment.paymentDate) as month,
+                            (Sum(rent.total) - (Select 
+                                                Sum(refund.total)
+                                                From  dbo.payment
+                                                Inner join dbo.refund
+                                                on refund.paymentId = payment.id
+                                                where YEAR(payment.paymentDate) = @year AND
+                                                        MONTH(payment.paymentDate) = @month
+                                                Group By
+                                                YEAR(payment.paymentDate), MONTH(payment.paymentDate)))*0.2 as earning
+                        From  dbo.payment
+                        Inner join dbo.rent
+                        on rent.paymentId = payment.id
+                        where YEAR(payment.paymentDate) = @year AND
+                                MONTH(payment.paymentDate) = @month
+                        Group By
+                            YEAR(payment.paymentDate), MONTH(payment.paymentDate)
+                        Order By
+                            year, month`
+        const result1 = await poolConnection.request()
+        .input('year', sql.Int, year)
+        .input('month', sql.Int, month)
+        .query(query1)
+        return result1.recordset[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const statisticEarningThisMonth = async()=>{
+    const current = new Date (await Util.currentTime())
+    const thisMonth = current.getMonth()+1
+    const thisYear = current.getFullYear()
+    const statistic = await statisticEarningByMonthYear(thisMonth, thisYear)
+    const statisticBefore = await statisticEarningByMonthYear(thisMonth-1, thisYear)
+    if(statisticBefore != null && statistic !=null){
+        statistic.diff = (statistic.earning-statisticBefore.earning)/statisticBefore.earning
+    }
+    return statistic
+}
+
+const statisticEarningByYear = async (year) => {
+    const earnings = {};
+    for (let i = 1; i <= 12; i++) {
+        const result = await statisticEarningByMonthYear(i, year);
+        earnings[`T${i}`] = result ? result.earning : 0;
+    }
+    return earnings;
+};
 
 const createRent = async (userId)=>{
     try {
@@ -493,7 +560,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
     //-point
     try {
         let poolConnection =  await sql.connect(config)
-        const query1 = `Update dbo.rentDetail set status = 0
+        const query1 = `Update dbo.rentDetail set isAccepted = 0
                         where id =@rentDetailId`
         await poolConnection.request()
         .input('rentDetailId', rentDetailId)
@@ -553,6 +620,14 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
             .input("message", sql.NVarChar, message)
             .input("dateUp", sql.DateTime, dateUp)
             .query(query6)
+            const query10 = `Insert into dbo.refund (paymentId, rentDetailId, date, total)
+                            values ((Select paymentId from dbo.rent where
+                            id = (Select rentId from dbo.rentDetail where id = @rentDetailId)), @rentDetailId, @date, @total)`
+            await poolConnection.request()
+            .input('rentDetailId', sql.Int, rentDetailId)
+            .input('date', sql.DateTime, await Util.currentTime())
+            .input('total', sql.Float, refund)
+            .query(query10)
         }
         receivedId = Car.ownerId
         title="Hủy chuyến xe từ " + (await user.getUserById(userId)).name
@@ -655,5 +730,7 @@ module.exports = {
     getRentAlreadyPayment,
     getRentDetailByRentId,
     statisticRentalByMonthYear,
-    statisticRentalThisMonth
+    statisticRentalThisMonth,
+    statisticEarningThisMonth,
+    statisticEarningByYear
 }

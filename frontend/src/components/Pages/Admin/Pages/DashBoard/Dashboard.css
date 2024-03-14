@@ -12,6 +12,11 @@
   padding: 20px;
   gap: 20px;
 }
+#dashboard > .homeContainer > .widgets div{
+  display: flex;
+  justify-content: space-between;
+  width: 35%;
+}
 
 #dashboard > .homeContainer > .charts {
   padding: 5px 20px;

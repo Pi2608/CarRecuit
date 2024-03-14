@@ -91,12 +91,15 @@ const getCarById = async(req, res)=>{
 }
 const filterCars = async (req, res)=>{
     try {
-        const carTypeId = req.body.carTypeId
-        const minPrice = req.body.minPrice
-        const maxPrice = req.body.maxPrice
-        const seats = req.body.seats
-        const typeOfFuels = req.body.typeOfFuels
-        const response = await car.filterCars(carTypeId, minPrice, maxPrice, seats, typeOfFuels)
+        // const cars = req.body.cars
+        // const carTypeId = req.body.carTypeId
+        // const minPrice = req.body.minPrice
+        // const maxPrice = req.body.maxPrice
+        // const seats = req.body.seats
+        // const typeOfFuels = req.body.typeOfFuels
+        // const gearStick = req.body.gearStick
+        const { cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick } = req.body;
+        const response = await car.filterCars(cars,carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick)
         res.json(response)
     } catch (error) {
         

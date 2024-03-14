@@ -1,5 +1,6 @@
 import "./Widget.css";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"; // Import KeyboardArrowDownIcon
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
@@ -8,8 +9,6 @@ import { useNavigate } from "react-router-dom";
 const Widget = ({ type, amount, diff }) => {
   const navigate = useNavigate();
   let data;
-
-  //temporary
 
   switch (type) {
     case "user":
@@ -33,10 +32,6 @@ const Widget = ({ type, amount, diff }) => {
       data = {
         title: "Chuyến xe trong tháng",
         isMoney: false,
-        link: "Xem tất cả",
-
-        
-        path: "/statistic",
         icon: (
           <ShoppingCartOutlinedIcon
             className="icon"
@@ -50,9 +45,8 @@ const Widget = ({ type, amount, diff }) => {
       break;
     case "earning":
       data = {
-        title: "Thu nhập",
+        title: "Thu nhập trong tháng",
         isMoney: true,
-        link: "Xem thu nhập",
         icon: (
           <MonetizationOnOutlinedIcon
             className="icon"
@@ -76,8 +70,8 @@ const Widget = ({ type, amount, diff }) => {
       </div>
       <div className="right">
         <div className="percentage positive" style={diff ? {} : { display: "none" }}>
-          <KeyboardArrowUpIcon />
-          {diff} %
+          {diff >= 0 ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon style={{ color: "red" }} />} {/* Conditionally render arrow icon and change color to red */}
+          <span style={{ color: diff < 0 ? "red" : "inherit" }}>{Math.abs(diff)} %</span> {/* Conditionally change color to red if diff is less than 0 */}
         </div>
         {data.icon}
       </div>
@@ -86,3 +80,4 @@ const Widget = ({ type, amount, diff }) => {
 };
 
 export default Widget;
+
