@@ -11,7 +11,6 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import axios from "axios";
 import Popup from "reactjs-popup";
 import "./Sidebar.css"
-import { func } from "prop-types";
 
 export default function Sidebar() {
 
@@ -23,14 +22,14 @@ export default function Sidebar() {
         console.log("User logged out");
     };
 
-    const { id, logout } = useAuth();
+    // const { id, logout } = useAuth();
 
-    const [deleteMsg, setDeleteMsg] = useState('');
+    // const [deleteMsg, setDeleteMsg] = useState('');
 
-    const handleLogout = () => {
-        logout();
-        console.log("User logged out");
-    };
+    // const handleLogout = () => {
+    //     logout();
+    //     console.log("User logged out");
+    // };
 
     async function deleteUser(){
         try {
