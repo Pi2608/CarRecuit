@@ -64,7 +64,7 @@ const Widget = ({ type, amount, diff }) => {
       <div className="left">
         <span className="title">{data.title}</span>
         <span className="counter">
-          {data.isMoney && "VND"} {amount}
+          {data.isMoney && "VND"} {Math.round(amount)}
         </span>
         <span className="link" onClick={() => navigate(data.path)}>{data.link}</span>
       </div>

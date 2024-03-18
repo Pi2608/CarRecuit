@@ -45,10 +45,6 @@ const Sidebar = () => {
             <CardGiftcardIcon className="icon" />
             <span>Voucher</span>
           </li>
-          <li onClick={() => navigate("/admin/statistic")}>
-            <AssessmentOutlinedIcon className="icon" />
-            <span>Thống kê</span>
-          </li>
           <li onClick={() => navigate("/admin/confirm")}>
             <div className="item">
               <NotificationsNoneOutlinedIcon className="icon" />

@@ -464,7 +464,6 @@ const getCarTypeByTypeId = async(typeId)=>{
 }
 
 
-
 module.exports={
     getAllCarsInUse,
     getCarTypeByTypeId,
