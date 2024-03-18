@@ -41,6 +41,7 @@ export default function Card({id, image, name, price, ldescription, rating}) {
                     <div className="price-info">
                         <div className="rating" style={{color: "rgb(255, 225, 0)", fontWeight: "450"}}><StarRoundedIcon style={{color: "rgb(255, 225, 0)", height: "24px"}}/>{rating ? rating : ''}</div>
                         <div className="price" style={{display: "flex", color: "green",fontSize: "0.9em", fontWeight: "500", alignItems: "center"}}>{price}K<p style={{color: "#4F4F4F", fontSize: "0.8em", padding: "0"}}>/ngày</p></div>
+
                     </div>
                 </div>
             </div>

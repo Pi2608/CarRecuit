@@ -81,7 +81,7 @@ export default function Infomation() {
     }));
     console.log(formData);
   };
-
+  
   async function getUserInfo() {
     try {
       const response = await axios.get(`http://localhost:4000/user/${id}`);

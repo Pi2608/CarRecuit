@@ -104,7 +104,7 @@ export default function CarList(){
     });
 
 
-    const fetchCarList = async () => {
+    const fetchCarListSequentially = async () => {
         try {
             const response = await axios.get('http://localhost:4000/car/');
             const carListData = response.data;

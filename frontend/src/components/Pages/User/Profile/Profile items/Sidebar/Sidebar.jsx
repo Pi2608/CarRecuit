@@ -16,6 +16,12 @@ import { func } from "prop-types";
 export default function Sidebar() {
 
     const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        console.log("User logged out");
+    };
 
     const { id, logout } = useAuth();
 
