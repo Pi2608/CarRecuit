@@ -47,19 +47,19 @@ export default function CarManage(){
         }
     }
 
+    useEffect(() => {}, [auth]);
+    
     useEffect(() => {
-        if (!auth) {
-            window.alert("Phiên đăng nhập của bạn đã hết. Vui lòng đăng nhập lại.");
-            navigate("/");
-         } else if (id) {
+        if (id) {
             getCarList();
-         }
-      }, [auth, id]);
+            console.log(carList);
+        }
+      },[id])
 
     return(
         <div id="carmanage">
             <div className="container">
-                <div className="head">
+                <div className="head" onClick={() => console.log(carList.additionalData)}>
                     <h1>Danh sách xe</h1>
                     <div className="rgt-btn" onClick={()=>navigate("/car/carregister")}><AddIcon />Đăng ký xe</div>
                 </div>
@@ -73,21 +73,22 @@ export default function CarManage(){
                         <th className='tbl'>Trạng thái</th>
 
                         {carList ? 
-                        carList.map((car)=>
-                        <tr key={car.id}>
-                            <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
-                            <div className="img-container">
-                                <img src={car.imgUrl} style={{backgroundColor: "red", height: "100%", width: "auto", borderRadius: "10px     "}}></img>
-                            </div>
-                            </td>
-                            <td className='tbl'>{car.name}</td>
-                            <td className='tbl'>{car.seats}</td>
-                            <td className='tbl'>{car.price}K</td>
-                            <td className='tbl'>{car.additionalData}</td>
-                            <td className='tbl'>{car.status ? "Đang hoạt động": "Ngưng hoạt động"}</td>
-                        </tr>)
-                        :
-                        <p>Bạn không có xe nào</p>
+                            carList.map((car)=>
+                                <tr key={car.id}>
+                                    <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
+                                    <div className="img-container">
+                                        <img src={car.imgUrl} style={{backgroundColor: "red", height: "100%", width: "auto", borderRadius: "10px     "}}></img>
+                                    </div>
+                                    </td>
+                                    <td className='tbl'>{car.name}</td>
+                                    <td className='tbl'>{car.seats}</td>
+                                     <td className='tbl'>{car.price}K</td>
+                                    <td className='tbl'>{(car.additionalData) ? car.additionalData.rentCount : "0"}</td>
+                                    <td className='tbl'>{car.status ? "Đang hoạt động": "Ngưng hoạt động"}</td>
+                                </tr>
+                            )
+                            :
+                                <p>Bạn không có xe nào</p>
                         }
                     </table>
                 </div>

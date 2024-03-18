@@ -96,9 +96,14 @@ export default function Home() {
     // console.log(filterDateTime);
     // const a = "3-12-2024 15:21:13";
     // const b = new Date(a)
-    // const c = new Date()
+    let c = new Date();
+    c = nextDateTime - currentDateTime; 
+    // Số milliseconds trong một ngày
+    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+    // Tính số ngày cách nhau
+    let differenceInDays = Math.ceil(c / millisecondsPerDay);
     // console.log(b)
-    // console.log(c)
+    console.log(differenceInDays)
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
       return;
@@ -124,9 +129,9 @@ export default function Home() {
   }
 
   function combineDateTime(time, date){
-    const dateTimeString = `${time}, ${date}`;
     // const combineDT = new DateTime(dateTimeString);
     // return combineDT;
+    const dateTimeString = `${time}, ${date}`;
     return dateTimeString
   }
 
@@ -247,18 +252,18 @@ export default function Home() {
               </div>
             </form>
           </div>
-          <div className="membership-section">
+          {/* <div className="membership-section">
             <p>Mã giảm giá</p>
             <div className="membership-container">
               <div className="membership mem1"></div>
               <div className="membership mem2"></div>
             </div>
-          </div>
+          </div> */}
           <div className="car-section">
             <p>Xe Dành Cho Bạn</p>
             <div className="car-container">
               {carList.map((car) => (
-                <Card key={car.id} id={car.id} year={car.year} price={car.price} description={car.description} image={car.imgUrl} typeId={car.carTypeId} />
+                <Card key={car.id} id={car.id} name={car.name} price={car.price} description={car.description} image={car.imgUrl} ldescription={car.ldescription  } typeId={car.carTypeId}/>
               ))}
             </div>
           </div>

@@ -274,7 +274,7 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
             .input('id', sql.Int, rent.id)
             .query(query3)
             return{
-                message: "thêm xe vào danh sách thuê"
+                message: "Thêm xe vào danh sách thuê"
             }
         }else{
             return {

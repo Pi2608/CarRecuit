@@ -54,7 +54,7 @@
 }
 
 #cars>.body>.filter-section>.amenities>.amenity:hover{
-    box-shadow: 0 2px 2px #ccc;
+    box-shadow: 0 0px 5px #ccc;
 }
 
 #cars>.body>.filter-section>.amenities>.amenity>.icon{
@@ -94,35 +94,63 @@
     cursor: pointer;
 }
 
-.switch {
-position: relative;
-display: inline-block;
-width: 60px;
-height: 34px;
+input.checkSeats { 
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
-.switch input { 
-opacity: 0;
-width: 0;
-height: 0;
+#type-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.slider {
-position: absolute;
-cursor: pointer;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: #ccc;
--webkit-transition: .4s;
-transition: .4s;
+#type-container>.type-select{
+    display: flex;
+    /* grid-template-columns: auto auto; */
+    /* column-gap: 20px; */
+    gap: 20px;
 }
 
-input:checked + .slider {
-background-color: #2196F3;
+
+#type-container>.choose{
+    width: 100%;
+    padding: 15px;
+    border-radius: 15px;
+    background-color: #5fcf86;
+    text-align: center;
+    font-weight: 500;
+    cursor: pointer;
 }
 
-input:focus + .slider {
-box-shadow: 0 0 1px #2196F3;
+#type-container>.choose:hover{
+    background-color: #469963;
+    color: #fff;
+}
+
+/* #type-container>.type-select{
+    padding-bottom: ;
+} */
+
+#type-container>.type-select>.tp>.icon{
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#type-container>.type-select>.tp>.icon:hover{
+    box-shadow: 0 0 5px #ccc;
+}
+
+#type-container>.type-select>.tp>.icon>.img-container img{
+    height: 64px;
+    width: auto;
 }

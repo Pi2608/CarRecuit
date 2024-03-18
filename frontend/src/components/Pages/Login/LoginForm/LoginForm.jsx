@@ -22,16 +22,6 @@ const LoginForm = () => {
     setErrMsg("");
   },[email, pwd])
 
-  const getAuth = async (token) => {
-    try {
-        const response = await axios.get(`http://localhost:4000/user/getByToken?token=${token}`);
-        const data = response.data;
-        return data;
-    } catch (error) {
-        console.error("Authentication error: " + error.message);
-    }
-  } 
-
   async function handleSubmit(e){
     e.preventDefault();
     try {
@@ -40,36 +30,34 @@ const LoginForm = () => {
         password: pwd,
       }
       const response1 = await axios.get(`http://localhost:4000/user/email/${email}`)
-      // console.log(response1)
-      if(response1.data){
+      console.log(response1)
+      if(response1){
         let token
+        console.log("hey")
         const authentication = await axios.post(
           "http://localhost:4000/user/login",
           postData
         );
-        // console.log(authentication.data.message);
-        if (authentication.data.message !== "Đăng Nhập thất bại"){ 
+        console.log(authentication.data.status);
+        if (authentication.data.status === 3 ){ 
           token = authentication.data.token;
           const authorization = await axios.get(`http://localhost:4000/user/getByToken?token=${token}`);
           const role = authorization.data.roleId;
-          // console.log(role);
+          console.log(role);
           login(token,role);
           setUser("")
           setPwd("")
           setErrMsg("")
+        }else if(authentication.data.status === 2 ){
+          console.log(authentication.data.status);
+          setErrMsg("Sai mật khẩu");
         }else{
-          setErrMsg("Sai mật khẩu")
+          setErrMsg("Tài khoản không tồn tại");
         }
       }
     }catch (err) {
       if(!err?.reponse){
         setErrMsg('No Sever Response')
-      }else if(err.response?.status === 400){
-        setErrMsg('Missing Usename or Password')
-      }else if(err.response?.status === 401){
-        setErrMsg('Unauthorized')
-      }else{
-        setErrMsg('Login Failed')
       }
     }
   }
