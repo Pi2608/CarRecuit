@@ -23,6 +23,15 @@ const getAllCarsInUse = async(req, res)=>{
         
     }
 }
+const getAllCars = async(req, res)=>{
+    try {
+        await Uitl.deleteAllImages()
+        const response =await car.getAllCars()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const recomendCar = async (req, res)=>{
     try {
         await Uitl.deleteAllImages()
@@ -91,12 +100,15 @@ const getCarById = async(req, res)=>{
 }
 const filterCars = async (req, res)=>{
     try {
-        const carTypeId = req.body.carTypeId
-        const minPrice = req.body.minPrice
-        const maxPrice = req.body.maxPrice
-        const seats = req.body.seats
-        const typeOfFuels = req.body.typeOfFuels
-        const response = await car.filterCars(carTypeId, minPrice, maxPrice, seats, typeOfFuels)
+        // const cars = req.body.cars
+        // const carTypeId = req.body.carTypeId
+        // const minPrice = req.body.minPrice
+        // const maxPrice = req.body.maxPrice
+        // const seats = req.body.seats
+        // const typeOfFuels = req.body.typeOfFuels
+        // const gearStick = req.body.gearStick
+        const { cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick } = req.body;
+        const response = await car.filterCars(cars,carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick)
         res.json(response)
     } catch (error) {
         
@@ -206,5 +218,6 @@ module.exports={
     getCarTypeByTypeId,
     recomendCar,
     requestAcceptedCar,
-    editAcceptedCar
+    editAcceptedCar,
+    getAllCars
 }

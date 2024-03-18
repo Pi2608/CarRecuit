@@ -4,6 +4,29 @@ const util = require("../Util/Util");
 const Location = require("./Location")
 
 
+const getAllCars = async ()=>{
+    try{
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id`
+        const result = await poolConnection.request().query(query1);
+        const cars= result.recordset;
+        for (let car of cars){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const img = result2.recordset[0]
+            car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.description
+        }
+        return cars
+    }catch(err){
+        console.log(err)
+    }
+}
 const getAllCarsInUse= async()=>{
     try{
         let poolConnection = await sql.connect(config)
@@ -170,6 +193,8 @@ const getCarById= async(id)=>{
         .input("id", sql.Int, id)
         .query(query);
         const car =  result.recordset[0];
+        const location = await Location.getCarLocation(car.id, 1)
+        car.ldescription = location.description
         const imgs = await getImgsCarById(id)
         for(let i=0; i< imgs.length; i++){
             imgs[i].url = await util.decodeImage(imgs[i].url, imgs[i].id)
@@ -229,19 +254,19 @@ const getCarsByPage = async (Cars, numPage, numItemsPerPage) => {
     }
 };
 
-const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
+const filterCars=async(Cars, carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick)=>{
     try{
-        const Cars = await getAllCarsInUse();
+        console.log(carTypeId, minPrice, maxPrice, seats, typeOfFuels, gearStick)
         const filteredCars = Cars.filter(car => {
             if (carTypeId && car.carTypeId.toString() !== carTypeId) {
                 return false;
             }
 
-            if (minPrice && car.price < minPrice) {
+            if (minPrice && car.price < parseInt(minPrice)) {
                 return false;
             }
 
-            if (maxPrice && car.price > maxPrice) {
+            if (maxPrice && car.price > parseInt(maxPrice)) {
                 return false;
             }
 
@@ -250,6 +275,10 @@ const filterCars=async(carTypeId, minPrice, maxPrice, seats, typeOfFuels)=>{
             }
 
             if (typeOfFuels && car.typeOfFuels !== typeOfFuels) {
+                return false;
+            }
+
+            if (gearStick && car.gearStick !== gearStick){
                 return false;
             }
             return true;
@@ -454,5 +483,6 @@ module.exports={
     getCarType,
     recomendCar,
     requestAcceptedCar,
-    editAcceptedCar
+    editAcceptedCar,
+    getAllCars
 }
