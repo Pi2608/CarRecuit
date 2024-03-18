@@ -10,7 +10,9 @@ let userId
 let amount
 const pay = async (req,res)=>{
     amount = req.body.amount
+    console.log(amount)
     userId = req.params.userId
+    console.log(userId)
     price = parseFloat((Number(amount)*0.000040572).toFixed(2));
     var create_payment_json = {
         "intent": "sale",
@@ -73,7 +75,7 @@ const loadingPayment = async (req, res)=>{
             throw error;
         } else {
             user.createTransaction(userId, amount, paymentId, amount, "PayPal")
-            res.json("thanh toán thành công")
+            res.redirect('http://localhost:5173/')
         }
     });
 }
@@ -92,6 +94,7 @@ const create_payment_url = async (req, res, next)=>{
         const orderId = await Util.generateRandomString(5);
         amount = req.body.amount;
         const bankCode = req.body.bankCode;
+        console.log(amount, bankCode)
         let locale = 'vn';
         if (!locale) {
             locale = 'vn';

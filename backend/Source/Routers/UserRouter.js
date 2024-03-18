@@ -10,6 +10,7 @@ userRouter.post("/register", userController.createUser)
 userRouter.post("/registerGG", userController.registerByGg)
 
 userRouter.post("/changePass/:userId", userController.changePassword)
+userRouter.post("/update/img/:userId", userController.uploadImgs, userController.updateImageUser)
 userRouter.post("/update/:userId", userController.updateUser)
 userRouter.put("/delete/:userId", userController.deleteUserById)
 userRouter.put("/editStatus", userController.editStatusUser)
@@ -20,6 +21,7 @@ userRouter.get("/notification/:userId", userController.getNotification)
 userRouter.put("/notification/send/:userId", userController.sendNotification)
 
 userRouter.get("/membership/:userId", userController.getMemberShipByUserId)
+userRouter.get("/transaction/total/:userId", userController.totalTransactionUser)
 userRouter.get("/transaction/:userId", userController.getTransactionHistory)
 
 userRouter.get("/NID", userController.showRequestConfirmNID)
@@ -32,6 +34,8 @@ userRouter.post("/NID/sendConfirm/:userId", userController.uploadImgs, userContr
 userRouter.post("/NDL/sendConfirm/:userId", userController.uploadImgs, userController.sendConfirmNDL)
 
 userRouter.get("/getByToken", userController.getUserByToken)
-userRouter.get("/:email", userController.getUserByEmail)
+userRouter.get("/email/:email", userController.getUserByEmail)
+userRouter.get("/counting/", userController.getCountUser)
+userRouter.get("/:userId", userController.getUserById)
 
 module.exports = userRouter;

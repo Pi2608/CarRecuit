@@ -28,6 +28,39 @@ const statisticRentalByYear = async(req, res)=>{
         
     }
 }
+const statisticRentalThisMonth = async(req,res)=>{
+    try {
+        const response = await rent.statisticRentalThisMonth()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const statisticEarningThisMonth = async(req, res)=>{
+    try {
+        const response = await rent.statisticEarningThisMonth()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const statisticEarningByYear = async(req, res)=>{
+    try {
+        const year = req.body.year
+        const response = await rent.statisticEarningByYear(year)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+const statisticEarningToday = async (req, res)=>{
+    try {
+        const response = await rent.statisticEarningToday()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 const getRentDetailCurrent = async(req, res)=>{
     try {
         const userId = req.params.userId
@@ -133,5 +166,9 @@ module.exports= {
     cancelRentDetailByOwner,
     cancelRentDetailByUser,
     getRentAlreadyPayment,
-    getRentDetailByRentId
+    getRentDetailByRentId,
+    statisticRentalThisMonth,
+    statisticEarningThisMonth,
+    statisticEarningByYear,
+    statisticEarningToday
 }

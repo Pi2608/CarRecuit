@@ -1,11 +1,44 @@
-#mytrip>.container h1{
-    padding : 15px 0px 15px 20px
+#mytrip>.container{
+    background-color: #fff;
+    box-shadow: 0 2px 5px #ccc;
+    border-radius: 25px;
+    padding: 20px 30px;
 }
 
-#mytrip>.container>.trip-container{
+#mytrip>.container>.container-body{
+    min-height: 400px;
     height: fit-content;
-    min-height: 440px;
+    padding: 0 20px;
+}
+
+#mytrip>.container>.container-body>.trip-container{
+    height: fit-content;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 3em;
+}
+
+#mytrip>.container>.container-body>.toggle-part{
+    display: flex;
+}
+
+#mytrip > .container > .container-body > .toggle-part > .choice {
+    position: relative;
+    padding: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#mytrip > .container > .container-body > .toggle-part > .choice.active::before {
+    content: "";
+    position: absolute;
+    background-color: #5fcf86;
+    height: 5px;
+    width: 100%;
+    bottom: 0px;
+    transform: translateY(-50%);
+    left: -10px;
+    margin-left: 10px;
+    transition: 1s;
 }

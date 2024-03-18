@@ -9,10 +9,8 @@ import "./LoginForm.css";
 const LoginForm = () => {
   const userRef = useRef()
 
-  const navigate = useNavigate()
-
   const { login } = useAuth();
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
@@ -22,38 +20,44 @@ const LoginForm = () => {
 
   useEffect(()=> {
     setErrMsg("");
-  },[user, pwd])
+  },[email, pwd])
 
   async function handleSubmit(e){
     e.preventDefault();
     try {
       const postData = {
-        email: user,
+        email: email,
         password: pwd,
       }
-      const response1 = await axios.get(`http://localhost:4000/user/${user}`)
-      if(response1.data){
-        const response2 = await axios.post(
+      const response1 = await axios.get(`http://localhost:4000/user/email/${email}`)
+      console.log(response1)
+      if(response1){
+        let token
+        console.log("hey")
+        const authentication = await axios.post(
           "http://localhost:4000/user/login",
           postData
         );
-        const token = response2.data.token;
-        // console.log(token)
-        // Set the token in a cookie and update the authentication state
-        login(token)
-
-        setUser("")
-        setPwd("")
+        console.log(authentication.data.status);
+        if (authentication.data.status === 3 ){ 
+          token = authentication.data.token;
+          const authorization = await axios.get(`http://localhost:4000/user/getByToken?token=${token}`);
+          const role = authorization.data.roleId;
+          console.log(role);
+          login(token,role);
+          setUser("")
+          setPwd("")
+          setErrMsg("")
+        }else if(authentication.data.status === 2 ){
+          console.log(authentication.data.status);
+          setErrMsg("Sai mật khẩu");
+        }else{
+          setErrMsg("Tài khoản không tồn tại");
+        }
       }
     }catch (err) {
       if(!err?.reponse){
         setErrMsg('No Sever Response')
-      }else if(err.response?.status === 400){
-        setErrMsg('Missing Usename or Password')
-      }else if(err.response?.status === 401){
-        setErrMsg('Unauthorized')
-      }else{
-        setErrMsg('Login Failed')
       }
     }
   }
@@ -68,8 +72,8 @@ const LoginForm = () => {
             placeholder="Email/Số điện thoại" 
             ref={userRef}
             autoComplete="off"
-            onChange={(e) => setUser(e.target.value)}
-            value={user}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
             required 
             />
           <FaUser className="icon" />
@@ -85,10 +89,11 @@ const LoginForm = () => {
           <FaLock className="icon" />
         </div>
         <button type="submit">Đăng nhập</button>
+        <p style={{color: "red"}}>{errMsg ? errMsg : ""}</p>
         <div className="register-link">
-          <p>
+          {/* <p>
             Bạn chưa là thành viên? <a href="#">Đăng ký</a>
-          </p>
+          </p> */}
         </div>
         <Login/>
       </form>

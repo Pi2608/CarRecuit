@@ -1,20 +1,42 @@
-import {useState} from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import LoginForm from "../../Pages/Login/LoginForm/LoginForm.jsx";
 import { useAuth } from "../../../Context/AuthProvider.jsx";
 import { Button } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import Popup from "reactjs-popup";
+import axios from "axios";
 import "./Header.css";
 
 function Header() {
     const [isTriggerClicked, setIsTriggerClicked] = useState(false)
-    const { auth } = useAuth()
+    const [ userInfo, setUserInfo] = useState([])
+    const { auth, id } = useAuth()
 
     const handleLogin = () => {
         setIsTriggerClicked(true)
     }
 
     const navigate = useNavigate()
+
+    useEffect(() =>{},[auth])
+
+    useEffect(() =>{
+        getUser();
+    },[id])
+
+    useEffect(() =>{},[userInfo])
+
+    async function getUser(){
+        try {
+            const response = await axios.get(`http://localhost:4000/user/${id}`)
+            const data = response.data;
+            setUserInfo(data)
+        } catch (error) {
+            console.error("Error fetching User Info: " + error)
+        }
+    }
 
     return(
         <div id="header">
@@ -24,23 +46,32 @@ function Header() {
                 </div>
                 <div className="menu-container">
                     <a className="menu-item">About CarFlex</a>
-                    <a className="menu-item" onClick={()=> navigate("/mycars")}>Trở thành chủ xe</a>
+                    <a className="menu-item" onClick={()=> navigate("/user/mycars")}>Trở thành chủ xe</a>
                     <div class="vertical-line"></div>
-                    {auth ? 
-                        <div className="menu-item user-container" onClick={() => navigate("/user/profile")}>User</div> :
+                    {auth ? (
+                        <div className="menu-item user-container" onClick={() => navigate("/user/profile")}>
+                            {userInfo.name ? <div style={{display: "flex"}}>
+                                <NotificationsIcon/>
+                                <div>
+                                    <p style={{paddingLeft: "20px"}}>{userInfo.name}</p>
+                                </div>
+                            </div> : <CircularProgress/>}
+                        </div>
+                    ) : (
                         <Popup
                             trigger={
                                 <Button 
-                                className="login"
-                                variant="outlined" 
-                                size="large" 
-                                style={{
+                                    className="login"
+                                    variant="outlined" 
+                                    size="large" 
+                                    style={{
                                         borderColor: "#00BF54", 
                                         color: "#00BF54", 
                                         fontWeight: "bold"
                                     }}
-                                onClick={handleLogin}>
-                                        Đăng nhập
+                                    onClick={handleLogin}
+                                >
+                                    Đăng nhập
                                 </Button>
                             }
                             position="center"
@@ -52,7 +83,7 @@ function Header() {
                                 </div>
                             )}
                         </Popup>
-                    }
+                    )}
                 </div>
             </div>
         </div>

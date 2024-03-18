@@ -1,0 +1,24 @@
+.bankCode-container>.bankCode img{
+    height: 30px;
+    width: 40px;
+    text-align: center;
+}
+.bankCode {
+    height: 40px;
+    width: 70px;
+    border: 2px solid transparent; /* Khởi tạo viền màu trong suốt */
+    padding: 10px;
+    cursor: pointer;
+    display: flex; /* Sử dụng flexbox để căn giữa theo chiều dọc */
+    flex-direction: column; /* Xếp các phần tử theo chiều dọc */
+    justify-content: center; /* Căn giữa các phần tử theo chiều dọc */
+    align-items: center; /* Căn giữa các phần tử theo chiều ngang */
+}
+
+.bankCode h5 {
+    text-align: center;
+}
+
+.bankCode.selected {
+    border-color: #08bd21; /* Thay đổi màu viền khi được chọn */
+}
