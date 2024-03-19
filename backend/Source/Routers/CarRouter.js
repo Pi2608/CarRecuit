@@ -19,6 +19,7 @@ carRouter.get('/feedback/:carId', carController.showCarFeedback)
 carRouter.post('/new/:ownerId', carController.uploadImgs ,carController.addCarRental)
 carRouter.post('/update/:carId', carController.uploadImgs, carController.updateCarRental)
 carRouter.put('/delete/:carId', carController.deleteCarRental)
+carRouter.post('/filterLocationDate', carController.filterLocationDate)
 
 
 

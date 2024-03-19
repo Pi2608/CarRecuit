@@ -108,6 +108,21 @@ const inputDate = async(date)=>{
     return newDate
 }
 
+const checkOverlap = async(dateStart1, dateEnd1, dateStart2, dateEnd2)=>{
+    const start1 = new Date(dateStart1);
+    const end1 = new Date(dateEnd1);
+    const start2 = new Date(dateStart2);
+    const end2 = new Date(dateEnd2);
+    console.log(start1, end1, start2, end2)
+    // Check if any of the start dates are after the other's end date
+    if (start1 > end2 || start2 > end1) {
+        return false; // No overlap
+    }
+
+    return true; // Overlap
+}
+
+
 module.exports={
     currentTime,
     getPositionCar,
@@ -117,5 +132,6 @@ module.exports={
     calculatePeriod,
     compareDates,
     deleteAllImages,
-    inputDate
+    inputDate,
+    checkOverlap
 }

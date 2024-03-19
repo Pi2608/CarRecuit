@@ -23,14 +23,14 @@ export default function Sidebar() {
         console.log("User logged out");
     };
 
-    const { id, logout } = useAuth();
+    // const { id, logout } = useAuth();
 
-    const [deleteMsg, setDeleteMsg] = useState('');
+    // const [deleteMsg, setDeleteMsg] = useState('');
 
-    const handleLogout = () => {
-        logout();
-        console.log("User logged out");
-    };
+    // const handleLogout = () => {
+    //     logout();
+    //     console.log("User logged out");
+    // };
 
     async function deleteUser(){
         try {

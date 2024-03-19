@@ -27,7 +27,7 @@ function App({ google }) {
         try {
             const newLocations = [];
             for (const car of cars) {
-                const response = await axios.get(`http://localhost:4000/location?carId=${car.id}&typeLocationId=1`)
+                const response = await axios.get(`http://localhost:4000/location/car/?carId=${car.id}&typeLocationId=1`)
                 newLocations.push(response.data)
             }
             setLocations(newLocations)
