@@ -324,7 +324,7 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
         if(NID[0].isConfirm == true && NDL[0].isConfirm == true){ // NID và NDL phải được xác minh
             let rent = await getCurrentRent(userId)
             let poolConnection = await sql.connect(config)
-            const timeBeforeRent = await Util.calculatePeriod(await Util.currentTime(), pick_up) // khoảng thời gian giữa hiện tại và tg thuê
+            const timeBeforeRent = await Util.calculatePeriod(await Util.currentTime(), await Util.inputDate(pick_up)) // khoảng thời gian giữa hiện tại và tg thuê
             const [dayLeft, hourLeft, minuteLeft, secondLeft] = timeBeforeRent.split(":").map(Number)
             if (dayLeft<3){// thời gian thuê phải ngắn hơn 3 ngày
                 return {
@@ -375,8 +375,8 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
                                 values (@carId, @pick_up, @drop_off, @rentId, @voucherId, 0, @final)`
             await poolConnection.request()
             .input('carId', sql.Int, carId)
-            .input('pick_up', sql.DateTime, pick_up)
-            .input('drop_off', sql.DateTime, drop_off)
+            .input('pick_up', sql.DateTime, await Util.inputDate(pick_up))
+            .input('drop_off', sql.DateTime, await Util.inputDate(drop_off))
             .input('rentId', sql.Int, rent.id)
             .input('voucherId', sql.Int, voucherId)
             .input('final', sql.Float, final)
@@ -389,7 +389,7 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
             .input('id', sql.Int, rent.id)
             .query(query3)
             return{
-                message: "thêm xe vào danh sách thuê"
+                message: "Thêm xe vào danh sách thuê"
             }
         }else{
             return {
@@ -763,6 +763,24 @@ const cancelRentDetailByOwner = async(notificationId)=>{
     }
 }
 
+const currentTrip = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted
+                        FROM dbo.car
+                        Inner join dbo.rentDetail on rentDetail.carId = car.id
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        inner join dbo.rent on rentDetail.rentId = rent.id
+                        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
+                        WHERE rentDetail.drop_off > GETDATE() and [dbo].[user].id =@userId`
+        const result1= await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query1)
+        return result1.recordset
+    } catch (error) {
+        
+    }
+}
 
 module.exports = {
     countRentalCar,
@@ -781,5 +799,6 @@ module.exports = {
     statisticRentalThisMonth,
     statisticEarningThisMonth,
     statisticEarningByYear,
-    statisticEarningToday
+    statisticEarningToday,
+    currentTrip
 }

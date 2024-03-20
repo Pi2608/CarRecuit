@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <div id="adsidebar">
       <div className="top">
-        <span className="logo">CarFlex</span>
+        <span className="logo" onClick={() => navigate("/")}>CarFlex</span>
       </div>
       <hr />
       <div className="center">
@@ -44,10 +44,6 @@ const Sidebar = () => {
           <li onClick={() => navigate("/admin/voucher")}>
             <CardGiftcardIcon className="icon" />
             <span>Voucher</span>
-          </li>
-          <li onClick={() => navigate("/admin/statistic")}>
-            <AssessmentOutlinedIcon className="icon" />
-            <span>Thống kê</span>
           </li>
           <li onClick={() => navigate("/admin/confirm")}>
             <div className="item">

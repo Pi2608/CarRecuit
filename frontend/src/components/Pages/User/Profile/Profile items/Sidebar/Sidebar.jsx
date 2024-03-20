@@ -16,15 +16,21 @@ import { func } from "prop-types";
 export default function Sidebar() {
 
     const navigate = useNavigate();
-
-    const { id, logout } = useAuth();
-
-    const [deleteMsg, setDeleteMsg] = useState('');
+    const { logout } = useAuth();
 
     const handleLogout = () => {
         logout();
         console.log("User logged out");
     };
+
+    // const { id, logout } = useAuth();
+
+    // const [deleteMsg, setDeleteMsg] = useState('');
+
+    // const handleLogout = () => {
+    //     logout();
+    //     console.log("User logged out");
+    // };
 
     async function deleteUser(){
         try {

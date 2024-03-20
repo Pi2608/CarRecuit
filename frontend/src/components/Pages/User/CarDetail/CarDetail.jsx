@@ -6,6 +6,7 @@ import CarImg2 from "../../../../images/Hyundai-accent-2022-2.jpg"
 import CarImg3 from "../../../../images/Hyundai-accent-2022-3.jpg"
 import CarImg4 from "../../../../images/Hyundai-accent-2022-4.jpg"
 import Button from '@mui/material/Button';
+import { TextField } from "@mui/material";
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DiscountIcon from '@mui/icons-material/Discount';
@@ -13,31 +14,38 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DirectionsCarFilledOutlinedIcon from '@mui/icons-material/DirectionsCarFilledOutlined';
 import { GiGearStickPattern } from "react-icons/gi";
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import EvStationIcon from '@mui/icons-material/EvStation';
+import { useAuth } from "../../../../Context/AuthProvider";
 import { useParams } from "react-router-dom";
+import Popup from "reactjs-popup";
 import axios from "axios";
 import "./CarDetail.css";
 
 export default function CarDetail(){
 
+    const { auth, id } = useAuth();
+
     const { carId } = useParams();
 
     const [ carImages, setCarImages ] = useState([]);
-    const [ carImage1, setCarImage1 ] = useState([]);
-    const [ carImage2, setCarImage2 ] = useState([]);
-    const [ carImage3, setCarImage3 ] = useState([]);
-    const [ carImage4, setCarImage4 ] = useState([]);
-
+    const [ userInfo, setUserInfo ] = useState([]);
+    const [ userNIDInfo, setUserNIDInfo ] = useState([]);
+    const [ userNDLInfo, setUserNDLInfo ] = useState([]);
     const [ carInfo, setCarInfo ] = useState([]);
-    const [ carName, setCarName ] = useState([]);
     const [ carSeats, setCarSeats ] = useState(0);
     const [ carGear, setCarGear ] = useState('');
     const [ carFuel, setCarFuel ] = useState(true);
     const [ carPrice, setCarPrice ] = useState('');
+    const [ carAmenities, setCarAmenities ] = useState([]);
     const [ rentDate, setRentDate ] = useState([]);
     const [ returnDate, setReturnDate ] = useState([]);
     const [ insurancePrice, setInsurancePrice ] = useState('')
-    const [ totalPrice, setTotalPrice ] = useState('')
+    const [ totalPrice, setTotalPrice ] = useState(0)
+    const [ totalDate, setTotalDate ] = useState(0)
+    const [ rentTotal, setRentTotal ] = useState(0)
+    const [ startDate, setStartDate ] = useState(new Date())
+    const [ endDate, setEndDate ] = useState(new Date())
+    const [ voucher, setVoucher ] = useState('')
+    const [ wallet, setWallet ] = useState('')
 
     async function getCarDetails() {
         try {
@@ -54,6 +62,7 @@ export default function CarDetail(){
             });
             const loadedImageList = await Promise.all(imagesPromise);
             setCarInfo(data[0]);
+            setCarAmenities(data[2]);
             setCarImages(loadedImageList);
             return data[0].carTypeId;
         } catch (error) {
@@ -61,13 +70,70 @@ export default function CarDetail(){
         }
     }
 
-    async function getCarTypes(typeId) {
+    async function getUserInfo(){
         try {
-            const response = await axios.get(`http://localhost:4000/car/type/${typeId}`);
+            const response = await axios.get(`http://localhost:4000/user/${id}`);
             const data = response.data;
-            setCarName(data.name)
+            setUserInfo(data)
+            setWallet(data.wallet);
+            return data.id
         } catch (error) {
-            console.log("Error getting car type: " + error);
+            console.error("Error fetching User Info: " + error)
+        }
+    }
+
+    async function getUserNid(id){
+        try {
+            const response = await axios.get(`http://localhost:4000/user/NID/${id}`);
+            const data = response.data;
+            setUserNIDInfo(data[0]); 
+        } catch (error) {
+            console.error("Error fetching NID: " + error)
+        }
+    }
+
+    async function getUserNdl(id){
+        try {
+            const response = await axios.get(`http://localhost:4000/user/NDL/${id}`);
+            const data = response.data;
+            setUserNDLInfo(data[0]); 
+        } catch (error) {
+            console.error("Error fetching NDL: " + error)
+        }
+    }
+
+    async function addCar(){
+        try {
+            const postData = {
+                pick_up: startDate,
+                drop_off: endDate,
+            } 
+            const response = await axios.post(`http://localhost:4000/rent/addCar?userId=${id}&carId=${carId}`, postData);
+            const data = response.data;
+            console.log(data);
+        } catch (error) {
+            console.error("Error adding car: " + error)
+        }
+    }
+
+    async function undoAddCar(){
+        try {
+            const response = await axios.get(`http://localhost:4000/rent/deleteCar?userId=${id}&carId=${carId}`);
+            const data = response.data;
+            console.log(data);
+        } catch (error) {
+            console.error("Error undo adding car: " + error)
+        }
+    }
+
+    async function sendRentRequest(){
+        try {
+            const response = await axios.get(`http://localhost:4000/rent/confirmPayment/${id}`);
+            const data = response.data;
+            console.log(data);
+            calculatePayment();
+        } catch (error) {
+            console.error("Error payment: " + error)
         }
     }
     
@@ -77,12 +143,24 @@ export default function CarDetail(){
 
     useEffect(() => {
         const fetchData = () => {
-            getCarDetails()
-                .then((typeId) => getCarTypes(typeId))
-                .catch((error) => console.error('Error fetching data:', error));
+            getCarDetails();
         }
         fetchData();
+        // let tomorrow = new Date();
+        // tomorrow.setDate(tomorrow.getDate() + 1);
+        // setEndDate(tomorrow);
+        startDate.setDate(20)
+        startDate.setHours(8, 0, 0, 0)
+        endDate.setDate(22)
+        endDate.setHours(7, 0, 0, 0);
     },[])
+
+    useEffect(() => {
+        getUserInfo()
+            .then((id) =>   { if (id) {
+                return Promise.all([getUserNid(id), getUserNdl(id)]);
+            }})
+    },[id])
 
     useEffect(() => {
         if (carInfo) {
@@ -91,13 +169,36 @@ export default function CarDetail(){
             setCarPrice(carInfo.price);
             setInsurancePrice(insuranceCalculate(carInfo.price))
             setTotalPrice(calculateTotalPrice(carInfo.price))
-            // console.log(carImages[0].url);
-            setCarImage1(carImages[0])
-            setCarImage2(carImages[1])
-            setCarImage3(carImages[2])
-            setCarImage4(carImages[3])
+            setTotalDate(calculateTotalDate(endDate, startDate))
         }
-    },[carInfo])
+    },[carInfo, carAmenities])
+    
+    useEffect(() => {
+        setRentTotal(calculateRentPrice(totalPrice, totalDate))
+    },[totalPrice, totalDate])
+
+    useEffect(() => {
+        setWallet(userInfo.wallet)
+    },[userInfo])
+    
+    function handleDate(d) {
+        const date = new Date(d);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        // const hours = String(date.getHours()).padStart(2, '0');
+        // const minutes = String(date.getMinutes()).padStart(2, '0');
+        // const formattedDateTime = `${hours}:${minutes} ${day}/${month}/${year}`;
+        const formattedDateTime = `${day}/${month}/${year}`;
+        return formattedDateTime;
+    }
+
+    function getTimeFromDate(d) {
+        const date = new Date(d);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
 
     function insuranceCalculate(input){
         if (input) {
@@ -120,20 +221,38 @@ export default function CarDetail(){
         }
     }
 
+    function calculateRentPrice(total, totalDate) {
+        let rentTotal = parseInt(total) * parseInt(totalDate);
+        console.log(rentTotal);
+        return rentTotal
+    }
+
+    function calculateTotalDate(enddate, startdate){
+        let millisecondsPerDay = 1000 * 60 * 60 * 24;
+        let period = enddate - startdate;
+        let differenceInDays = Math.ceil(period / millisecondsPerDay);
+        // setTotalDate(differenceInDays)
+        return differenceInDays
+    }
+
+    function calculatePayment(){
+        setWallet(prev => prev - rentTotal)
+    }
+
     return(
         <div id="car-detail">
             <Header/>
             <div className="body">
                 <div className="img-container">
                     {carImages.map((img, index) => (
-                        <img src={img.url} alt="" className={`item-${index + 1}`}/>
+                        <img key={img.id} src={img.url} alt="" className={`item-${index + 1}`}/>
                     ))}
                 </div>
                 <div className="car-info">
                     <div className="info">
                         <div className="name">
-                            {(carName && carInfo.year) ? 
-                                <p>{carName + " " + carInfo.year}</p>
+                            {(carInfo) ? 
+                                <p>{carInfo.name}</p>
                             :
                                 <p>Car</p>
                             } 
@@ -176,8 +295,54 @@ export default function CarDetail(){
                             <div className="titl" style={{fontSize: "1.2em", fontWeight: "500"}}>
                                 Các tiện nghi khác 
                             </div>
+                            <br />
+                            <div className="amenity-container">
+                                {carAmenities.map((amenity) => (
+                                    <div className="box" key={amenity.id}>
+                                            <div className="amenity"> 
+                                                {amenity.id === 1 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/map-v2.png"></img>}
+                                                {amenity.id === 2 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/bluetooth-v2.png"></img>}
+                                                {amenity.id === 3 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/360_camera-v2.png"></img>}
+                                                {amenity.id === 4 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/parking_camera-v2.png"></img>}
+                                                {amenity.id === 5 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/dash_camera-v2.png"></img>}
+                                                {amenity.id === 6 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/reverse_camera-v2.png"></img>}
+                                                {amenity.id === 7 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/tpms-v2.png"></img>}
+                                                {amenity.id === 8 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/impact_sensor-v2.png"></img>}
+                                                {amenity.id === 9 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/head_up-v2.png"></img>}
+                                                {amenity.id === 10 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/sunroof-v2.png"></img>}
+                                                {amenity.id === 11 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/gps-v2.png"></img>}
+                                                {amenity.id === 12 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/babyseat-v2.png"></img>}
+                                                {amenity.id === 13 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/usb-v2.png"></img>}
+                                                {amenity.id === 14 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/spare_tire-v2.png"></img>}
+                                                {amenity.id === 15 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/dvd-v2.png"></img>}
+                                                {amenity.id === 16 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/bonnet-v2.png"></img>}
+                                                {amenity.id === 17 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/etc-v2.png"></img>}
+                                                {amenity.id === 18 && <img src="https://n1-cstg.mioto.vn/v4/p/m/icons/features/airbags-v2.png"></img>}
+                                                <p>{amenity.name}</p>
+                                            </div>
+                                    </div>
+                                ))}             
+                            </div>
                         </div>
                         <hr/>
+                        <div className="description">
+                            <br />
+                            <div className="titl" style={{fontSize: "1.2em", fontWeight: "500"}}>
+                                Mô tả 
+                            </div>
+                            <br />
+                            <p style={{color: "#4F4F4F"}}>{carInfo ? carInfo.description : ""}</p>
+                        </div>
+                        <br />
+                        <hr />
+                        <br />
+                        <div className="rating">
+                            <br />
+                            <div className="titl" style={{fontSize: "1.2em", fontWeight: "500"}}>
+                                Đánh Giá
+                            </div>
+                            <br />
+                        </div>
                     </div>
                     <div className="price">
                         <h1>{carInfo.price}K</h1>
@@ -189,8 +354,8 @@ export default function CarDetail(){
                                         <td></td>
                                     </tr>
                                     <tr>
-                                        <td style={{textAlign: "left", fontWeight: "490"}}>02/02/2024</td>
-                                        <td style={{paddingLeft: "10px", fontWeight: "490"}}>7:00</td>
+                                        <td style={{textAlign: "left", fontWeight: "490"}}>{handleDate(startDate)}</td>
+                                        <td style={{paddingLeft: "10px", fontWeight: "490"}}>{getTimeFromDate(startDate)}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -202,8 +367,8 @@ export default function CarDetail(){
                                         <td></td>
                                     </tr>
                                     <tr>
-                                        <td style={{textAlign: "left", fontWeight: "490"}}>03/02/2024</td>
-                                        <td style={{paddingLeft: "10px", fontWeight: "490"}}>8:00</td>
+                                        <td style={{textAlign: "left", fontWeight: "490"}}>{handleDate(endDate)}</td>
+                                        <td style={{paddingLeft: "10px", fontWeight: "490"}}>{getTimeFromDate(endDate)}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -228,10 +393,10 @@ export default function CarDetail(){
                         <hr style={{padding: "0 21px"}}/>
                         <div className="total">
                             <div>Tổng cộng</div>
-                            <div>{totalPrice}K x 2 ngày</div>
+                            <div>{totalPrice}K x {totalDate} ngày</div>
                         </div>
                         <hr/>
-                        <div className="voucher">
+                        <div className="voucher" style={{cursor : "pointer"}}>
                             <div>
                                 <DiscountIcon style={{height: "16px"}}/><p>Mã khuyến mãi</p>
                             </div>
@@ -240,9 +405,69 @@ export default function CarDetail(){
                         <hr/>
                         <div className="payment">
                             <p>Thành tiền</p>
-                            <p>1.870.000 đ</p>
+                            <p>{rentTotal}K</p>
                         </div>
-                        <Button variant="contained">Thanh toán</Button>
+                        {(auth && userInfo) ? (
+                            <hr />
+                        ) : null }
+                        {(auth && userInfo) ? (
+                            <div className="wallet">
+                                <p>Ví</p>
+                                <p>{wallet}K</p>
+                            </div>
+                        ): null}
+                        {auth ?
+                            <Popup
+                                trigger={
+                                    <div 
+                                        variant="contained" 
+                                        style={{cursor: "pointer", padding: "8px", backgroundColor: "#5fcf86", borderRadius: "5px", fontWeight: "500", textAlign: "center", color: "#fff"}}
+                                        onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
+                                        onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
+                                        // onClick={() => {console.log("run")}}
+                                    >Yêu cầu thuê xe</div>
+                                }
+                                modal
+                                contentStyle={{
+                                    backgroundColor: "#FFFFFF",
+                                    borderRadius: "25px",
+                                    padding: "1em 2em 1.5em 2em",
+                                    height: "fit-content",
+                                    width: "fit-content",
+                                }}
+                                onOpen={() => {addCar();console.log("run")}}
+                            >
+                                {close =>
+                                    <div id="payment">
+                                        <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Xác nhận thanh toán</p>
+                                        <br />
+                                        <div className="btn-ctn">
+                                            <div 
+                                                className="btn"
+                                                onMouseLeave={(e) => {e.target.style.backgroundColor = "#fff"}}
+                                                onMouseOver={(e) => {e.target.style.backgroundColor = "#ccc"}}
+                                                onClick={() => {undoAddCar();close()}}
+                                            >Hủy</div>
+                                            <div 
+                                                className="btn"
+                                                onClick={() => {sendRentRequest(); close()}}
+                                                style={{backgroundColor: "#5fcf86", cursor: "pointer"}}
+                                                onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
+                                                onMouseOver={(e) => {e.target.style.backgroundColor = "#469963", e.target.style.color = "#fff"}}
+                                            >Xác nhận</div>
+                                        </div>
+                                    </div>
+                                }
+                            </Popup>
+                        :
+                            <div 
+                                variant="contained" 
+                                style={{cursor: "pointer", padding: "8px", backgroundColor: "#5fcf86", borderRadius: "5px", fontWeight: "500", textAlign: "center", color: "#fff"}}
+                                onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
+                                onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
+                                // onClick={() => {console.log("run")}}
+                            >Yêu cầu thuê xe</div>
+                        }
                     </div>
                 </div>
             </div>
@@ -250,3 +475,5 @@ export default function CarDetail(){
         </div>
     )
 }
+
+//

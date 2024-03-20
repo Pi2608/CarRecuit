@@ -26,7 +26,6 @@ const getAllUser = async (req, res) => {
 }
 const getUserById = async (req, res) => {
     try {
-        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getUserById(userId)
         res.json(response)

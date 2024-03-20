@@ -20,6 +20,7 @@
     grid-area: main;
     height: 630px;
     width: auto;
+    max-width: 800px;
     border-radius: var(--border-radius);
 }
 
@@ -27,6 +28,7 @@
     grid-area: item1;
     height: 200px;
     width: auto;
+    max-width: 300px;
     border-radius: var(--border-radius);
 }
 
@@ -34,6 +36,7 @@
     grid-area: item2;
     height: 200px;
     width: auto;
+    max-width: 300px;
     border-radius: var(--border-radius);
 }
 
@@ -41,6 +44,7 @@
     grid-area: item3;
     height: 200px;
     width: auto;
+    max-width: 300px;
     border-radius: var(--border-radius);
 }
 
@@ -114,6 +118,7 @@
 }
 
 #car-detail>.body>.car-info>.price{
+    height: fit-content;
     display: flex;
     flex-direction: column;
     background-color: rgb(249, 252, 255);
@@ -192,7 +197,8 @@
     padding: 10px 8px   
 }
 
-#car-detail>.body>.car-info>.price>.payment{
+#car-detail>.body>.car-info>.price>.payment,
+#car-detail>.body>.car-info>.price>.wallet{
     display: flex;
     justify-content: space-between;
     font-weight: 600;
@@ -203,4 +209,43 @@
     font-size: 24px;
 }
 
+#car-detail>.body>.car-info>.info>.amenities>.amenity-container{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 15px;
+}
 
+#car-detail>.body>.car-info>.info>.amenities>.amenity-container>.box>.amenity{
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+    gap: 1em;
+}
+
+#car-detail>.body>.car-info>.info>.amenities>.amenity-container>.box>.amenity img{
+    width: 32px;
+    height: auto;
+}
+
+#payment{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#payment>.btn-ctn{
+    display: flex;
+    gap: 10px;
+}
+
+#payment>.btn-ctn>.btn{
+    padding: 15px;
+    width: 100px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+#payment>.btn-ctn>.btn:hover{
+    box-shadow: 0 0 5px #ccc;
+}

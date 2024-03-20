@@ -32,9 +32,30 @@ const getLocationAll = async(req, res)=>{
         
     }
 }
+const getLocationInfo = async (req, res)=>{
+    try {
+        const lat = req.query.lat
+        const lng = req.query.lng
+        const response = await location.getLocationInfo(lat, lng)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const addCityAll = async (req, res)=>{
+    try {
+        const response = await location.addCityAll()
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 
 module.exports={
     getCarLocation,
     addCarRentLocation,
-    getLocationAll
+    getLocationAll,
+    getLocationInfo,
+    addCityAll
 }

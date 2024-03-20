@@ -20,7 +20,7 @@ const getAllCars = async ()=>{
             const img = result2.recordset[0]
             car.imgUrl = await util.decodeImage(img.url, img.id)
             const location = await Location.getCarLocation(car.id, 1)
-            car.ldescription = location.description
+            car.ldescription = location.city
         }
         return cars
     }catch(err){
@@ -43,7 +43,7 @@ const getAllCarsInUse= async()=>{
             const img = result2.recordset[0]
             car.imgUrl = await util.decodeImage(img.url, img.id)
             const location = await Location.getCarLocation(car.id, 1)
-            car.ldescription = location.description
+            car.ldescription = location.city
         }
         return cars
     }catch(err){
@@ -100,7 +100,7 @@ const recomendCar = async(numberItems)=>{
             const img = result2.recordset[0]
             car.imgUrl = await util.decodeImage(img.url, img.id)
             const location = await Location.getCarLocation(car.id, 1)
-            car.ldescription = location.description
+            car.ldescription = location.city
         }
         return recommendedCars
     } catch (error) {
@@ -125,7 +125,7 @@ const requestAcceptedCar = async ()=>{
             const img = result2.recordset[0]
             car.imgUrl = await util.decodeImage(img.url, img.id)
             const location = await Location.getCarLocation(car.id, 1)
-            car.ldescription = location.description
+            car.ldescription = location.city
         }
         return cars
     } catch (error) {
@@ -194,7 +194,7 @@ const getCarById= async(id)=>{
         .query(query);
         const car =  result.recordset[0];
         const location = await Location.getCarLocation(car.id, 1)
-        car.ldescription = location.description
+        car.ldescription = location.city
         const imgs = await getImgsCarById(id)
         for(let i=0; i< imgs.length; i++){
             imgs[i].url = await util.decodeImage(imgs[i].url, imgs[i].id)
@@ -463,6 +463,48 @@ const getCarTypeByTypeId = async(typeId)=>{
     }
 }
 
+const getCarByLocationAndDate = async (location, dateStart, dateEnd)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT car.*, location.city as ldescription ,(carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        INNER JOIN [dbo].[location] on car.id = location.carId and location.typeLocationId = 1
+                        where car.status = 1 and car.isDeleted = 0 and car.isAccepted = 1 and location.city = @location`
+        const result1 = await poolConnection.request()
+        .input ('location', sql.NVarChar, location)
+        .query(query1)
+        const filterCarsByLocation = result1.recordset
+        const filrerCarsByLocationAndDate = []
+        for(const car of filterCarsByLocation){
+            const query2 = `Select rentDetail.pick_up, rentDetail.drop_off from dbo.rentDetail
+                            INNER JOIN dbo.rent on rentDetail.rentId = rent.id
+                            Where rentDetail.carId = @carId and rent.paymentId is not NULL`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const rentDetails = result2.recordset
+            if (rentDetails[0]!=null){
+                let status = true;
+                for (const rentDetail of rentDetails){
+                    if(await util.checkOverlap(rentDetail.pick_up, rentDetail.drop_off,await util.inputDate(dateStart), await util.inputDate(dateEnd))){
+                        status = false;
+                    }
+                }
+                if(status){
+                    filrerCarsByLocationAndDate.push(car)
+                }
+            }else{
+                filrerCarsByLocationAndDate.push(car)
+            }
+        }
+        return filrerCarsByLocationAndDate
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 
 module.exports={
@@ -484,5 +526,6 @@ module.exports={
     recomendCar,
     requestAcceptedCar,
     editAcceptedCar,
-    getAllCars
+    getAllCars,
+    getCarByLocationAndDate
 }
