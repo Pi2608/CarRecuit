@@ -102,7 +102,7 @@ const getLocationInfo = (lat, lng) => {
                 .then(response => {
                     const data = response.data;
                     if (data.resourceSets) {
-                        const formattedAddress = data.resourceSets[0].resources[0].name
+                        const formattedAddress = data.resourceSets[0].resources[0].address.adminDistrict
                         resolve(formattedAddress);
                     } else {
                         console.log("qq")
@@ -126,7 +126,7 @@ const addCityAll = async () => {
             .query(query1)
         const locations = result1.recordset
         for (let location of locations) {
-            const query2 = `Update dbo.location set description = @city where carId = @carId`
+            const query2 = `Update dbo.location set city = @city where carId = @carId`
             await poolConnection.request()
             .input('city', sql.NVarChar, await getLocationInfo(location.latitude, location.longitude))
             .input('carId', location.carId)
