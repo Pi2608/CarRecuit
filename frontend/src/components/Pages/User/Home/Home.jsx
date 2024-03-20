@@ -107,6 +107,8 @@ export default function Home() {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
       return;
+    } else {
+      getAddress()
     }
   },[])
 
@@ -115,8 +117,8 @@ export default function Home() {
   useEffect(() => {},[id, roleUserId])
   
   useEffect(() => {
-    // console.log(location)
-    // console.log(address)
+    console.log(location)
+    console.log(address)
   },[carList,location,address])
 
   function handleDate(d){

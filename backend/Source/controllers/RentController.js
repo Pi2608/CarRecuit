@@ -153,6 +153,25 @@ const getRentDetailByRentId = async(req,res)=>{
     }
 }
 
+const currentTrip = async (req, res)=>{
+    try {
+        const userId = req.params.userId
+        const response = await rent.currentTrip(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const historyTrip = async (req,res)=>{
+    try {
+        const userId = req.params.userId
+        const response = await rent.historyTrip(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 
 module.exports= {
     getCountRentalCar,
@@ -170,5 +189,7 @@ module.exports= {
     statisticRentalThisMonth,
     statisticEarningThisMonth,
     statisticEarningByYear,
-    statisticEarningToday
+    statisticEarningToday,
+    currentTrip,
+    historyTrip
 }
