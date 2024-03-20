@@ -11,7 +11,11 @@ import ElectricCarOutlinedIcon from '@mui/icons-material/ElectricCarOutlined';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import TuneIcon from '@mui/icons-material/Tune';
 import LanguageIcon from '@mui/icons-material/Language';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import MapIcon from '@mui/icons-material/Map';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
+import { styled } from '@mui/material/styles';
 import { GiGearStick } from "react-icons/gi";
 import Popup from "reactjs-popup";
 import axios from "axios";
@@ -31,32 +35,92 @@ export default function CarList(){
     const [filterOptions, setFilterOptions] = useState({
         carTypeId: '',
         seats: [],
+        rating: false,
         typeOfFuels: '',
         gearStick: '',
-        minPrice: '',
-        maxPrice: ''
+        minPrice: '500',
+        maxPrice: '2000'
     });
-    
-    // const handleInputChange = (event) => {
-    //     const { name, value } = event.target;
 
-    //     if (name === 'seats' && filterOptions.seats === value) {
-    //         if (selectedCarSeats.includes(value)) {
-    //             setSelectedCarSeats(selectedCarSeats.filter((seat) => seat !== value));
-    //         } else {
-    //             setSelectedCarSeats([...selectedCarSeats, value]);
-    //         }
-    //         setFilterOptions(prevOptions => ({
-    //             ...prevOptions,
-    //             [name]: selectedCarSeats
-    //         }));
-    //     }else{
-    //         setFilterOptions(prevOptions => ({
-    //             ...prevOptions,
-    //             [name]: value
-    //         }));
-    //     }
-    // };
+    const marks = [
+        {
+          value: 500,
+          label: '500',
+        },
+        {
+            value: 1000,
+            label: '1000',
+        },
+        {
+            value: 1500,
+            label: '1500',
+        },
+        {
+            value: 2000,
+            label: '2000',
+        },
+    ]
+
+    const PrettoSlider = styled(Slider)({
+        color: '#5fcf86',
+        height: 8,
+        '& .MuiSlider-track': {
+          border: 'none',
+        },
+        '& .MuiSlider-thumb': {
+          height: 24,
+          width: 24,
+          backgroundColor: '#fff',
+          border: '2px solid currentColor',
+          '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+            boxShadow: 'inherit',
+          },
+          '&::before': {
+            display: 'none',
+          },
+        },
+        '& .MuiSlider-valueLabel': {
+          lineHeight: 1.2,
+          fontSize: 12,
+          background: 'unset',
+          padding: 0,
+          width: 32,
+          height: 32,
+          borderRadius: '50% 50% 50% 0',
+          backgroundColor: '#52af77',
+          transformOrigin: 'bottom left',
+          transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
+          '&::before': { display: 'none' },
+          '&.MuiSlider-valueLabelOpen': {
+            transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
+          },
+          '& > *': {
+            transform: 'rotate(45deg)',
+          },
+        },
+      });      
+
+    const handleChangePrice = (event, newValue, activeThumb) => {
+        if (!Array.isArray(newValue)) {
+            return;
+        }
+    
+        let newMinPrice, newMaxPrice;
+    
+        if (activeThumb === 0) {
+            newMinPrice = Math.min(newValue[0], filterOptions.maxPrice - 500);
+            newMaxPrice = filterOptions.maxPrice;
+        } else {
+            newMinPrice = filterOptions.minPrice;
+            newMaxPrice = Math.max(newValue[1], filterOptions.minPrice + 500);
+        }
+    
+        setFilterOptions(prevOptions => ({
+            ...prevOptions,
+            minPrice: newMinPrice,
+            maxPrice: newMaxPrice,
+        }));
+    };
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -72,6 +136,24 @@ export default function CarList(){
                 ...prevOptions,
                 [name]: updatedSeats
             }));
+        } else if (name === 'typeOfFuels') {
+            const updatedFuel = filterOptions.typeOfFuels === value
+                ? ""
+                : value;
+    
+            setFilterOptions(prevOptions => ({
+                ...prevOptions,
+                [name]: updatedFuel
+            }));
+        } else if (name === 'gearStick') {
+            const updatedGear = filterOptions.gearStick === value
+                ? ""
+                : value;
+    
+            setFilterOptions(prevOptions => ({
+                ...prevOptions,
+                [name]: updatedGear
+            }));
         } else {
             setFilterOptions(prevOptions => ({
                 ...prevOptions,
@@ -86,6 +168,9 @@ export default function CarList(){
             return false;
         }
         if (filterOptions.seats.length > 0 && car.seats !== parseInt(filterOptions.seats)) {
+            return false;
+        }
+        if (filterOptions.rating && car.rating !== 5) {
             return false;
         }
         if (filterOptions.typeOfFuels && car.typeOfFuels !== filterOptions.typeOfFuels) {
@@ -159,7 +244,10 @@ export default function CarList(){
                         <CalendarMonthOutlinedIcon style={{height: "20px", width: "auto", paddingLeft: "25px"}}/><p>07:00, 02/02/2024 - 08:00, 03/02/2024</p>
                     </div>
                     <div className="amenities">
-                        <div className="amenity reset-btn"><RotateLeftIcon/></div>
+                        <div 
+                            className="amenity reset-btn" 
+                            onClick={() => setFilterOptions({carTypeId: '', seats: [], rating: false, typeOfFuels: '', gearStick: '', minPrice: '', maxPrice: ''})}
+                        ><RotateLeftIcon/></div>
                         <Popup 
                             trigger={
                                 <div className="amenity car-type" style={(filterOptions.seats.length > 0) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}><div className="icon">        <AirportShuttleOutlinedIcon/>                           </div><p>Loại xe</p>        </div>
@@ -244,15 +332,312 @@ export default function CarList(){
                                             />
                                         </label>
                                     </div>
-                                    <div className="choose" onClick={close}>Chọn</div>
+                                    <div className="choose" onClick={close}>Áp dụng</div>
                                 </div>
                             )}
                         </Popup>
                         <div className="amenity car-brand"><div className="icon">       <LanguageIcon/>                                         </div><p>Hãng xe</p>        </div>
-                        <div className="amenity five-star-owner"><div className="icon"> <StarRoundedIcon style={{color: "rgb(255, 225, 0)"}}/>  </div><p>Chủ xe 5 sao</p>   </div>
-                        <div className="amenity electric-car"><div className="icon">    <ElectricCarOutlinedIcon/>                              </div><p>Xe điện</p>        </div>
-                        <div className="amenity gear-shift"><div className="icon">      <GiGearStick size={{height: "10px"}} />                 </div><p>Truyền động</p>    </div>
-                        <div className="amenity all-filter"><div className="icon">      <TuneIcon/>                                             </div><p>Bộ lọc</p>         </div>
+                        <div 
+                            className="amenity five-star-owner" 
+                            style={(filterOptions.rating) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}
+                            onClick={() =>setFilterOptions(prevOptions => ({...prevOptions, rating: !filterOptions.rating}))}
+                        ><div className="icon"> <StarRoundedIcon style={{color: "rgb(255, 225, 0)"}}/>  </div><p>Chủ xe 5 sao</p>   </div>
+                        <Popup
+                            trigger={
+                                <div className="amenity electric-car" style={(filterOptions.typeOfFuels) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}><div className="icon">    <LocalGasStationIcon/>                              </div><p>Loại nhiên liệu</p>        </div>
+                            }
+                            contentStyle={{
+                                backgroundColor: "white",
+                                width: "fit-content",
+                                height: "fit-content",
+                                padding: "1em 2em 1.5em 2em",
+                                borderRadius: "15px",
+                            }}
+                            modal
+                        >                            
+                            {(close) =>(
+                                <div id="type-container">
+                                    <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Loại nhiên liệu</p>
+                                    <hr style={{width: "100%"}}/>
+                                    <br />
+                                    <div className="type-select" style={{padding: "20px 0 30px 0"}}>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.typeOfFuels === "Xăng") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}>
+                                                <p>Xăng</p>
+                                            </div>
+                                            <input 
+                                                className="checkTypeOfFuels"
+                                                type="checkbox"
+                                                name="typeOfFuels"
+                                                checked={filterOptions.typeOfFuels === "Xăng"}
+                                                value={"Xăng"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.typeOfFuels === "Dầu diesel") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <p>Dầu Diesel</p>
+                                            </div>
+                                            <input 
+                                                className="checkTypeOfFuels"
+                                                type="checkbox"
+                                                name="typeOfFuels"
+                                                checked={filterOptions.typeOfFuels === "Dầu Diesel"}
+                                                value={"Dầu diesel"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.typeOfFuels === "Điện") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <p>Điện</p>
+                                            </div>
+                                            <input 
+                                                className="checkTypeOfFuels"
+                                                type="checkbox"
+                                                name="typeOfFuels"
+                                                checked={filterOptions.typeOfFuels === "Điện"}
+                                                value={"Điện"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div className="choose" onClick={close}>Áp dụng</div>
+                                </div>
+                            )}
+                        </Popup>
+                        <Popup
+                            trigger={
+                                <div className="amenity gear-shift" style={(filterOptions.gearStick) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}><div className="icon">      <GiGearStick size={{height: "10px"}} />                 </div><p>Truyền động</p>    </div>
+                            }
+                            contentStyle={{
+                                backgroundColor: "white",
+                                width: "fit-content",
+                                height: "fit-content",
+                                padding: "1em 2em 1.5em 2em",
+                                borderRadius: "15px",
+                            }}
+                            modal
+                        >                            
+                            {(close) =>(
+                                <div id="type-container">
+                                    <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Truyền động</p>
+                                    <hr style={{width: "100%"}}/>
+                                    <br />
+                                    <div className="type-select" style={{padding: "20px 0 30px 0"}}>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.gearStick === "Số tự động") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}>
+                                                <p>Số tự động</p>
+                                            </div>
+                                            <input 
+                                                className="checkgearStick"
+                                                type="checkbox"
+                                                name="gearStick"
+                                                checked={filterOptions.gearStick === "Số tự động"}
+                                                value={"Số tự động"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.gearStick === "Số sàn") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <p>Số sàn</p>
+                                            </div>
+                                            <input 
+                                                className="checkgearStick"
+                                                type="checkbox"
+                                                name="gearStick"
+                                                checked={filterOptions.gearStick === "Số sàn"}
+                                                value={"Số sàn"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div className="choose" onClick={close}>Áp dụng</div>
+                                </div>
+                            )}
+                        </Popup>
+                        <Popup
+                            trigger={
+                                <div className="amenity all-filter"><div className="icon">      <TuneIcon/>                                             </div><p>Bộ lọc</p>         </div>
+                            }
+                            contentStyle={{
+                                backgroundColor: "white",
+                                width: "fit-content",
+                                height: "80vh",
+                                overflow: "auto",
+                                padding: "1em 2em 1.5em 2em",
+                                borderRadius: "15px",
+                            }}
+                            modal
+                        >
+                            {(close) =>(
+                                <div id="type-container">
+                                    <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Bộ lọc nâng cao</p>
+                                    <hr style={{width: "100%"}}/>
+                                    <br />
+                                    <div style={{width: "100%"}}>
+                                        <p>Số chỗ</p>
+                                    </div>
+                                    <div className="type-select" style={{padding: "20px 0 30px 0"}}>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.seats.includes("4")) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}>
+                                                <div className="img-container">
+                                                    <img src="https://n1-cstg.mioto.vn/m/vehicle-types/4-mini-v2.png"/>
+                                                </div>
+                                                <p>Xe 4 chỗ</p>
+                                            </div>
+                                            <input 
+                                                className="checkSeats"
+                                                type="checkbox"
+                                                name="seats"
+                                                checked={filterOptions.seats.includes("4")}
+                                                value={"4"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.seats.includes("5")) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <div className="img-container">
+                                                    <img src="https://n1-cstg.mioto.vn/m/vehicle-types/4-sedan-v2.png"/>
+                                                </div>
+                                                <p>Xe 5 chỗ</p>
+                                            </div>
+                                            <input 
+                                                className="checkSeats"
+                                                type="checkbox"
+                                                name="seats"
+                                                checked={filterOptions.seats.includes("5")}
+                                                value={"5"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.seats.includes("6")) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <div className="img-container">
+                                                    <img src="https://n1-cstg.mioto.vn/m/vehicle-types/5-suv-v2.png"/>
+                                                </div>
+                                                <p>Xe 6 chỗ</p>
+                                            </div>
+                                            <input 
+                                                className="checkSeats"
+                                                type="checkbox"
+                                                name="seats"
+                                                checked={filterOptions.seats.includes("6")}
+                                                value={"6"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.seats.includes("7")) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <div className="img-container">
+                                                    <img src="https://n1-cstg.mioto.vn/m/vehicle-types/7-mpv-v2.png"/>
+                                                </div>
+                                                <p>Xe 7 chỗ</p>
+                                            </div>
+                                            <input 
+                                                className="checkSeats"
+                                                type="checkbox"
+                                                name="seats"
+                                                checked={filterOptions.seats.includes("7")}
+                                                value={"7"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div style={{width: "100%"}}>
+                                        <p>Loại nhiên liệu</p>
+                                    </div>
+                                    <div className="type-select" style={{padding: "20px 0 30px 0"}}>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.typeOfFuels === "Xăng") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}>
+                                                <p>Xăng</p>
+                                            </div>
+                                            <input 
+                                                className="checkTypeOfFuels"
+                                                type="checkbox"
+                                                name="typeOfFuels"
+                                                checked={filterOptions.typeOfFuels === "Xăng"}
+                                                value={"Xăng"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.typeOfFuels === "Dầu diesel") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <p>Dầu Diesel</p>
+                                            </div>
+                                            <input 
+                                                className="checkTypeOfFuels"
+                                                type="checkbox"
+                                                name="typeOfFuels"
+                                                checked={filterOptions.typeOfFuels === "Dầu Diesel"}
+                                                value={"Dầu diesel"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.typeOfFuels === "Điện") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <p>Điện</p>
+                                            </div>
+                                            <input 
+                                                className="checkTypeOfFuels"
+                                                type="checkbox"
+                                                name="typeOfFuels"
+                                                checked={filterOptions.typeOfFuels === "Điện"}
+                                                value={"Điện"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div style={{width: "100%"}}>
+                                        <p>Truyền động</p>
+                                    </div>
+                                    <div className="type-select" style={{padding: "20px 0 30px 0"}}>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.gearStick === "Số tự động") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}>
+                                                <p>Số tự động</p>
+                                            </div>
+                                            <input 
+                                                className="checkgearStick"
+                                                type="checkbox"
+                                                name="gearStick"
+                                                checked={filterOptions.gearStick === "Số tự động"}
+                                                value={"Số tự động"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                        <label className="tp">
+                                            <div className="icon" style={(filterOptions.gearStick === "Số sàn") ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}>
+                                                <p>Số sàn</p>
+                                            </div>
+                                            <input 
+                                                className="checkgearStick"
+                                                type="checkbox"
+                                                name="gearStick"
+                                                checked={filterOptions.gearStick === "Số sàn"}
+                                                value={"Số sàn"}
+                                                onChange={handleInputChange}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div style={{width: "100%"}}> 
+                                        <p>Mức giá</p>
+                                    </div>
+                                    <Box sx={{width: "400px", padding: "10px"}}>
+                                        <PrettoSlider
+                                            getAriaLabel={(index) => (index === 0 ? 'Minimum price' : 'Maximum price')}
+                                            min={500}
+                                            max={2000}
+                                            step={null}
+                                            marks={marks}
+                                            value={[filterOptions.minPrice, filterOptions.maxPrice]}
+                                            onChange={handleChangePrice}                              
+                                            valueLabelDisplay="auto"
+                                            aria-label="pretto slider"
+                                        />
+                                    </Box>
+                                    <div className="choose" onClick={close}>Áp dụng</div>
+                                </div>
+                            )}
+                        </Popup>
                     </div>
                 </div>
                 <div className="car-list">
