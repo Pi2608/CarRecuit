@@ -781,6 +781,24 @@ const currentTrip = async(userId)=>{
         
     }
 }
+const historyTrip = async(userId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted
+                        FROM dbo.car
+                        Inner join dbo.rentDetail on rentDetail.carId = car.id
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        inner join dbo.rent on rentDetail.rentId = rent.id
+                        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
+                        WHERE rentDetail.drop_off < GETDATE() and [dbo].[user].id =@userId`
+        const result1 = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query1)
+        return result1.recordset
+    } catch (error) {
+        
+    }
+}
 
 module.exports = {
     countRentalCar,
@@ -800,5 +818,6 @@ module.exports = {
     statisticEarningThisMonth,
     statisticEarningByYear,
     statisticEarningToday,
-    currentTrip
+    currentTrip,
+    historyTrip
 }
