@@ -203,6 +203,17 @@ const editAcceptedCar = async (req,res)=>{
         
     }
 }
+const filterLocationDate = async (req,res)=>{
+    try {
+        const location = req.body.location
+        const dateStart = req.body.dateStart
+        const dateEnd = req.body.dateEnd
+        const response = await car.getCarByLocationAndDate(location, dateStart, dateEnd)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 module.exports={
     uploadImgs,
     getAllCarsInUse,
@@ -219,5 +230,6 @@ module.exports={
     recomendCar,
     requestAcceptedCar,
     editAcceptedCar,
-    getAllCars
+    getAllCars,
+    filterLocationDate
 }

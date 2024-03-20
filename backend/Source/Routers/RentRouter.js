@@ -19,5 +19,7 @@ rentRouter.get('/confirmPayment/:userId', rentController.confirmPayment)
 rentRouter.get('/acceptRentDetail', rentController.acceptRentDetail)
 rentRouter.get('/cancelByUser', rentController.cancelRentDetailByUser)
 rentRouter.get('/cancelByOwner', rentController.cancelRentDetailByOwner)
+rentRouter.get('/currentTrip/:userId', rentController.currentTrip)
+rentRouter.get('/historyTrip/:userId', rentController.historyTrip)
 
 module.exports= rentRouter

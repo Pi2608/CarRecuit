@@ -73,8 +73,7 @@
     display: grid;
     grid-template-columns: auto auto auto auto;
     gap: 30px;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
     padding-top: 30px;
 }
 
@@ -94,7 +93,9 @@
     cursor: pointer;
 }
 
-input.checkSeats { 
+input.checkSeats,
+input.checkTypeOfFuels,
+input.checkgearStick{ 
     opacity: 0;
     width: 0;
     height: 0;
