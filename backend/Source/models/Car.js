@@ -56,7 +56,7 @@ const getAllCarsOfOwner = async(ownnerId)=>{
         let poolConnection = await sql.connect(config)
         const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
                         FROM dbo.car
-                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isDeleted = 0 and car.isAccepted = 1 and ownerId = @ownerId`
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isDeleted = 0 and ownerId = @ownerId`
         const result = await poolConnection.request()
         .input('ownerId', sql.Int, ownnerId)
         .query(query1);
@@ -309,6 +309,7 @@ const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, 
         const result2= await poolConnection.request()
         .query(query2)
         const car = result2.recordset[0]
+        console.log(car)
         const query3 = 'Insert into dbo.location (carId, typeLocationId, description) values (@carId, 1, @ldescription)'
         await poolConnection.request()
         .input('carId', sql.Int, car.id)
@@ -328,7 +329,9 @@ const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, 
             .input('carId', sql.Int, car.id)
             .query(query4)
         }
-        await addCarAmenities(carId, amenities)
+        await addCarAmenities(car.Id, amenities)
+
+        console.log("nice");
     }catch(err){
         console.log(err)
     }
