@@ -114,6 +114,7 @@ const filterCars = async (req, res)=>{
         
     }
 }
+
 const addCarRental = async (req, res)=>{
     try {
         const ownerId = req.params.ownerId
@@ -126,8 +127,9 @@ const addCarRental = async (req, res)=>{
         const gearStick = req.body.gearStick
         const typeOfFuels = req.body.typeOfFuels
         const ldescription = req.body.ldescription
-        const imagePaths = req.files.map(file=>file.path);
         const amenities = JSON.parse(req.body.amenities)
+        const imagePaths = req.files.map(file=>file.path);
+        console.log(ownerId, carTypeId, CLP, price, description, seats, year, gearStick, typeOfFuels, ldescription, imagePaths, amenities)
         let imgs = [];
         for (const path of imagePaths) {
             try {
