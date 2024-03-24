@@ -4,6 +4,7 @@ const Util = require("../Util/Util");
 const voucher = require("./Voucher")
 const car = require("./Car")
 const user = require("./User")
+const schedule = require ('node-schedule')
 const countRentalCar = async (carId)=>{
     try {
         let poolConnection = await sql.connect(config)
@@ -592,7 +593,35 @@ const acceptRentDetail = async(notificationId)=>{
         .input("message", sql.NVarChar, message)
         .input("dateUp", sql.DateTime, dateUp)
         .query(query5)
+        // Hủy lịch những chiếc xe đã trùng thời gian
         
+        const query6 = `SELECT * FROM dbo.rentDetail
+                        WHERE id != @rentDetailId AND carId = @carId AND isAccepted IS NULL`
+        const result6 = await poolConnection.request()
+        .input('rentDetailId', sql.Int, rentDetail.id)
+        .input('carId', sql.Int, rentDetail.carId)
+        .query(query6)
+        const rentDetailsSameCar = result6.recordset
+
+        for (let rentDetailSameCar of rentDetailsSameCar){
+            if (await Util.checkOverlap(rentDetailSameCar.pick_up, rentDetailSameCar.drop_off, rentDetail.pick_up, rentDetail.drop_off)){
+                await cancelRentDetailByOwner(rentDetailSameCar.notificationId)
+            }
+        }
+        // Đặt lịch chỉnh status cho server
+        schedule.scheduleJob(await Util.dateUTC(rentDetail.pick_up), async()=>{
+            const query4 = `Update dbo.rentDetail set status = N'Đang sử dụng' where id =@id`
+            await poolConnection.request()
+            .input('id', sql.Int, rentDetail.id)
+            .query(query4)
+        })
+        schedule.scheduleJob(await Util.dateUTC(rentDetail.drop_off), async()=>{
+            const query4 = `Update dbo.rentDetail set status = N'Đã hoàn thành' where id =@id`
+            await poolConnection.request()
+            .input('id', sql.Int, rentDetail.id)
+            .query(query4)
+        })
+
         return{
             message :"chấp nhận thành công"
         }
@@ -744,7 +773,7 @@ const cancelRentDetailByOwner = async(notificationId)=>{
         const rent = result4.recordset[0]
         let receivedId = rent.userId
         let title = "Chủ xe đã từ chối cho thuê xe"
-        let message ="Hủy thuê chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)) + " vào lúc " + formatDate(rentDetail.pick_up)
+        let message ="Hủy thuê chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)) + " vào lúc " + Util.formatDate(rentDetail.pick_up)
         let dateUp = await Util.currentTime()
         let senderId = ownerId
         const query5=`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
@@ -799,19 +828,19 @@ const currentTrip = async(userId)=>{
         }
         return rentDetails
     } catch (error) {
-        
+        console.log(error)
     }
 }
 const historyTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
         const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, carId
-                        FROM dbo.car
-                        Inner join dbo.rentDetail on rentDetail.carId = car.id
-                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
-                        inner join dbo.rent on rentDetail.rentId = rent.id
-                        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
-                        WHERE rentDetail.drop_off < GETDATE() and [dbo].[user].id =@userId`
+        FROM dbo.car
+        Inner join dbo.rentDetail on rentDetail.carId = car.id
+        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+        inner join dbo.rent on rentDetail.rentId = rent.id
+        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
+        WHERE rentDetail.drop_off < GETDATE() and rentDetail.isAccepted = 1 and [dbo].[user].id =6`
         const result1 = await poolConnection.request()
         .input('userId', sql.Int, userId)
         .query(query1)
@@ -827,12 +856,81 @@ const historyTrip = async(userId)=>{
         }
         return rentDetails
     } catch (error) {
-        
+        console.log(error)
     }
 }
 
-const ownerRentDetail = async (ownerId)=>{
-    
+const ownerRentDetailRequest = async (ownerId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT rentDetail.id, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off,  (rentDetail.total*0.8) as received, [dbo].[user].name, carId
+                        FROM dbo.car
+                        Inner join dbo.rentDetail on rentDetail.carId = car.id
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        Inner Join dbo.rent on rent.id = rentDetail.rentId
+                        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
+                        where car.ownerId = @ownerId and rent.paymentId is not NULL and rentDetail.isAccepted is NULL`
+        const result1 = await poolConnection.request()
+        .input('ownerId', sql.Int, ownerId)
+        .query(query1)
+        const rentDetails = result1.recordset
+        for(let rentDetail of rentDetails){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, rentDetail.carId)
+            .query(query2)
+            const img = result2.recordset[0]
+            rentDetail.imgUrl = await Util.decodeImage(img.url, img.id)
+            rentDetail.message = rentDetail.status
+        }
+        return rentDetails
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const ownerRentDetailUpcoming = async (ownerId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `SELECT rentDetail.id, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off,  (rentDetail.total*0.8) as received, [dbo].[user].name, rentDetail.status, carId
+                        FROM dbo.car
+                        Inner join dbo.rentDetail on rentDetail.carId = car.id
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        Inner Join dbo.rent on rent.id = rentDetail.rentId
+                        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
+                        where car.ownerId = @ownerId and rent.paymentId is not NULL 
+                        AND rentDetail.isAccepted is not Null
+                        AND rentDetail.drop_off > GETDATE()`
+        const result1 = await poolConnection.request()
+        .input('ownerId', sql.Int, ownerId)
+        .query(query1)
+        const rentDetails = result1.recordset
+        for(let rentDetail of rentDetails){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, rentDetail.carId)
+            .query(query2)
+            const img = result2.recordset[0]
+            rentDetail.imgUrl = await Util.decodeImage(img.url, img.id)
+            rentDetail.message = rentDetail.status
+        }
+        return rentDetails
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const findRentDetailByNotification = async(notificationId)=>{
+    try {
+        let poolConnection = await sql.connect(config)
+        const query1 = `Select id from dbo.rentDetail where notificationId = @notificationId`
+        const result1 = await poolConnection.request()
+        .input('notificationId', sql.Int, notificationId)
+        .query(query1)
+        return result1.recordset[0]
+    } catch (error) {
+        
+    }
 }
 
 module.exports = {
@@ -854,5 +952,8 @@ module.exports = {
     statisticEarningByYear,
     statisticEarningToday,
     currentTrip,
-    historyTrip
+    historyTrip,
+    ownerRentDetailRequest,
+    ownerRentDetailUpcoming,
+    findRentDetailByNotification
 }

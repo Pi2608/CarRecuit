@@ -1,4 +1,5 @@
 const rent = require('../models/Rent')
+const util = require('../Util/Util')
 
 const getCountRentalCar = async(req, res)=>{
     try {
@@ -155,6 +156,7 @@ const getRentDetailByRentId = async(req,res)=>{
 
 const currentTrip = async (req, res)=>{
     try {
+        await util.deleteAllImages()
         const userId = req.params.userId
         const response = await rent.currentTrip(userId)
         res.json(response)
@@ -165,8 +167,41 @@ const currentTrip = async (req, res)=>{
 
 const historyTrip = async (req,res)=>{
     try {
+        await util.deleteAllImages()
         const userId = req.params.userId
         const response = await rent.historyTrip(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const ownerRentDetailRequest = async(req,res)=>{
+    try {
+        await util.deleteAllImages()
+        const ownerId = req.params.ownerId
+        const response = await rent.ownerRentDetailRequest(ownerId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const ownerRentDetailUpcoming = async(req,res)=>{
+    try {
+        await util.deleteAllImages()
+        const ownerId = req.params.ownerId
+        const response = await rent.ownerRentDetailUpcoming(ownerId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
+
+const findRentDetailByNotification = async (req,res)=>{
+    try {
+        const notificationId = req.params.notificationId
+        const response = await rent.findRentDetailByNotification(notificationId)
         res.json(response)
     } catch (error) {
         
@@ -191,5 +226,8 @@ module.exports= {
     statisticEarningByYear,
     statisticEarningToday,
     currentTrip,
-    historyTrip
+    historyTrip,
+    ownerRentDetailRequest,
+    ownerRentDetailUpcoming,
+    findRentDetailByNotification
 }

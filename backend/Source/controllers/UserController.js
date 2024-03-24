@@ -179,9 +179,9 @@ const replyFeedback = async (req, res) => {
     try {
         const userId = req.query.userId
         const message = req.body.message
-        const carId = req.query.carId
+        const rentDetailId = req.query.rentDetailId
         const rating = req.body.rating
-        const response = await User.replyFeedback(userId, carId, message, rating)
+        const response = await User.replyFeedback(userId, rentDetailId, message, rating)
         res.json(response)
     } catch (error) {
 
@@ -360,6 +360,16 @@ const getCountUser = async (req, res)=>{
         
     }
 }
+const checkFeedback = async (req,res)=>{
+    try {
+        await util.deleteAllImages()
+        const userId = req.params.userId
+        const response = await User.checkFeedback(userId)
+        res.json(response)
+    } catch (error) {
+        
+    }
+}
 
 
 module.exports = {
@@ -393,5 +403,6 @@ module.exports = {
     getUserById,
     updateImageUser,
     totalTransactionUser,
-    getCountUser
+    getCountUser,
+    checkFeedback
 }

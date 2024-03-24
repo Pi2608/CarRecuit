@@ -21,5 +21,8 @@ rentRouter.get('/cancelByUser', rentController.cancelRentDetailByUser)
 rentRouter.get('/cancelByOwner', rentController.cancelRentDetailByOwner)
 rentRouter.get('/currentTrip/:userId', rentController.currentTrip)
 rentRouter.get('/historyTrip/:userId', rentController.historyTrip)
+rentRouter.get('/owner/request/:ownerId', rentController.ownerRentDetailRequest)
+rentRouter.get('/owner/upcoming/:ownerId', rentController.ownerRentDetailUpcoming)
+rentRouter.get('/rentDetail/:notificationId', rentController.findRentDetailByNotification)
 
 module.exports= rentRouter
