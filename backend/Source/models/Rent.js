@@ -499,8 +499,8 @@ const confirmPayment = async (userId)=>{
                 .query(query5)
                 const Car = result5.recordset[0]
                 const title = "Lời yêu cầu thuê xe từ " + User.name
-                const message = `Thuê chiếc xe `+ (await car.getCarTypeByTypeId(Car.carTypeId)).name+` vào ngày ` + rentDetails[i].pick_up
-                +  ` và trả vào ngày ` + rentDetails[i].drop_off
+                const message = `Thuê chiếc xe `+ (await car.getCarTypeByTypeId(Car.carTypeId)).name+` vào lúc ` + Util.formatDate(rentDetails[i].pick_up)
+                +  ` và trả vào lúc ` + Util.formatDate(rentDetails[i].drop_off)
                 const senderId = User.id 
                 const receivedId = Car.ownerId
                 const dateUp = await Util.currentTime()
@@ -580,7 +580,7 @@ const acceptRentDetail = async(notificationId)=>{
         const rent = result4.recordset[0]
         let receivedId = rent.userId
         let title = "Chấp nhận yêu cầu từ chủ xe"
-        let message ="Chiếc xe " +(await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)).name + " đã được chủ xe chấp nhận cho thuê vào ngày " + rentDetail.pick_up 
+        let message ="Chiếc xe " +(await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)).name + " đã được chủ xe chấp nhận cho thuê vào ngày " + Util.formatDate(rentDetail.pick_up) 
         let dateUp = await Util.currentTime()
         let senderId = ownerId
         const query5=`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
@@ -592,6 +592,7 @@ const acceptRentDetail = async(notificationId)=>{
         .input("message", sql.NVarChar, message)
         .input("dateUp", sql.DateTime, dateUp)
         .query(query5)
+        
         return{
             message :"chấp nhận thành công"
         }
@@ -679,7 +680,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         }
         receivedId = Car.ownerId
         title="Hủy chuyến xe từ " + (await user.getUserById(userId)).name
-        message="Chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)).name + " vào ngày " +  rentDetail.pick_up + " đã bị hủy."
+        message="Chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)).name + " vào lúc " +  Util.formatDate(rentDetail.pick_up) + " đã bị hủy."
         senderId = userId
         const query8 =`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
                         values(@receivedId, @senderId, @title, @message, @dateUp)`
@@ -743,7 +744,7 @@ const cancelRentDetailByOwner = async(notificationId)=>{
         const rent = result4.recordset[0]
         let receivedId = rent.userId
         let title = "Chủ xe đã từ chối cho thuê xe"
-        let message ="Hủy thuê chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)) + " vào ngày " + rentDetail.pick_up
+        let message ="Hủy thuê chuyến xe " + (await car.getCarTypeByTypeId((await car.getCarById(rentDetail.carId))[0].carTypeId)) + " vào lúc " + formatDate(rentDetail.pick_up)
         let dateUp = await Util.currentTime()
         let senderId = ownerId
         const query5=`Insert into dbo.notification (receivedId, senderId, title, message, dateUp)
@@ -766,7 +767,7 @@ const cancelRentDetailByOwner = async(notificationId)=>{
 const currentTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, carId
                         FROM dbo.car
                         Inner join dbo.rentDetail on rentDetail.carId = car.id
                         INNER JOIN dbo.carType ON car.carTypeId = carType.id
@@ -776,7 +777,27 @@ const currentTrip = async(userId)=>{
         const result1= await poolConnection.request()
         .input('userId', sql.Int, userId)
         .query(query1)
-        return result1.recordset
+        const rentDetails = result1.recordset
+        for(let rentDetail of rentDetails){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, rentDetail.carId)
+            .query(query2)
+            const img = result2.recordset[0]
+            rentDetail.imgUrl = await Util.decodeImage(img.url, img.id)
+            if(rentDetail.isAccepted == null){
+                rentDetail.message = 'Đang chờ chấp nhận'
+            }else if(rentDetail.isAccepted == true){
+                if(rentDetail.status == null){
+                    rentDetail.message = 'Đã được chấp nhận'
+                }else{
+                    rentDetail.message = rentDetail.status
+                }
+            }else if (rentDetail.isAccepted == false){
+                rentDetail.message = 'Đã bị từ chối'
+            }
+        }
+        return rentDetails
     } catch (error) {
         
     }
@@ -784,7 +805,7 @@ const currentTrip = async(userId)=>{
 const historyTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, carId
                         FROM dbo.car
                         Inner join dbo.rentDetail on rentDetail.carId = car.id
                         INNER JOIN dbo.carType ON car.carTypeId = carType.id
@@ -794,10 +815,24 @@ const historyTrip = async(userId)=>{
         const result1 = await poolConnection.request()
         .input('userId', sql.Int, userId)
         .query(query1)
-        return result1.recordset
+        const rentDetails = result1.recordset
+        for(let rentDetail of rentDetails){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, rentDetail.carId)
+            .query(query2)
+            const img = result2.recordset[0]
+            rentDetail.imgUrl = await Util.decodeImage(img.url, img.id)
+            rentDetail.message = rentDetail.status
+        }
+        return rentDetails
     } catch (error) {
         
     }
+}
+
+const ownerRentDetail = async (ownerId)=>{
+    
 }
 
 module.exports = {
