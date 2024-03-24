@@ -3,6 +3,9 @@ const imageToBase64 = require('image-to-base64')
 const decode = require ('node-base64-image').decode
 const path = require('path');
 const fs = require('fs').promises
+const schedule = require ('node-schedule')
+const sql = require('mssql');
+const config = require("../config/dbconfig");
 
 const currentTime = async()=>{
     var date = new Date();
@@ -122,6 +125,46 @@ const checkOverlap = async(dateStart1, dateEnd1, dateStart2, dateEnd2)=>{
     return true; // Overlap
 }
 
+const dateUTC = async(date)=>{
+    var newDate = new Date(date)
+    newDate.setHours(newDate.getHours()-7)
+    return newDate
+}
+
+const startServer = async()=>{
+    let poolConnection = await sql.connect(config)
+    const query1 = `Update dbo.rentDetail set status = N'Đã hoàn thành' where isAccepted = 1 and drop_off<GETDATE()`
+    await poolConnection.request()
+    .query(query1)
+    const query2 = `Update dbo.rentDetail set status = N'Đang sử dụng' where isAccepted = 1 and drop_off>GETDATE() and pick_up<GETDATE()`
+    await poolConnection.request()
+    .query(query2)
+    const query3 = 'Select id, pick_up from dbo.rentDetail where isAccepted = 1 and pick_up>GETDATE()'
+    const result3 = await poolConnection.request()
+    .query(query3)
+    const rentDetailsPick = result3.recordset
+    for (let rentDetail of rentDetailsPick){
+        schedule.scheduleJob(await dateUTC(rentDetail.pick_up), async()=>{
+            const query4 = `Update dbo.rentDetail set status = N'Đang sử dụng' where id =@id`
+            await poolConnection.request()
+            .input('id', sql.Int, rentDetail.id)
+            .query(query4)
+        })
+    }
+    const query5 = `Select id, drop_off from dbo.rentDetail where isAccepted = 1 and drop_off>GETDATE()`
+    const result5 = await poolConnection.request()
+    .query(query5)
+    const rentDetailsDrop = result5.recordset
+    for (let rentDetail of rentDetailsDrop){
+        schedule.scheduleJob(await dateUTC(rentDetail.drop_off), async()=>{
+            const query4 = `Update dbo.rentDetail set status = N'Đã hoàn thành' where id =@id`
+            await poolConnection.request()
+            .input('id', sql.Int, rentDetail.id)
+            .query(query4)
+        })
+    }
+}
+
 
 module.exports={
     currentTime,
@@ -133,5 +176,6 @@ module.exports={
     compareDates,
     deleteAllImages,
     inputDate,
-    checkOverlap
+    checkOverlap,
+    startServer
 }
