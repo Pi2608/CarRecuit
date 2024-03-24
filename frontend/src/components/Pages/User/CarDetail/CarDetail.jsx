@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
-import CarImg1 from "../../../../images/Hyundai-accent-2022-1.jpg"
-import CarImg2 from "../../../../images/Hyundai-accent-2022-2.jpg"
-import CarImg3 from "../../../../images/Hyundai-accent-2022-3.jpg"
-import CarImg4 from "../../../../images/Hyundai-accent-2022-4.jpg"
 import Button from '@mui/material/Button';
-import { TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DiscountIcon from '@mui/icons-material/Discount';
@@ -14,6 +10,14 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DirectionsCarFilledOutlinedIcon from '@mui/icons-material/DirectionsCarFilledOutlined';
 import { GiGearStickPattern } from "react-icons/gi";
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import Rating from '@mui/material/Rating';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+import { DateRange } from 'react-date-range';
+import locale from 'date-fns/locale/vi';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useAuth } from "../../../../Context/AuthProvider";
 import { useParams } from "react-router-dom";
 import Popup from "reactjs-popup";
@@ -28,24 +32,45 @@ export default function CarDetail(){
 
     const [ carImages, setCarImages ] = useState([]);
     const [ userInfo, setUserInfo ] = useState([]);
+    const [ feedback, setFeedback ] = useState([]);
+    const [ feedbackDetail, setFeedbackDetail ] = useState([]);
     const [ userNIDInfo, setUserNIDInfo ] = useState([]);
     const [ userNDLInfo, setUserNDLInfo ] = useState([]);
     const [ carInfo, setCarInfo ] = useState([]);
     const [ carSeats, setCarSeats ] = useState(0);
-    const [ carGear, setCarGear ] = useState('');
     const [ carFuel, setCarFuel ] = useState(true);
     const [ carPrice, setCarPrice ] = useState('');
     const [ carAmenities, setCarAmenities ] = useState([]);
-    const [ rentDate, setRentDate ] = useState([]);
-    const [ returnDate, setReturnDate ] = useState([]);
     const [ insurancePrice, setInsurancePrice ] = useState('')
     const [ totalPrice, setTotalPrice ] = useState(0)
     const [ totalDate, setTotalDate ] = useState(0)
     const [ rentTotal, setRentTotal ] = useState(0)
     const [ startDate, setStartDate ] = useState(new Date())
+    const [ startTime, setStartTime ] = useState(new Date())
     const [ endDate, setEndDate ] = useState(new Date())
+    const [ maxDate, setMaxDate ] = useState(new Date())
     const [ voucher, setVoucher ] = useState('')
     const [ wallet, setWallet ] = useState('')
+    const [ date, setDate ] = useState({
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection',
+    })
+
+    const timeOptions = [];
+    
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+            const formattedHour = ('0' + hour).slice(-2);
+            const formattedMinute = ('0' + minute).slice(-2);
+            const timeString = formattedHour + ':' + formattedMinute;
+            timeOptions.push(
+                <MenuItem key={timeString} value={timeString}>
+                    {timeString}
+                </MenuItem>
+            );
+        }
+    }
 
     async function getCarDetails() {
         try {
@@ -136,24 +161,74 @@ export default function CarDetail(){
             console.error("Error payment: " + error)
         }
     }
+
+    async function getFeedbacks() {
+        try {
+            const response = await axios.get(`http://localhost:4000/car/feedback/${carId}`);
+            const feedbackListData = response.data;
+    
+            const feedbackDataPromise = feedbackListData.map(async (feedback) => {
+                try {
+                    const userResponse = await axios.get(`http://localhost:4000/user/${feedback.userId}`);
+                    const userData = userResponse.data;
+                    const userName = userData.name; // Assuming the user's name is stored in a property named 'name'
+    
+                    const imagePromise = new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = userData.imgUrl; // Assuming the user's image URL is stored in a property named 'imgUrl'
+                        img.onload = () => resolve(img.src);
+                        img.onerror = () => resolve(null);
+                    });
+    
+                    const imageUrl = await imagePromise;
+    
+                    return {
+                        feedback,
+                        userName,
+                        userImage: imageUrl
+                    };
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    return null;
+                }
+            });
+            const feedbackData = await Promise.all(feedbackDataPromise);
+            setFeedback(feedbackData.filter(feedback => feedback !== null));
+            setFeedbackDetail(feedbackData.filter(feedback => feedback !== null)[0].feedback);
+        } catch (error) {
+            console.error('Error fetching feedbacks:', error);
+        }
+    }
+    
     
     useEffect(() => {
         window.scrollTo(0, 0)
     },[])
 
     useEffect(() => {
-        const fetchData = () => {
-            getCarDetails();
+        const fetchData = async () => {
+            await getCarDetails();
+            await getFeedbacks();
         }
         fetchData();
-        // let tomorrow = new Date();
-        // tomorrow.setDate(tomorrow.getDate() + 1);
-        // setEndDate(tomorrow);
+        var today = new Date();
+        maxDate.setDate(today.getDate() + 30)
         startDate.setDate(20)
         startDate.setHours(8, 0, 0, 0)
         endDate.setDate(22)
         endDate.setHours(7, 0, 0, 0);
     },[])
+
+    useEffect(() => {
+        if (feedback) {
+            console.log(feedback)
+            console.log(feedbackDetail.rating)
+        }
+    }, [feedback, feedbackDetail]);
+
+    // useEffect(()=>{
+    //     console.log(maxDate);
+    // },[maxDate])
 
     useEffect(() => {
         getUserInfo()
@@ -239,6 +314,10 @@ export default function CarDetail(){
         setWallet(prev => prev - rentTotal)
     }
 
+    function handleChange(ranges){
+        setDate(ranges.selection)
+    }
+      
     return(
         <div id="car-detail">
             <Header/>
@@ -325,54 +404,124 @@ export default function CarDetail(){
                             </div>
                         </div>
                         <hr/>
-                        <div className="description">
+                        <div className="description" style={{minHeight: "175px"}}>
                             <br />
                             <div className="titl" style={{fontSize: "1.2em", fontWeight: "500"}}>
                                 Mô tả 
                             </div>
                             <br />
-                            <p style={{color: "#4F4F4F"}}>{carInfo ? carInfo.description : ""}</p>
+                            <p style={{color: "#4F4F4F",}}>{carInfo ? carInfo.description : ""}</p>
                         </div>
                         <br />
                         <hr />
                         <br />
-                        <div className="rating">
+                        <div className="rating-section">
                             <br />
                             <div className="titl" style={{fontSize: "1.2em", fontWeight: "500"}}>
                                 Đánh Giá
                             </div>
                             <br />
+                            {feedback.map((fb) => (
+                                <div key={fb.feedback.id} className="feedback-container" style={{ marginBottom: "20px"}}>
+                                    <div style={{ width: "20%", height: "100px", display: "flex", justifyContent: "center", alignItems: "center", borderRight: "solid 1px #ccc" }}>
+                                        <div
+                                            style={{
+                                                width: "80px",
+                                                height: "80px",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                borderRadius: "50%",
+                                                overflow: "hidden"
+                                            }}>
+                                            <img src={fb.userImage} alt={fb.userName} style={{ height: '100%', width: 'auto' }} />
+                                        </div>
+                                    </div>
+                                    <div style={{ width: "80%", textAlign: "left", padding: "0 20px" }}>
+                                        <div style={{ paddingTop: "10px", fontSize: "20px", fontWeight: "500" }}>{fb.userName}</div>
+                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                            <Rating value={parseInt(fb.feedback.rating)} precision={0.2} size="small" readOnly />
+                                            <div>{handleDate(fb.feedback.feedbackDate)}</div>
+                                        </div>
+                                        <p style={{ fontSize: "15px", color: "#545454", paddingTop: "5px"}}>{fb.feedback.message}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                     <div className="price">
                         <h1>{carInfo.price}K</h1>
-                        <div className="period">
-                            <div className="book">
-                                <table>
-                                    <tr>
-                                        <td style={{textAlign: "left", fontWeight: "490"}}>Nhận xe</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td style={{textAlign: "left", fontWeight: "490"}}>{handleDate(startDate)}</td>
-                                        <td style={{paddingLeft: "10px", fontWeight: "490"}}>{getTimeFromDate(startDate)}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div className="vertical-line"></div>
-                            <div className="return">
-                                <table>
-                                    <tr>
-                                        <td style={{textAlign: "left", fontWeight: "490"}}>Trả xe</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td style={{textAlign: "left", fontWeight: "490"}}>{handleDate(endDate)}</td>
-                                        <td style={{paddingLeft: "10px", fontWeight: "490"}}>{getTimeFromDate(endDate)}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
+                        <Popup
+                            trigger={
+                                <div className="period">
+                                    <div className="book">
+                                        <table>
+                                            <tr>
+                                                <td style={{textAlign: "left", fontWeight: "490"}}>Nhận xe</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{textAlign: "left", fontWeight: "490"}}>{handleDate(startDate)}</td>
+                                                <td style={{paddingLeft: "10px", fontWeight: "490"}}>{getTimeFromDate(startDate)}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div className="vertical-line"></div>
+                                    <div className="return">
+                                        <table>
+                                            <tr>
+                                                <td style={{textAlign: "left", fontWeight: "490"}}>Trả xe</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td style={{textAlign: "left", fontWeight: "490"}}>{handleDate(endDate)}</td>
+                                                <td style={{paddingLeft: "10px", fontWeight: "490"}}>{getTimeFromDate(endDate)}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            }     
+                            contentStyle={{
+                                height: "fit-content",
+                                width: "60%",
+                                backgroundColor: "white",
+                                padding: "1em 2em 1.5em 2em",
+                                borderRadius: "15px"
+                            }}
+                            modal
+                            >
+                                <div id="home-datetime-container">
+                                    <p style={{fontSize: "22px", fontWeight: "500"}}>Thời gian</p>
+                                    <hr style={{width: "100%"}}/>
+                                    <p style={{color: "#ccc"}}>*Giới hạn thời gian thuê xe tối đa 30 ngày. Bạn vui lòng điều chỉnh lại thời gian phù hợp</p>
+                                    <div className="datetime-modify">
+                                    <div className="date-modify">
+                                        <DateRange
+                                            ranges={[date]}
+                                            onChange={handleChange}
+                                            minDate={new Date()}
+                                            maxDate={maxDate}
+                                            months={2}
+                                            direction="horizontal"
+                                            locale={locale}
+                                            color="#5fcf86"
+                                        />
+                                    </div>
+                                    <div className="time-modify">
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <TimePicker
+                                                label="Controlled picker"
+                                                value={startDate}
+                                                onChange={(newValue) => setStartDate(newValue)}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                    </div>
+                                    <div className="conclude">
+                                    
+                                    </div>
+                                </div>
+                            </Popup>
                         <br/>
                         <div className="location">
                             <div>Địa điểm giao xe</div>

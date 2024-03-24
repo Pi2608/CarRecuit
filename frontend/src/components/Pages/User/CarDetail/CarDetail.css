@@ -227,6 +227,15 @@
     height: auto;
 }
 
+#car-detail>.body>.car-info>.info>.rating-section>.feedback-container{
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    background-color: #DBDBDB;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
 #payment{
     display: flex;
     flex-direction: column;

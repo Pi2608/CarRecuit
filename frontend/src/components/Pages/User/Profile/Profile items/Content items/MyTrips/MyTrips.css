@@ -14,9 +14,13 @@
 #mytrip>.container>.container-body>.trip-container{
     height: fit-content;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
-    padding: 3em;
+    padding: 1em;
+}
+
+#mytrip>.container>.container-body>.trip-container td{
+    padding: 1em 0;
 }
 
 #mytrip>.container>.container-body>.toggle-part{
