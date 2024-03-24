@@ -56,7 +56,7 @@ const getAllCarsOfOwner = async(ownnerId)=>{
         let poolConnection = await sql.connect(config)
         const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
                         FROM dbo.car
-                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isDeleted = 0 and car.isAccepted = 1 and ownerId = @ownerId`
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isDeleted = 0 and ownerId = @ownerId`
         const result = await poolConnection.request()
         .input('ownerId', sql.Int, ownnerId)
         .query(query1);
@@ -141,6 +141,33 @@ const editAcceptedCar = async(isAccepted, carId)=>{
         .input('isAccepted', sql.Int, isAccepted)
         .input('carId', sql.Int, carId)
         .query(query)
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+                        FROM dbo.car
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.id = @carId`
+        const result1 = await poolConnection.request()
+        .input('carId', sql.Int, carId)
+        .query(query1)
+        const car = result1.recordset[0]
+        const senderId = 1
+        let receivedId = car.ownerId
+        let title
+        let message
+        const dateUp = await util.currentTime()
+        if (isAccepted === '1'){
+            title = 'Chấp đăng ký cho thuê chiếc xe '+ car.name
+            message = 'Chiếc xe của đã được admin cấp quyền và duyệt cho thuê từ lúc ' + util.formatDate(dateUp)+ '. Chân thành cảm ơn'
+        }else{
+            title = 'Từ chối cho thuê chiếc xe '+ car.name
+            message = 'Vì một số lí do. Admin đã quyết định không cấp phép chiếc xe này được cho thuê'
+        }
+        const query2 = `Insert into dbo.notification (senderId, receivedId, title, message, dateUp) values (@senderId, @receivedId, @title, @message, @dateUp)`
+        await poolConnection.request()
+        .input('senderId', sql.Int, senderId)
+        .input('receivedId', sql.Int, receivedId)
+        .input('title', sql.NVarChar, title)
+        .input('message', sql.NVarChar, message)
+        .input('dateUp', sql.DateTime, dateUp)
+        .query(query2)
         return{
             message: "Cập nhật status thành công"
         }
@@ -309,6 +336,7 @@ const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, 
         const result2= await poolConnection.request()
         .query(query2)
         const car = result2.recordset[0]
+        console.log(car)
         const query3 = 'Insert into dbo.location (carId, typeLocationId, description) values (@carId, 1, @ldescription)'
         await poolConnection.request()
         .input('carId', sql.Int, car.id)
@@ -328,7 +356,9 @@ const addCarRental = async (ownerId, carTypeId, CLP, price, description, seats, 
             .input('carId', sql.Int, car.id)
             .query(query4)
         }
-        await addCarAmenities(carId, amenities)
+        await addCarAmenities(car.Id, amenities)
+
+        console.log("nice");
     }catch(err){
         console.log(err)
     }

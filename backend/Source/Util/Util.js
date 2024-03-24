@@ -15,6 +15,17 @@ const currentTime = async()=>{
     return date;
 }
 
+function formatDate(date) {
+    console.log(date)
+    const hours = String(date.getHours()-7);
+    const minutes = String(date.getMinutes());
+    const day = String(date.getDate());
+    const month = String(date.getMonth() + 1); // Months are zero-based
+    const year = date.getFullYear();
+
+    return `${hours}:${minutes} ${day}/${month}/${year}`;
+}
+
 const calculatePeriod= async(startDate, endDate)=> {
     const startDateTime = new Date(startDate);
     const endDateTime = new Date(endDate);
