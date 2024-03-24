@@ -82,7 +82,7 @@ export default function CarManage(){
                                     </td>
                                     <td className='tbl'>{car.name}</td>
                                     <td className='tbl'>{car.seats}</td>
-                                     <td className='tbl'>{car.price}K</td>
+                                    <td className='tbl'>{car.price}K</td>
                                     <td className='tbl'>{(car.additionalData) ? car.additionalData.rentCount : "0"}</td>
                                     <td className='tbl'>{(car.isAccepted && car.status) ? "Đang hoạt động": "Ngưng hoạt động"}</td>
                                 </tr>
