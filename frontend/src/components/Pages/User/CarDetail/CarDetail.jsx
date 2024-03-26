@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
-import Button from '@mui/material/Button';
-import { MenuItem, TextField } from "@mui/material";
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DiscountIcon from '@mui/icons-material/Discount';
@@ -20,6 +18,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useAuth } from "../../../../Context/AuthProvider";
 import { useParams } from "react-router-dom";
+import LoginForm from "../../Login/LoginForm/LoginForm";
 import dayjs from "dayjs";
 import Modal from '@mui/material/Modal';
 import Popup from "reactjs-popup";
@@ -32,7 +31,7 @@ export default function CarDetail(){
 
     const { carId } = useParams();
 
-    const [open, setOpen] = useState(false);
+    const [ open, setOpen ] = useState(false);
     const [ carImages, setCarImages ] = useState([]);
     const [ userInfo, setUserInfo ] = useState([]);
     const [ feedback, setFeedback ] = useState([]);
@@ -48,11 +47,10 @@ export default function CarDetail(){
     const [ totalPrice, setTotalPrice ] = useState(0)
     const [ totalDate, setTotalDate ] = useState(0)
     const [ rentTotal, setRentTotal ] = useState(0)
+    const [ boundDate, setBoundDate ] = useState(new Date())
     const [ startDate, setStartDate ] = useState(new Date())
-    const [ startTime, setStartTime ] = useState(new Date())
     const [ endDate, setEndDate ] = useState(new Date())
     const [ maxDate, setMaxDate ] = useState(new Date())
-    const [ voucher, setVoucher ] = useState('')
     const [ wallet, setWallet ] = useState('')
     const [ filterDateTime,setFilterDateTime ] = useState('');
     const [ date, setDate ] = useState({
@@ -60,21 +58,6 @@ export default function CarDetail(){
         endDate: new Date(),
         key: 'selection',
     })
-
-    const timeOptions = [];
-    
-    for (let hour = 0; hour < 24; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-            const formattedHour = ('0' + hour).slice(-2);
-            const formattedMinute = ('0' + minute).slice(-2);
-            const timeString = formattedHour + ':' + formattedMinute;
-            timeOptions.push(
-                <MenuItem key={timeString} value={timeString}>
-                    {timeString}
-                </MenuItem>
-            );
-        }
-    }
 
     async function getCarDetails() {
         try {
@@ -170,35 +153,36 @@ export default function CarDetail(){
         try {
             const response = await axios.get(`http://localhost:4000/car/feedback/${carId}`);
             const feedbackListData = response.data;
-    
-            const feedbackDataPromise = feedbackListData.map(async (feedback) => {
-                try {
-                    const userResponse = await axios.get(`http://localhost:4000/user/${feedback.userId}`);
-                    const userData = userResponse.data;
-                    const userName = userData.name; // Assuming the user's name is stored in a property named 'name'
-    
-                    const imagePromise = new Promise((resolve) => {
-                        const img = new Image();
-                        img.src = userData.imgUrl; // Assuming the user's image URL is stored in a property named 'imgUrl'
-                        img.onload = () => resolve(img.src);
-                        img.onerror = () => resolve(null);
-                    });
-    
-                    const imageUrl = await imagePromise;
-    
-                    return {
-                        feedback,
-                        userName,
-                        userImage: imageUrl
-                    };
-                } catch (error) {
-                    console.error('Error fetching user data:', error);
-                    return null;
-                }
-            });
-            const feedbackData = await Promise.all(feedbackDataPromise);
-            setFeedback(feedbackData.filter(feedback => feedback !== null));
-            setFeedbackDetail(feedbackData.filter(feedback => feedback !== null)[0].feedback);
+            if (response.data.length > 0) {
+                const feedbackDataPromise = feedbackListData.map(async (feedback) => {
+                    try {
+                        const userResponse = await axios.get(`http://localhost:4000/user/${feedback.userId}`);
+                        const userData = userResponse.data;
+                        const userName = userData.name; // Assuming the user's name is stored in a property named 'name'
+        
+                        const imagePromise = new Promise((resolve) => {
+                            const img = new Image();
+                            img.src = userData.imgUrl; // Assuming the user's image URL is stored in a property named 'imgUrl'
+                            img.onload = () => resolve(img.src);
+                            img.onerror = () => resolve(null);
+                        });
+        
+                        const imageUrl = await imagePromise;
+        
+                        return {
+                            feedback,
+                            userName,
+                            userImage: imageUrl
+                        };
+                    } catch (error) {
+                        console.error('Error fetching user data:', error);
+                        return null;
+                    }
+                });
+                const feedbackData = await Promise.all(feedbackDataPromise);
+                setFeedback(feedbackData.filter(feedback => feedback !== null));
+                setFeedbackDetail(feedbackData.filter(feedback => feedback !== null)[0].feedback);
+            }
         } catch (error) {
             console.error('Error fetching feedbacks:', error);
         }
@@ -210,19 +194,18 @@ export default function CarDetail(){
 
     useEffect(() => {
         window.scrollTo(0, 0)
-    },[])
-
-    useEffect(() => {
         const fetchData = async () => {
             await getCarDetails();
             await getFeedbacks();
         }
         fetchData();
         var today = new Date();
-        maxDate.setDate(today.getDate() + 30)
+        boundDate.setDate(today.getDate() + 3)
+        maxDate.setMonth(boundDate.getMonth() + 1)
+        startDate.setDate(boundDate.getDate() )
         startDate.setHours(7, 0, 0, 0)
-        endDate.setDate(today.getDate() + 1)
-        endDate.setHours(8, 0, 0, 0);
+        endDate.setDate(boundDate.getDate() + 1)
+        endDate.setHours(7, 0, 0, 0);
         setTotalDate(calculateTotalDate(endDate, startDate))
         displayPeriod(startDate, endDate)
     },[])
@@ -259,9 +242,6 @@ export default function CarDetail(){
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        // const hours = String(date.getHours()).padStart(2, '0');
-        // const minutes = String(date.getMinutes()).padStart(2, '0');
-        // const formattedDateTime = `${hours}:${minutes} ${day}/${month}/${year}`;
         const formattedDateTime = `${day}/${month}/${year}`;
         return formattedDateTime;
     }
@@ -531,7 +511,7 @@ export default function CarDetail(){
                                                 <DateRange
                                                     ranges={[date]}
                                                     onChange={handleChange}
-                                                    minDate={new Date()}
+                                                    minDate={boundDate}
                                                     maxDate={maxDate}
                                                     months={2}
                                                     direction="horizontal"
@@ -657,11 +637,8 @@ export default function CarDetail(){
                             >
                                 {close =>
                                     <div id="payment">
-                                        <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Xác nhận thanh toán</p>
-                                        <div className="payment-info">
-                                            <p style={{fontSize: "18px", fontWeight: "500", paddingBottom: "20px"}}>Xe {carInfo.name}</p>
-                                            <div></div>
-                                        </div>
+                                        <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "15px"}}>Xác nhận thanh toán</p>
+                                        
                                         <br />
                                         <div className="btn-ctn">
                                             <div 
@@ -682,12 +659,25 @@ export default function CarDetail(){
                                 }
                             </Popup>
                         :
-                            <div 
-                                variant="contained" 
-                                style={{cursor: "pointer", padding: "8px", backgroundColor: "#5fcf86", borderRadius: "5px", fontWeight: "500", textAlign: "center", color: "#fff"}}
-                                onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
-                                onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
-                            >Yêu cầu thuê xe</div>
+                            <Popup
+                                trigger={
+                                    <div 
+                                        variant="contained" 
+                                        style={{cursor: "pointer", padding: "8px", backgroundColor: "#5fcf86", borderRadius: "5px", fontWeight: "500", textAlign: "center", color: "#fff"}}
+                                        onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
+                                        onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
+                                    >Yêu cầu thuê xe</div>
+                                }
+                                position="center"
+                                modal
+                            >
+                                {close => (
+                                    <div className="login-popup">
+                                        <LoginForm/>
+                                    </div>
+                                )}
+                        </Popup>
+                            
                         }
                     </div>
                 </div>

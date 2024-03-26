@@ -188,5 +188,7 @@ module.exports={
     deleteAllImages,
     inputDate,
     checkOverlap,
-    startServer
+    startServer,
+    formatDate,
+    dateUTC
 }

@@ -33,7 +33,6 @@ const LoginForm = () => {
       console.log(response1)
       if(response1){
         let token
-        console.log("hey")
         const authentication = await axios.post(
           "http://localhost:4000/user/login",
           postData

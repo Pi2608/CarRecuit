@@ -1,15 +1,8 @@
 import React from 'react';
 import './App.css';
-import {
-  createBrowserRouter,
-  RouterProvider,
-  useRouteError ,
-  BrowserRouter,
-  Route,
-  Routes,
-} from "react-router-dom";
-// import { LocalizationProvider } from '@mui/x-date-pickers';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuth } from './Context/AuthProvider.jsx';
+
 import ErrorPage from './components/Pages/ErrorPage/ErrorPage.jsx';
 import Home from './components/Pages/User/Home/Home.jsx';
 import CarList from './components/Pages/User/CarList/CarList.jsx';
@@ -19,12 +12,10 @@ import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.j
 import Transaction from './components/Pages/User/Profile/Pages/TransactionPage/Transaction.jsx';
 import Trips from './components/Pages/User/Profile/Pages/TravelPage/Trips.jsx';
 import MyCars from './components/Pages/User/Profile/Pages/MyCarsPage/MyCars.jsx';
-// import Address from './components/Pages/User/Profile/Pages/AddressPage/Address.jsx';
 import ChangePw from './components/Pages/User/Profile/Pages/ChangePwPage/ChangePw.jsx';
 import CarRegister from './components/Pages/User/Profile/Pages/CarRegister/CarRegister.jsx';
 
 import Dashboard from './components/Pages/Admin/Pages/DashBoard/Dashboard.jsx';
-import New from './components/Pages/Admin/Pages/New/New.jsx';
 import UserListPage from './components/Pages/Admin/Pages/UserListPage/UserListPage.jsx';
 import CarListPage from './components/Pages/Admin/Pages/CarListPage/CarListPage.jsx';
 import VoucherListPage from './components/Pages/Admin/Pages/VoucherListPage/VoucherListPage.jsx';
@@ -32,89 +23,51 @@ import StatisticPage from './components/Pages/Admin/Pages/StatisticPage/Statisti
 import ConfirmInfoPage from './components/Pages/Admin/Pages/ConfirmInfoPage/ConfirmInfoPage.jsx';
 import { carInputs, userInputs, voucherInputs } from './components/Pages/Admin/Pages/formSource.js';
 
-import LoginForm from './components/Pages/Login/LoginForm/LoginForm.jsx';
 
 function App(){
+  
+  const { auth, roleUserId } = useAuth();
+ 
   return (
     <div>
-      {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
-        <Routes>
-          <Route path="/">
-            {/* user */}
-            <Route index element={<Home/>}/>
-            <Route path="login">
-              <Route index element={<LoginForm/>}/>
-            </Route>
-            <Route path="car">
-              <Route path="carregister">
-                <Route index element={<CarRegister/>}/>
-              </Route>
-              <Route path="carlist">
-                <Route index element={<CarList/>}/>
-              </Route>
-              <Route path="cardetail/:carId">
-                <Route index element={<CarDetail/>}/>
-              </Route>
-            </Route>
-            <Route path="map">
-              <Route index element={<Map/>}/>
-            </Route>
-            <Route path="user">
-              <Route path="profile">
-                <Route index element={<Profile/>}/>
-              </Route>
-              <Route path="mycars">
-                <Route index element={<MyCars/>}/>
-              </Route>
-              <Route path="mytrips">
-                <Route index element={<Trips/>}/>
-              </Route>
-              {/* <Route path="myaddress">
-                <Route index element={<Address/>}/>
-              </Route> */}
-              <Route path="resetpw">
-                <Route index element={<ChangePw/>}/>
-              </Route>
-              <Route path="transaction">
-                <Route index element={<Transaction/>}/>
-              </Route>
-            </Route>
-            {/* admin */}
-            <Route path="admin">
-              <Route path="dashboard">
-                <Route index element={<Dashboard/>}/>
-              </Route>
-              <Route path="users">
-                <Route index element={<UserListPage/>}/>
-                <Route path="new" element={<New inputs={userInputs} title="Thêm người dùng mới"/>}/>
-              </Route>
-              <Route path="cars">
-                <Route index element={<CarListPage/>}/>
-                <Route path="new" element={<New inputs={carInputs} title="Thêm xe mới"/>}/>
-              </Route>
-              <Route path="voucher">
-                <Route index element={<VoucherListPage/>}/>
-                <Route path="new" element={<New inputs={voucherInputs} title="Thêm voucher mới"/>}/>
-              </Route>
-              <Route path="statistic">
-                <Route index element={<StatisticPage/>}/>
-              </Route>
-              <Route path="confirm">
-                <Route index element={<ConfirmInfoPage/>}/>
-              </Route>
-            </Route>
+      <Routes>
+        <Route path="/">
+          <Route index element={<Home />} />
+          <Route path="car">
+            <Route path="carlist" element={<CarList />} />
+            <Route path="cardetail/:carId" element={<CarDetail />} />
           </Route>
-        </Routes>
-      {/* </LocalizationProvider> */}
+          <Route path="map" element={<Map />} />
+          {!auth && <Route path="login" element={<LoginForm />} />}
+          {auth && roleUserId === 1 && (
+            <>
+              <Route path="user">
+                <Route path="profile" element={<Profile />} />
+                <Route path="mycars" element={<MyCars />} />
+                <Route path="mytrips" element={<Trips />} />
+                <Route path="resetpw" element={<ChangePw />} />
+                <Route path="transaction" element={<Transaction />} />
+              </Route>
+              <Route path="car">
+                <Route path="carregister" element={<CarRegister />} />
+              </Route>
+            </>
+          )}
+          {auth && roleUserId !== 1 && (
+            <Route path="admin">
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<UserListPage />} />
+              <Route path="cars" element={<CarListPage />} />
+              <Route path="voucher" element={<VoucherListPage />} />
+              <Route path="statistic" element={<StatisticPage />} />
+              <Route path="confirm" element={<ConfirmInfoPage />} />
+            </Route>
+          )}
+          {!auth && <Navigate to="/login" />}
+        </Route>
+      </Routes>
     </div>
   )
 }
 
 export default App
-{/*<Route path="/" element={<Home />} />
-<Route path="/login" element={<Login />} />
-<Route path="/carlist" element={<CarList />} />
-<Route path="/cardetail" element={<CarDetail />} />
-<Route path="/profile" element={<Profile />} />*/}
-{/* <Route path="/blog/" element={<BlogApp />} />
-<Route path="/users/" element={<UserApp />} /> */}

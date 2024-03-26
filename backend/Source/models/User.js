@@ -328,9 +328,15 @@ const deleteUserById = async (userId) => {
     }
 }
 
-const replyFeedback = async (userId, carId, message, rating) => {
+const replyFeedback = async (userId, rentDetailId , message, rating) => {
     try {
+
         let poolConnection = await sql.connect(config);
+        const query4 = `Select carId from dbo.rentDetail where id = @rentDetailId`
+        const result4 = await poolConnection.request()
+        .input('rentDetailId', sql.Int, rentDetailId)
+        .query(query4)
+        const carId = result4.recordset[0].carId
         const query = 'INSERT INTO [dbo].[feedback] (userId, carId, message, rating, feedbackDate) Values (@UserId, @CarId, @Message, @Rating, @FeedbackDate)';
         await poolConnection.request()
             .input('UserId', sql.Int, userId)
@@ -345,6 +351,12 @@ const replyFeedback = async (userId, carId, message, rating) => {
             .input('rating', sql.Float, ratingCar)
             .input('carId', sql.Int, carId)
             .query(query2)
+        const query3 = `Update dbo.rentDetail set feedbackId = 
+                        (Select Max(id) from dbo.feedback)
+                        where id = @rentDetailId`
+        await poolConnection.request()
+        .input('rentDetailId', sql.Int, rentDetailId)
+        .query(query3)
         return {
             message: "gửi Feedback thành công"
         }
@@ -693,6 +705,35 @@ const getCountUser = async ()=>{
         
     }
 }
+
+const checkFeedback = async (userId)=>{
+    try {
+        let poolConnection =await sql.connect(config)
+        const query = `SELECT rentDetail.id, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, carId
+                        FROM dbo.car
+                        Inner join dbo.rentDetail on rentDetail.carId = car.id
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        inner join dbo.rent on rentDetail.rentId = rent.id
+                        Inner join [dbo].[user] on rent.userId = [dbo].[user].id
+                        WHERE rentDetail.drop_off < GETDATE() and rentDetail.isAccepted = 1 and [dbo].[user].id = @userId and rentDetail.feedbackId is NULL`
+        const result = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query(query)
+        const rentDetails = result.recordset
+        for(let rentDetail of rentDetails){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, rentDetail.carId)
+            .query(query2)
+            const img = result2.recordset[0]
+            rentDetail.imgUrl = await util.decodeImage(img.url, img.id)
+            rentDetail.message = rentDetail.status
+        }
+        return rentDetails
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports = {
     getAllUser,
     getUserById,
@@ -723,6 +764,7 @@ module.exports = {
     getRoleByUserId,
     updateImageUser,
     totalTransactionUser,
-    getCountUser
+    getCountUser,
+    checkFeedback
 }
 
