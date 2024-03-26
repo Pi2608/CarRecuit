@@ -111,9 +111,11 @@ const recomendCar = async(numberItems)=>{
 const requestAcceptedCar = async ()=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name
+        const query1 = `SELECT car.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name, dbo.[user].name as userName
                         FROM dbo.car
-                        INNER JOIN dbo.carType ON car.carTypeId = carType.id where car.isAccepted is NULL`
+                        INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                        Inner join [dbo].[user] on car.ownerId = dbo.[user].id
+                        where car.isAccepted is NULL`
         const result1 = await poolConnection.request()
         .query(query1)
         const cars = result1.recordset
