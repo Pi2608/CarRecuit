@@ -16,7 +16,6 @@ const currentTime = async()=>{
 }
 
 function formatDate(date) {
-    console.log(date)
     const hours = String(date.getHours()-7);
     const minutes = String(date.getMinutes());
     const day = String(date.getDate());
@@ -116,7 +115,6 @@ const compareDates= async(startDate, endDate) =>{
 }
 
 const inputDate = async(date)=>{
-    console.log(date)
     const newDate = new Date(date)
     newDate.setHours(newDate.getHours()+7)
     return newDate
@@ -127,7 +125,6 @@ const checkOverlap = async(dateStart1, dateEnd1, dateStart2, dateEnd2)=>{
     const end1 = new Date(dateEnd1);
     const start2 = new Date(dateStart2);
     const end2 = new Date(dateEnd2);
-    console.log(start1, end1, start2, end2)
     // Check if any of the start dates are after the other's end date
     if (start1 > end2 || start2 > end1) {
         return false; // No overlap

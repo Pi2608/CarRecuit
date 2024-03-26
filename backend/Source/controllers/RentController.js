@@ -105,8 +105,8 @@ const confirmPayment = async (req,res)=>{
 }
 const acceptRentDetail = async(req,res)=>{
     try {   
-        const notificationId = req.query.notificationId
-        const response = await rent.acceptRentDetail(notificationId)
+        const rentDetailId = req.query.rentDetailId
+        const response = await rent.acceptRentDetail(rentDetailId)
         res.json(response)
     } catch (error) {
         
@@ -126,8 +126,8 @@ const cancelRentDetailByUser = async(req,res)=>{
 
 const cancelRentDetailByOwner = async(req, res)=>{
     try {
-        const notificationId = req.query.notificationId
-        const response = await rent.cancelRentDetailByOwner(notificationId)
+        const rentDetailId = req.query.rentDetailId
+        const response = await rent.cancelRentDetailByOwner(rentDetailId)
         res.json(response)
     } catch (error) {
         
