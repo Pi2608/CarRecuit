@@ -13,11 +13,12 @@ import TuneIcon from '@mui/icons-material/Tune';
 import LanguageIcon from '@mui/icons-material/Language';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import MapIcon from '@mui/icons-material/Map';
-import Box from '@mui/material/Box';
+import Box from '@mui/material/Box';    
 import Slider from '@mui/material/Slider';
 import { styled } from '@mui/material/styles';
 import { GiGearStick } from "react-icons/gi";
 import Popup from "reactjs-popup";
+import { Modal } from "@mui/material";
 import axios from "axios";
 import "./CarList.css";
 
@@ -25,6 +26,7 @@ export default function CarList(){
 
     const navigate = useNavigate();
 
+    const [open, setOpen] = useState(false);
     const [carList, setCarList] = useState([]);
     const [carBrandList, setCarBrandList] = useState([]);
     const [filterList, setFilterList]= useState([]);
@@ -162,6 +164,9 @@ export default function CarList(){
         }
     };
     
+    const handleOpen = () => setOpen(true);
+
+    const handleClose = () => setOpen(false);
 
     const filteredCars = carList.filter(car => {
         if (filterOptions.carTypeId && car.carTypeId !== filterOptions.carTypeId) {
@@ -246,7 +251,8 @@ export default function CarList(){
                     <div className="amenities">
                         <div 
                             className="amenity reset-btn" 
-                            onClick={() => setFilterOptions({carTypeId: '', seats: [], rating: false, typeOfFuels: '', gearStick: '', minPrice: '', maxPrice: ''})}
+                            onClick={() => setFilterOptions({carTypeId: '', seats: [], rating: false, typeOfFuels: '', gearStick: '', minPrice: '500', maxPrice: '2000'})}
+                            style={(filterOptions.carTypeId || filterOptions.gearStick || filterOptions.rating || filterOptions.seats.length > 0 || (parseInt(filterOptions.minPrice) !== 500 || parseInt(filterOptions.maxPrice) !== 2000)) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}
                         ><RotateLeftIcon/></div>
                         <Popup 
                             trigger={
@@ -336,7 +342,21 @@ export default function CarList(){
                                 </div>
                             )}
                         </Popup>
-                        <div className="amenity car-brand"><div className="icon">       <LanguageIcon/>                                         </div><p>Hãng xe</p>        </div>
+                        <Popup
+                            trigger={
+                                <div className="amenity car-brand"><div className="icon">       <LanguageIcon/>                                         </div><p>Hãng xe</p>        </div>
+                            }
+                            contentStyle={{
+                                backgroundColor: "white",
+                                width: "fit-content",
+                                height: "fit-content",
+                                padding: "1em 2em 1.5em 2em",
+                                borderRadius: "15px",
+                            }}
+                            modal
+                        >
+
+                        </Popup>
                         <div 
                             className="amenity five-star-owner" 
                             style={(filterOptions.rating) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}
@@ -455,22 +475,17 @@ export default function CarList(){
                                 </div>
                             )}
                         </Popup>
-                        <Popup
-                            trigger={
-                                <div className="amenity all-filter"><div className="icon">      <TuneIcon/>                                             </div><p>Bộ lọc</p>         </div>
-                            }
-                            contentStyle={{
-                                backgroundColor: "white",
-                                width: "fit-content",
-                                height: "80vh",
-                                overflow: "auto",
-                                padding: "1em 2em 1.5em 2em",
-                                borderRadius: "15px",
-                            }}
-                            modal
+                        <div className="amenity all-filter" onClick={handleOpen} style={(filterOptions.carTypeId || filterOptions.gearStick || filterOptions.rating || filterOptions.seats.length > 0 || (parseInt(filterOptions.minPrice) !== 500 || parseInt(filterOptions.maxPrice) !== 2000)) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} :{}}><div className="icon">      <TuneIcon/>                                             </div><p>Bộ lọc</p>         </div>
+                        <Modal
+                            open={open}
+                            onClose={handleClose}
+                            disableEnforceFocus
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                            style={{height: "80vh", width: "fit-content", display: "flex", justifyContent: "center", borderRadius: "25px"}}
                         >
-                            {(close) =>(
-                                <div id="type-container">
+                            <div id="type-container-mui">
+                                <div className="modal">
                                     <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Bộ lọc nâng cao</p>
                                     <hr style={{width: "100%"}}/>
                                     <br />
@@ -628,22 +643,24 @@ export default function CarList(){
                                             max={2000}
                                             step={null}
                                             marks={marks}
-                                            value={[filterOptions.minPrice, filterOptions.maxPrice]}
+                                            value={[parseInt(filterOptions.minPrice), parseInt(filterOptions.maxPrice)]}
                                             onChange={handleChangePrice}                              
                                             valueLabelDisplay="auto"
                                             aria-label="pretto slider"
                                         />
                                     </Box>
-                                    <div className="choose" onClick={close}>Áp dụng</div>
+                                    <div className="choose" onClick={handleClose}>Áp dụng</div>
                                 </div>
-                            )}
-                        </Popup>
+                            </div>
+                        </Modal>
                     </div>
                 </div>
-                <div className="car-list">
-                    {filteredCars.map((car) =>(
-                        <Card key={car.id} id={car.id} name={car.name} price={car.price} description={car.description} image={car.imgUrl} ldescription={car.ldescription  } typeId={car.carTypeId}/>
-                    ))}
+                <div className="list-container">
+                    <div className="car-list">
+                        {filteredCars.map((car) =>(
+                            <Card key={car.id} id={car.id} name={car.name} price={car.price} description={car.description} image={car.imgUrl} ldescription={car.ldescription  } typeId={car.carTypeId}/>
+                        ))}
+                    </div>
                 </div>
                 <div className="map-btn" onClick={()=>navigate("/")}><MapIcon/>Bản đồ</div>
             </div>

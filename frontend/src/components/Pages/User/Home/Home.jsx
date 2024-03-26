@@ -6,12 +6,19 @@ import Card from "../../../Items/Card/Card";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+import { DateRange } from 'react-date-range';
+import locale from 'date-fns/locale/vi';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import dayjs from "dayjs";
+import Modal from '@mui/material/Modal';
 import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
 import { useAuth } from '../../../../Context/AuthProvider.jsx';
-import Popup from "reactjs-popup";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import axios from "axios";
 import "./Home.css"
 import { func } from "prop-types";
@@ -24,23 +31,46 @@ export default function Home() {
 
   const { auth, id, roleUserId  } = useAuth();
 
+  const [ open, setOpen ] = useState(false);
+
   const [ carList, setCarList ] = useState([]);
-  const [location, setLocation] = useState(null);
-  const [address, setAddress] = useState(null)
-  const [error, setError] = useState(null);
+  const [ location, setLocation ] = useState(null);
+  const [ address, setAddress ] = useState(null)
+  const [ error, setError ] = useState(null);
 
-  const [startDateTime, setStartDateTime] = useState(new Date());
-  const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('20:00');
-
-  const [endDateTime, endStartDateTime] = useState(new Date());
-  const [endDate, endStartDate] = useState('');
-  const [endTime, endStartTime] = useState('21:00');
-
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [nextDateTime, setNextDateTime] = useState(new Date());
-
+  const [ boundDate, setBoundDate ] = useState(new Date());
+  const [ startDate, setStartDate ] = useState(new Date());
+  const [ endDate, endStartDate ] = useState(new Date());
+  const [ maxDate, setMaxDate ] = useState(new Date())
+  
   const [filterDateTime,setFilterDateTime] = useState("");
+  
+  const [ date, setDate ] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+    key: 'selection',
+  })
+
+  const handleOpen = () => setOpen(true);
+
+  const handleClose = () => setOpen(false);
+
+  function handleChange(ranges){
+    setDate(ranges.selection)
+    const startDateTemp = new Date(startDate);
+    const endDateTemp = new Date(endDate);
+    const newStartDate = new Date(ranges.selection.startDate);
+    const newEndDate = new Date(ranges.selection.endDate);
+    startDateTemp.setDate(newStartDate.getDate());
+    startDateTemp.setMonth(newStartDate.getMonth());
+    endDateTemp.setDate(newEndDate.getDate());
+    endDateTemp.setMonth(newEndDate.getMonth());
+    startDate.setDate(startDateTemp.getDate());
+    startDate.setMonth(startDateTemp.getMonth());
+    endDate.setDate(endDateTemp.getDate());
+    endDate.setMonth(endDateTemp.getMonth());
+    displayPeriod(startDate, endDate);
+  }    
 
   async function fetchCarList(){
     try {
@@ -88,22 +118,15 @@ export default function Home() {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchCarList();
-    let tomorrow = new Date();//
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    setNextDateTime(tomorrow);
     displayPeriod();
-    // setFilterDateTime(
-    // console.log(filterDateTime);
-    // const a = "3-12-2024 15:21:13";
-    // const b = new Date(a)
-    let c = new Date();
-    c = nextDateTime - currentDateTime; 
-    // Số milliseconds trong một ngày
-    const millisecondsPerDay = 1000 * 60 * 60 * 24;
-    // Tính số ngày cách nhau
-    let differenceInDays = Math.ceil(c / millisecondsPerDay);
-    // console.log(b)
-    console.log(differenceInDays)
+    var today = new Date();
+    boundDate.setDate(today.getDate() + 3)
+    maxDate.setMonth(boundDate.getMonth() + 1)
+    startDate.setDate(boundDate.getDate() )
+    startDate.setHours(7, 0, 0, 0)
+    endDate.setDate(boundDate.getDate() + 1)
+    endDate.setHours(7, 0, 0, 0);
+    displayPeriod(startDate, endDate);
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
       return;
@@ -121,31 +144,21 @@ export default function Home() {
     console.log(address)
   },[carList,location,address])
 
-  function handleDate(d){
-    const date = new Date(d)
+  function handleDateTime(d) {
+    const date = new Date(d);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${day}/${month}/${year}`;
-    return formattedDate
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}`;
+    return formattedDateTime;
   }
 
-  function combineDateTime(time, date){
-    // const combineDT = new DateTime(dateTimeString);
-    // return combineDT;
-    const dateTimeString = `${time}, ${date}`;
-    return dateTimeString
-  }
-
-  function combineDateString(date1, date2){
-    const dateString = `${date1} - ${date2}`;
-    return dateString;
-  }
-
-  function displayPeriod(){
-    const tempCurDate = combineDateTime(startTime, handleDate(currentDateTime));
-    const tempNextDate = combineDateTime(endTime, handleDate(nextDateTime));
-    const rs = combineDateString(tempCurDate, tempNextDate);
+  function displayPeriod(startDate, endDate){
+    const tempStartDate = handleDateTime(startDate);
+    const tempEndDate = handleDateTime(endDate);
+    const rs = `${tempStartDate} - ${tempEndDate}`;
     setFilterDateTime(rs)
   }
 
@@ -172,50 +185,103 @@ export default function Home() {
                   </table>
                 </div>
                 <div class="vertical-line"></div>
-                <div className="sub-option period">
-                  <Popup
-                    trigger={
-                      <table style={{width: "100%"}}>
-                        <tr>
-                          <td><CalendarMonthIcon style={{height: "20px"}}/></td>
-                          <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Thời gian thuê</td>
-                        </tr>
-                        <tr>
-                          <td></td>
-                          {/* <td><TextField select fullWidth variant="standard"/></td> */}
-                          <td style={{cursor: "pointer"}}>
-                            <p style={{textAlign: "left", fontWeight: "500", fontSize: "17px"}}>{filterDateTime}</p>
-                          </td>
-                        </tr>
-                      </table>
-                    }
-                    contentStyle={{
-                      height: "fit-content",
-                      width: "60%",
-                      backgroundColor: "white",
-                      padding: "1em 2em 1.5em 2em",
-                      borderRadius: "15px"
-                    }}
-                    modal
-                  >
-                    <div id="home-datetime-container">
-                      <p style={{fontSize: "22px", fontWeight: "500"}}>Thời gian</p>
-                      <hr style={{width: "100%"}}/>
-                      <p style={{color: "#ccc"}}>*Giới hạn thời gian thuê xe tối đa 30 ngày. Bạn vui lòng điều chỉnh lại thời gian phù hợp</p>
-                      <div className="datetime-modify">
-                        <div className="date-modify">
-
-                        </div>
-                        <div className="time-modify">
-
-                        </div>
-                      </div>
-                      <div className="conclude">
-                        
-                      </div>
-                    </div>
-                  </Popup>
+                <div className="sub-option period" onClick={handleOpen}>
+                    <table style={{width: "100%"}}>
+                      <tr>
+                        <td><CalendarMonthIcon style={{height: "20px"}}/></td>
+                        <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Thời gian thuê</td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td style={{cursor: "pointer"}}>
+                          <p style={{textAlign: "left", fontWeight: "500", fontSize: "17px"}}>{filterDateTime}</p>
+                        </td>
+                      </tr>
+                    </table>
                 </div>
+                <Modal
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                  >
+                      <div 
+                          id="home-datetime-container" 
+                          style={{
+                              width: "60%",
+                              height: "fit-content", 
+                              padding: "25px", 
+                              backgroundColor: "#fff", 
+                              borderRadius: "25px", 
+                              transform: 'translate(30%, 100px)'
+                              }}>
+                          <p style={{fontSize: "22px", fontWeight: "500"}}>Thời gian</p>
+                          <hr style={{width: "100%"}}/>
+                          <p style={{color: "#ccc"}}>*Giới hạn thời gian thuê xe tối đa 30 ngày. Bạn vui lòng điều chỉnh lại thời gian phù hợp</p>
+                          <div className="datetime-modify">
+                              <div className="date-modify">
+                                  <DateRange
+                                      ranges={[date]}
+                                      onChange={handleChange}
+                                      minDate={boundDate}
+                                      maxDate={maxDate}
+                                      months={2}
+                                      direction="horizontal"
+                                      locale={locale}
+                                      color="#5fcf86"
+                                      rangeColors="#5fcf86, #469963"
+                                  />
+                              </div>
+                              <div className="time-modify" style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "space-around"}}>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <TimePicker
+                                          label="Controlled picker"
+                                          views={['hours','minutes']}
+                                          value={dayjs(startDate)}
+                                          sx={{
+                                              width: "40%"
+                                          }}
+                                          onChange={(newValue) => {startDate.setTime(newValue), displayPeriod(startDate, endDate), console.log(startDate)}}
+                                      />
+                                  </LocalizationProvider>
+                                  <p style={{fontSize: "30px", padding: "0 10px"}}>-</p>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <TimePicker
+                                          label="Controlled picker"
+                                          views={['hours','minutes']}
+                                          value={dayjs(endDate)}
+                                          sx={{
+                                              width: "40%"
+                                          }}
+                                          onChange={(newValue) => {endDate.setTime(newValue), displayPeriod(startDate, endDate), console.log(endDate)}}
+                                      />
+                                  </LocalizationProvider>
+                              </div>
+                          </div>
+                          <br />
+                          <div className="conclude" style={{width: "70%", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                              <div>
+                                  <p>{filterDateTime ? filterDateTime : "--/--/--- --:-- - --/--/---- --:--"}</p>
+                              </div>
+                              <div 
+                                  style={{
+                                      padding: "10px",
+                                      backgroundColor: "#5fcf86",
+                                      color: "#fff",
+                                      borderRadius: "5px",
+                                      cursor: "pointer"
+                                  }}
+                                  onMouseOut={(e) => {
+                                      e.target.style.backgroundColor = "#5fcf86";
+                                  }}
+                                  onMouseOver={(e) => {
+                                      e.target.style.backgroundColor = "#469963";
+                                  }}
+                                  onClick={handleClose}
+                              >Tiếp tục</div>
+                          </div>
+                      </div>
+                  </Modal>
                 <div className="search-button">
                   <Button 
                     variant="outlined" 

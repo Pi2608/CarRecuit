@@ -68,7 +68,7 @@
     padding: 0;
 }
 
-#cars>.body>.car-list{
+#cars>.body>.list-container>.car-list{
     width: 80%;
     display: grid;
     grid-template-columns: auto auto auto auto;
@@ -154,4 +154,68 @@ input.checkgearStick{
 #type-container>.type-select>.tp>.icon>.img-container img{
     height: 64px;
     width: auto;
+}
+
+#type-container-mui{
+    width: fit-content;
+    height: 80vh;
+    background-color: #fff;
+    border-radius: 25px;
+    overflow: auto;
+    padding: 15px 30px 20px 30px;
+    transform: translate(89%, 80px)
+}
+
+#type-container-mui>.modal{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#type-container-mui>.modal>.type-select{
+    display: flex;
+    gap: 20px;
+}
+
+
+#type-container-mui>.modal>.choose{
+    width: 100%;
+    padding: 15px;
+    border-radius: 15px;
+    background-color: #5fcf86;
+    text-align: center;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#type-container-mui>.modal>.choose:hover{
+    background-color: #469963;
+    color: #fff;
+}
+
+#type-container-mui>.modal>.type-select>.tp>.icon{
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#type-container-mui>.modal>.type-select>.tp>.icon:hover{
+    box-shadow: 0 0 5px #ccc;
+}
+
+#type-container-mui>.modal>.type-select>.tp>.icon>.img-container img{
+    height: 64px;
+    width: auto;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
 }
