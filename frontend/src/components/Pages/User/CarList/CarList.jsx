@@ -111,8 +111,8 @@ export default function CarList(){
             newMinPrice = Math.min(newValue[0], filterOptions.maxPrice - 500);
             newMaxPrice = filterOptions.maxPrice;
         } else {
-            newMinPrice = filterOptions.minPrice;
             newMaxPrice = Math.max(newValue[1], filterOptions.minPrice + 500);
+            newMinPrice = filterOptions.minPrice;
         }
     
         setFilterOptions(prevOptions => ({

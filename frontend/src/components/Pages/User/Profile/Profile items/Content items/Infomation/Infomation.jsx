@@ -19,19 +19,29 @@ import dayjs from "dayjs";
 import { FaBorderNone } from "react-icons/fa";
 
 export default function Infomation() {
+  let day;
+  let dayNID1;
+  let dayNID2;
+  let dayNDL;
+
   const { auth, id } = useAuth();
   const [token, setToken] = useState(Cookies.get("token"));
 
   const fileInputRef = useRef(null);
-  const [selectedFile1, setSelectedFile1] = useState(null);
-  const [selectedFile2, setSelectedFile2] = useState(null);
-  const [selectedFile3, setSelectedFile3] = useState(null);
+  const navigate = useNavigate();
 
-  const [userId, setUserId] = useState("");
+  
+  const [isHovered, setIsHovered] = useState(false);
+
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [selectedFile1_2, setSelectedFile1_2] = useState([]);
+  const [selectedFile3, setSelectedFile3] = useState(null);
 
   const [userInfo, setUserInfo] = useState([]);
   const [userDob, setUserDob] = useState("");
   const [userName, setUserName] = useState("");
+  const [userGender, setUserGender] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
   const [userPoint, setUserPoint] = useState(0);
   const [userCredit, setUserCredit] = useState(0);
   const [userPhoneNumber, setUserPhoneNumber] = useState("");
@@ -39,205 +49,190 @@ export default function Infomation() {
 
   const [userNIDInfo, setUserNIDInfo] = useState([]);
   const [userNIDImg, setUserNIDImg] = useState([]);
-  const [idNumber, setIdNumber] = useState("");
-  const [idName, setIdName] = useState("");
-  const [idDob, setIdDob] = useState("");
-  const [idNative, setIdNative] = useState("");
-  const [idAddress, setIdAddress] = useState("");
-  const [idProvideDate, setIdProvideDate] = useState("");
-  const [idProvider, setIdProvider] = useState("");
 
   const [userNDLInfo, setUserNDLInfo] = useState([]);
   const [userNDLImg, setUserNDLImg] = useState([]);
-  const [dlNumber, setDlNumber] = useState("");
-  const [dlName, setDlName] = useState("");
-  const [dlDob, setDlDob] = useState("");
 
-  const [disableCCCD, setdisableCCCD] = useState(true);
-  const [disableGPLX, setdisableGPLX] = useState(true);
+  const [disableCCCD, setDisableCCCD] = useState(true);
+  const [disableGPLX, setDisableGPLX] = useState(true);
 
   const [checkValidation, setCheckValidation] = useState(true);
   const [checkNumChar, setCheckNumChar] = useState(true);
 
-  const [tempDate, setTempDate] = useState(dayjs(""));
+  const [formDataNDL, setFormDataNDL] = useState({
+      NDL: '',
+      name: '',
+      dateOfBirth: "",
+      selectedFile3: "",
+      isConfirm: false
+  });
 
-  const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
+  const [formDataNID, setFormDataNID] = useState({
     NID: '',
     name: '',
     dateOfBirth: '',
     native: '',
     address: '',
     dateProvide: '',
-    provider: ''
+    provider: '',
+    selectedFile1: "",
+    selectedFile2: "",
+    isConfirm: false,
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    console.log(formData);
-  };
-  
   async function getUserInfo() {
     try {
       const response = await axios.get(`http://localhost:4000/user/${id}`);
       const data = response.data;
-      setUserInfo(data);
-      return data.id;
+      setUserInfo(data);      
+      setUserName(data.name);
+      setUserPhoneNumber(data.phone);
+      setUserEmail(data.email);
+      setUserDob(handleDate(data.dateOfBirth));
+      setUserGender(data?.gender || 'Nam');
+      setUserCredit(data.wallet);
+      setUserPoint(data.point);
+      setUserAvatar(data.imgUrl);
+      console.log('hmm');
     } catch (error) {
       console.error("Error fetching User Info: " + error);
     }
   }
 
-  async function getUserNid(id) {
+  async function getUserNid() {
     try {
       const response = await axios.get(`http://localhost:4000/user/NID/${id}`);
       const data = response.data;
-      setUserNIDInfo(data[0]); // Fix: Use data directly instead of userNID
-      setUserNIDImg(data[1]); // Fix: Use data directly instead of userNI
+      setUserNIDInfo(data[0]);
+      setUserNIDImg(data[1]);
+      setFormDataNID({
+        NID: data[0]?.NID || '',
+        name: data[0]?.name || '',
+        dateOfBirth: data[0]?.dateOfBirth || '',
+        native: data[0]?.native || '',
+        address: data[0]?.address || '',
+        dateProvide: data[0]?.dateProvide || '',
+        provider: data[0]?.provider || '',
+        isConfirm: data[0]?.isConfirm || false,
+        selectedFile1: data[1][1]?.url || null,
+        selectedFile2: data[1][0]?.url || null
+      })
     } catch (error) {
       console.error("Error fetching NID: " + error);
     }
   }
 
-  async function getUserNdl(id) {
+  async function getUserNdl() {
     try {
       const response = await axios.get(`http://localhost:4000/user/NDL/${id}`);
       const data = response.data;
-      setUserNDLInfo(data[0]); // Fix: Use data directly instead of userNDL
-      setUserNDLImg(data[1]); // Fix: Use data directly instead of userNDL
+      setUserNDLInfo(data[0]); 
+      setUserNDLImg(data[1]);
+      setFormDataNDL({
+        NDL: data[0]?.NDL || '',
+        name: data[0]?.name || '',
+        dateOfBirth: data[0]?.dateOfBirth || '',
+        isConfirm: data[0]?.isConfirm || false,
+        selectedFile3: data[1][0].url || null
+      });
+      // console.log();
     } catch (error) {
       console.error("Error fetching NDL: " + error);
     }
   }
 
   useEffect(() => {
-    const fetchData = () => {
-      getUserInfo()
-        .then((id) => {
-          if (id) {
-            return Promise.all([getUserNid(id), getUserNdl(id)]);
-          }
-        })
-        .catch((error) => console.error("Error fetching data:", error));
+    const fetchData = async () => {
+      await getUserInfo();
+      await getUserNid();
+      await getUserNdl()
     };
     if (auth) {
     }
     fetchData();
   }, [id]);
 
-  useEffect(() => {
-    if (userInfo) {
-      setUserName(userInfo.name);
-      setUserPhoneNumber(userInfo.phone);
-      setUserEmail(userInfo.email);
-      setUserDob(handleDate(userInfo.dateOfBirth));
-      setUserCredit(userInfo.wallet);
-      setUserPoint(userInfo.point);
-    }
-
-    if (userNIDInfo) {
-      setIdNumber(userNIDInfo.NID);
-      setIdName(userNIDInfo.name);
-      setIdDob(handleDate(userNIDInfo.dateOfBirth));
-      setIdNative(userNIDInfo.native);
-      setIdAddress(userNIDInfo.address);
-      setIdProvideDate(handleDate(userNIDInfo.dateProvide));
-      setIdProvider(userNIDInfo.provider);
-      setFormData({
-        NID: userNIDInfo.NID,
-        name: userNIDInfo.name,
-        dateOfBirth: userNIDInfo.dateOfBirth,
-        native: userNIDInfo.native,
-        address: userNIDInfo.address,
-        dateProvide: userNIDInfo.dateProvide,
-        provider: userNIDInfo.provider
-      })
-    }
-
-    if (userNDLInfo) {
-      setDlNumber(userNDLInfo.NDL);
-      setDlName(userNDLInfo.name);
-      setDlDob(handleDate(userNDLInfo.dateOfBirth));
-    }
-  }, [userInfo, userNIDInfo, userNDLInfo]);
+  useEffect(() => {}, [userInfo, formDataNID, formDataNDL]);
 
   const handleClick = () => {
     fileInputRef.current.click();
   };
 
   const handleGPLX = () => {
-    setdisableGPLX(!disableGPLX);
+    setDisableGPLX(!disableGPLX);
   };
 
-  const handleEditCCCD = () => {
-    setdisableCCCD(!disableCCCD);
+  const handleCCCD = () => {
+    setDisableCCCD(!disableCCCD);
   };
 
   const handleDate = (d) => {
     const date = new Date(d);
-    // Extract date components
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    // Format as "--/--/----"
-    const formattedDate = `${day}/${month}/${year}`;
+    const formattedDate = `${day}-${month}-${year}`;
     return formattedDate;
   };
 
-  const handleFileChange1 = (event) => {
-    try {
-      const file = event.target.files[0];
-      if (!file) {
-        throw new Error("No file selected");
-      }
-      console.log("File selected:", file.name);
-      setSelectedFile1(file);
-    } catch (error) {
-      console.error("Error:", error.message);
-    }
-  };
+  function convertDateFormat(inputDate) {
+    const parts = inputDate.split('-');
+    const newDate = parts[2] + '-' + parts[1] + '-' + parts[0];
+    
+    return newDate;
+  }
 
-  const handleFileChange2 = (event) => {
-    try {
-      const file = event.target.files[0];
-      if (!file) {
-        throw new Error("No file selected");
-      }
-      console.log("File selected:", file.name);
-      setSelectedFile2(file);
-      setFileUploadSuccess(true);
-    } catch (error) {
-      console.error("Error:", error.message);
-      setFileUploadSuccess(false);
-    }
-  };
+  const handleChangeNID = (e) => {
+    const { name, value } = e.target;
+    if (name === 'NID' || name === 'name' || name === 'native' || name === 'address' || name === 'provider') {
+      setFormDataNID(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    } else if (name === 'selectedFile1') {
+      const file = e.target.files[0];
+      setSelectedFile1_2(prev=>{
+        const updatedFiles = [...prev];
+        const newValue = file;
 
-  const handleFileChange3 = (event) => {
-    try {
+        updatedFiles[0] = newValue;
+
+        return updatedFiles;
+      });
+    } else if (name === 'selectedFile2') {
+      const file = e.target.files[0];
+      setSelectedFile1_2(prev=>{
+        const updatedFiles = [...prev];
+        const newValue = file;
+
+        updatedFiles[1] = newValue;
+
+        return updatedFiles;
+      });
+    }
+    console.log(selectedFile1_2);
+  };
+  
+  const handleChangeNDL = (event) => {
+    const { name, value } = event.target;
+    if (name === 'NDL' || name === 'name') {
+      setFormDataNDL(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    } else if (name === 'selectedFile3') {
       const file = event.target.files[0];
-      if (!file) {
-        throw new Error("No file selected");
-      }
-      console.log("File selected:", file.name);
       setSelectedFile3(file);
-    } catch (error) {
-      console.error("Error:", error.message);
     }
+    console.log(formDataNDL)
   };
 
   const handleKeyDown = (event) => {
     const forbiddenKeys = ["e", "+", "-", "."];
-
     // Prevent the characters "e", "+", and "-" from being entered.
     if (forbiddenKeys.includes(event.key)) {
       event.preventDefault();
     }
-
     // Prevent input when the length is 11 and the key pressed is not delete, backspace, or arrow keys.
     if (
       event.target.value.length >= 11 &&
@@ -247,27 +242,140 @@ export default function Infomation() {
     }
   };
 
-  async function handleInfo(e) {
-    console.log(userName);
-    console.log(userPhoneNumber);
-    console.log(tempDate.toJSON());
+  async function handleChangeAvatar(e,close){
     e.preventDefault();
+
+    try {
+      const postData = new FormData();
+  
+      postData.append('images', selectedAvatar);
+      
+      console.log(postData);
+      const response = await axios.post(`http://localhost:4000/user/update/img/${id}`, postData)
+      console.log("Update avatar: " + response);
+      setSelectedAvatar(null)
+      await getUserInfo();
+      close();
+      window.location.reload();
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+  }
+
+  async function handleInfo(e) {
+    e.preventDefault();
+
+    if (day === undefined || day === "") {
+      day = userDob;
+    }
+
     const postData = {
       name: userName,
       phone: userPhoneNumber,
-      dateOfBirth: tempDate,
+      dateOfBirth: new Date(convertDateFormat(day)),
+      gender: userGender,
     };
-    console.log(postData);
     try {
       const response = await axios.post(
-        `
-            http://localhost:4000/user/update/${id}`,
+        `http://localhost:4000/user/update/${id}`,
         postData
       );
-      await getUserInfo(userEmail);
+      console.log('succeed')
+      await getUserInfo();
+      day = ""
     } catch (error) {
       console.error("Error update user", error);
     }
+  }
+
+  async function handleSubmitNID(e) {
+    e.preventDefault();
+    try {
+      const postData = new FormData();
+      if(dayNID1 === undefined || dayNID1 === "") {
+        dayNID1 = handleDate(formDataNID.dateOfBirth)
+      }
+      if(dayNID2 === undefined || dayNID2 === "") {
+        dayNID2 = handleDate(formDataNID.dateProvide)
+      }
+      console.log([selectedFile1_2])
+
+      postData.append('NID', formDataNID.NID)
+      postData.append('name', formDataNID.name)
+      postData.append('dateOfBirth', new Date(convertDateFormat(dayNID1)));
+      postData.append('native', formDataNID.native)
+      postData.append('address', formDataNID.address)
+      postData.append('dateProvide', new Date(convertDateFormat(dayNID2)));
+      postData.append('provider', formDataNID.provider)
+      
+      for (let index = 0; index < selectedFile1_2.length; index++) {
+        postData.append('images', selectedFile1_2[index]);
+      }
+
+      console.log(postData);
+      const response = await axios.post(`http://localhost:4000/user/NID/sendConfirm/${id}`,postData);
+      console.log('Confirmation sent successfully.');
+      handleCCCD();
+      await getUserNid();
+      dayNID1 = "";
+      dayNID2 = "";
+      // setSelectedFile3(null);
+    } catch (error) {
+      console.error('Error sending confirmation:', error);
+    }
+  }
+
+  async function handleSubmitNDL(e) {
+    e.preventDefault();
+    try {
+      const postData = new FormData();
+      if(dayNDL === undefined || dayNDL === "") {
+        dayNDL = handleDate(formDataNDL.dateOfBirth)
+      }
+
+      postData.append('NDL', formDataNDL.NDL)
+      postData.append('name', formDataNDL.name)
+      postData.append('dateOfBirth', new Date(convertDateFormat(dayNDL)));
+      postData.append('images', selectedFile3);
+
+      const response = await axios.post(`http://localhost:4000/user/NDL/sendConfirm/${id}`,postData);
+      console.log('Confirmation sent successfully.');
+      handleGPLX();
+      await getUserNdl();
+      dayNDL = "";
+      // setSelectedFile3(null);
+    } catch (error) {
+      console.error('Error sending confirmation:', error);
+    }
+  }
+
+  const cancelNIDChange = () => {
+    console.log("hmm")
+    setFormDataNID({
+      NID: userNIDInfo?.NDL,
+      name: userNIDInfo?.name,
+      dateOfBirth: userNIDInfo?.dateOfBirth,
+      native: userNIDInfo?.native,
+      address: userNIDInfo?.address,
+      dateProvide: userNIDInfo?.dateProvide,
+      provider: userNIDInfo?.provider,
+      isConfirm: userNIDInfo?.isConfirm,
+      selectedFile1: userNIDImg[1]?.url,
+      selectedFile2: userNIDImg[0]?.url,
+    })
+    handleCCCD();
+  }
+
+  const cancelNDLChange = () => {
+    console.log(userNDLInfo.dateOfBirth);
+    setFormDataNDL({
+      NDL: userNDLInfo?.NDL,
+      name: userNDLInfo?.name,
+      dateOfBirth: userNDLInfo?.dateOfBirth,
+      selectedFile3: userNDLImg[0]?.url,
+      isConfirm: userNDLInfo?.isConfirm,
+    })
+    handleGPLX();
   }
 
   const checkPattern = (inputValue, pattern) => {
@@ -398,18 +506,37 @@ export default function Infomation() {
                       </p>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateField
-                          placeholder={userDob}
+                          // placeholder={userDob}
+                          value={dayjs(convertDateFormat(userDob))}
                           size="small"
                           sx={{
                             width: "400px",
                           }}
                           format="DD-MM-YYYY"
                           onChange={(newDate) => {
-                            setTempDate(newDate);
+                            day = handleDate(newDate);
                           }}
                         ></DateField>
                       </LocalizationProvider>
                     </label>
+                    <p
+                      style={{
+                        fontWeight: "500",
+                        lineHeight: "2",
+                        color: "#767676",
+                      }}
+                      >Giới tính
+                    </p>
+                    <div style={{display: "flex", gap: "20px"}}>
+                      <label style={{display: "flex", cursor: "pointer"}}>
+                        <input name="gender" type="radio" checked={userInfo.gender === "Nam"} onClick={setUserGender("Nam")} value="Nam"/>
+                        <p>Nam</p>
+                      </label>
+                      <label style={{display: "flex", cursor: "pointer"}}>
+                        <input name="gender" type="radio" checked={userInfo.gender === "Nữ"} onClick={setUserGender("Nữ")} value="Nữ"/>
+                        <p>Nữ</p>
+                      </label>
+                    </div>
                     <button
                       type="submit"
                       style={{
@@ -446,9 +573,95 @@ export default function Infomation() {
         </div>
         <div className="content">
           <div className="avatar-box">
-            <div className="avatar-container">
-              <img src="" alt="" />
-            </div>
+            <Popup
+            trigger={
+              <div class="avatar-container"  onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+                  <img src={userInfo.imgUrl} alt="" />
+                  <div class="overlay">
+                    <CameraAltOutlinedIcon style={{height: '32px', width: '32px'}}/>
+                  </div>
+              </div>
+            }
+            modal
+            contentStyle={{
+              height: 'fit-content',
+              width: '30%',
+              backgroundColor: 'white',
+              borderRadius: '25px',
+              display: 'flex',
+              justifyContent: 'center',
+              padding: "20px"
+            }}
+            >
+              {close =>
+                <form id="img-modal" onSubmit={(e)=>{handleChangeAvatar(e,close);}}>
+                  <h2>Chọn ảnh đại diện</h2>
+                  <br />
+                  <br />
+                  <div id="avatar-container"  onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+                      <img src={selectedAvatar ? URL.createObjectURL(selectedAvatar) : userInfo.imgUrl} alt=""/>
+                  </div>
+                  <br />
+                  <br />
+                  {selectedAvatar ? (
+                    <div style={{width: "100%", display: "flex", justifyContent: "center", gap: "10px"}}>
+                      <button
+                        onClick={(e)=>setSelectedAvatar(null)}
+                        style={{
+                          backgroundColor: "#fff",
+                          border: "none",
+                          borderRadius: "5px",
+                          width: "40%"
+                        }}
+                        onMouseEnter={(e)=> e.target.style.backgroundColor = "#ccc"}
+                        onMouseLeave={(e)=> e.target.style.backgroundColor = "#fff"}
+                      >
+                        Hủy
+                      </button>
+                      <button
+                      type="submit"
+                      style={{
+                        width: "40%",
+                        textAlign: "center",
+                        padding: "10px",
+                        backgroundColor: "#5fcf86",
+                        borderRadius: "5px",
+                        fontWeight: "500",
+                        color: "white",
+                        cursor: "pointer",
+                        border: "none"
+                      }}
+                      onMouseEnter={(e)=> e.target.style.backgroundColor = "#469963"}
+                      onMouseLeave={(e)=> e.target.style.backgroundColor = "#5fcf86"}
+                      >Xác nhận chọn</button>
+                    </div>
+                  ):(
+                    <div style={{width: "100%"}}>
+                      <button
+                      type="button"
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                        padding: "10px",
+                        backgroundColor: "#5fcf86",
+                        borderRadius: "5px",
+                        fontWeight: "500",
+                        color: "white",
+                        cursor: "pointer",
+                        border: "none"
+                      }}
+                      onMouseEnter={(e)=> e.target.style.backgroundColor = "#469963"}
+                      onMouseLeave={(e)=> e.target.style.backgroundColor = "#5fcf86"}
+                      onClick={() => {
+                        handleClick();
+                      }}
+                      >Chọn ảnh</button>
+                      <input type="file" style={{ display: "none" }} ref={fileInputRef} accept=".png, .jpg" onChange={(e)=>setSelectedAvatar(e.target.files[0])}/>
+                    </div>
+                  )}
+                </form>
+              }
+            </Popup>
             <div className="ctn">
               <p className="user-name">
                 {userInfo.name ? userInfo.name : "User"}
@@ -473,7 +686,7 @@ export default function Infomation() {
               </div>
               <div className="info-box-item">
                 <p>Giới tính</p>
-                <p className="main">{userInfo.gender ? userInfo.gender : ""}</p>
+                <p className="main">{userInfo.gender ? userInfo.gender : "Nam"}</p>
               </div>
             </div>
             <div className="info-desc">
@@ -504,13 +717,13 @@ export default function Infomation() {
         </div>
       </div>
 
-      <div className="container">
+      <form className="container" onSubmit={handleSubmitNID}>
         <div className="title">
           <div>
             <h2>CCCD/CMND</h2>
             <div style={{ fontSize: "10px", padding: "8px" }}>
-              {userNIDInfo ? (
-                userNIDInfo.isConfirm ? (
+              {formDataNID ? (
+                formDataNID.isConfirm ? (
                   <div
                     style={{
                       backgroundColor: "#00FF00",
@@ -557,67 +770,71 @@ export default function Infomation() {
             </div>
           </div>
           {disableCCCD ? (
-            <div className="edit-btn" onClick={handleEditCCCD}>
+            <div className="edit-btn" onClick={handleCCCD}>
               Chỉnh sửa
             </div>
           ) : (
             <div className="btn-container">
-              <div onClick={handleEditCCCD} style={{ cursor: "pointer" }}>
+              <div onClick={cancelNIDChange} style={{ cursor: "pointer" }}>
                 Hủy
               </div>
-              <div className="edit-btn" onClick={handleEditCCCD}>
+              <button type="submit" className="edit-btn">
                 Lưu
-              </div>
+              </button>
             </div>
           )}
         </div>
-        <form className="content">
+        <div className="content">
           <div className="info-id-card">
-            <h3 onClick={() => {console.log(formData)}}>Thông tin chung</h3>
+            <h3 onClick={() => {console.log(formDataNID)}}>Thông tin chung</h3>
             <h4 style={{ color: "#767676" }}>Số CCCD/CMND</h4>
             <TextField
-              placeholder={userNIDInfo?.NID ? userNIDInfo.NID : "Số CCCD/CMND"}
+              name="NID"
+              placeholder={formDataNID?.NID ? formDataNID.NID : "Số CCCD/CMND"}
               required
               size="small"
               sx={{
                 width: "400px",
               }}
               disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.NID}
+              onChange={handleChangeNID}
+              value={formDataNID.NID}
             />
             <h4 style={{ color: "#767676" }}>Họ và tên</h4>
             <TextField
-              placeholder={userNIDInfo?.name ? userNIDInfo.name : "Họ và tên"}
+              name="name"
+              placeholder={formDataNID?.name ? formDataNID.name : "Họ và tên"}
               required
               size="small"
               sx={{
                 width: "400px",
               }}
               disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.name}
+              onChange={handleChangeNID}
+              value={formDataNID.name}
             />
             <h4 style={{ color: "#767676" }}>Ngày sinh</h4>
-            <TextField
-              placeholder={
-                userNIDInfo?.dateOfBirth
-                  ? handleDate(userNIDInfo.dateOfBirth)
-                  : "--/--/----"
-              }
-              required
-              size="small"
-              sx={{
-                width: "400px",
-              }}
-              disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.dateOfBirth}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateField
+                name="dateOfBirth"
+                value={dayjs(convertDateFormat(handleDate(formDataNID.dateOfBirth)))}
+                size="small"
+                sx={{
+                  width: "400px",
+                }}
+                format="DD-MM-YYYY"
+                required
+                disabled={disableCCCD}
+                onChange={(newDate) => {
+                  dayNID1 = handleDate(newDate);
+                }}
+              ></DateField>
+            </LocalizationProvider>
             <h4 style={{ color: "#767676" }}>Quê quán</h4>
             <TextField
+              name="native"
               placeholder={
-                userNIDInfo?.native ? userNIDInfo.native : "Quê quán"
+                formDataNID?.native ? formDataNID.native : "Quê quán"
               }
               required
               size="small"
@@ -625,14 +842,15 @@ export default function Infomation() {
                 width: "400px",
               }}
               disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.native}
+              onChange={handleChangeNID}
+              value={formDataNID.native}
             />
 
             <h4 style={{ color: "#767676" }}>Nơi thường trú</h4>
             <TextField
+              name="address"
               placeholder={
-                userNIDInfo?.address ? userNIDInfo.address : "Nơi thường trú"
+                formDataNID?.address ? formDataNID.address : "Nơi thường trú"
               }
               required
               size="small"
@@ -640,31 +858,33 @@ export default function Infomation() {
                 width: "400px",
               }}
               disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.address}
+              onChange={handleChangeNID}
+              value={formDataNID.address}
             />
 
             <h4 style={{ color: "#767676" }}>Ngày cấp</h4>
-            <TextField
-              placeholder={
-                userNIDInfo?.dateProvide
-                  ? handleDate(userNIDInfo.dateProvide)
-                  : "--/--/----"
-              }
-              required
-              size="small"
-              sx={{
-                width: "400px",
-              }}
-              disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.dateProvide}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateField
+                name="dateProvide"
+                value={dayjs(convertDateFormat(handleDate(formDataNID.dateProvide)))}
+                size="small"
+                sx={{
+                  width: "400px",
+                }}
+                format="DD-MM-YYYY"
+                required
+                disabled={disableCCCD}
+                onChange={(newDate) => {
+                  dayNID2 = handleDate(newDate);
+                }}
+              ></DateField>
+            </LocalizationProvider>
 
             <h4 style={{ color: "#767676" }}>Nơi cấp</h4>
             <TextField
+              name="provider"
               placeholder={
-                userNIDInfo?.provider ? userNIDInfo.provider : "Nơi cấp"
+                formDataNID?.provider ? formDataNID.provider : "Nơi cấp"
               }
               required
               size="small"
@@ -672,14 +892,14 @@ export default function Infomation() {
                 width: "400px",
               }}
               disabled={disableCCCD}
-              onChange={handleChange}
-              value={formData.provider}
+              onChange={handleChangeNID}
+              value={formDataNID.provider}
             />
           </div>
           <div className="info-id-card">
             <h3>Hình ảnh</h3>
             <p>Mặt trước:</p>
-            {selectedFile1 ? (
+            {formDataNID.selectedFile1 ? (
               <div className="img-container">
                 <label
                   htmlFor="input-file1"
@@ -691,7 +911,7 @@ export default function Infomation() {
                   }}
                 >
                   <img
-                    src={URL.createObjectURL(selectedFile1)}
+                    src={selectedFile1_2[0] ? URL.createObjectURL(selectedFile1_2[0]) : formDataNID.selectedFile1}
                     style={{ width: "100%", height: "auto" }}
                     className="uploaded-image"
                   />
@@ -707,11 +927,12 @@ export default function Infomation() {
                   </button>
                   <input
                     id="input-file1"
+                    name="selectedFile1"
                     type="file"
                     style={{ display: "none" }}
                     ref={fileInputRef}
                     accept=".png, .jpg"
-                    onChange={handleFileChange1}
+                    onChange={handleChangeNID}
                     disabled={disableCCCD}
                   />
                 </label>
@@ -720,7 +941,7 @@ export default function Infomation() {
               <label htmlFor="input-file1" className="info-license-upload">
                 <CameraAltOutlinedIcon fontSize="large" />
                 <button
-                  id="upload-ndl"
+                  id="upload-nid"
                   type="button"
                   onClick={() => {
                     handleClick();
@@ -731,17 +952,18 @@ export default function Infomation() {
                 </button>
                 <input
                   id="input-file1"
+                  name="selectedFile1"
                   type="file"
                   style={{ display: "none" }}
                   ref={fileInputRef}
                   accept=".png, .jpg"
-                  onChange={handleFileChange1}
+                  onChange={handleChangeNID}
                   disabled={disableCCCD}
                 />
               </label>
             )}
             <p>Mặt sau:</p>
-            {selectedFile2 ? (
+            {formDataNID.selectedFile2 ? (
               <div className="img-container">
                 <label
                   htmlFor="input-file2"
@@ -753,12 +975,12 @@ export default function Infomation() {
                   }}
                 >
                   <img
-                    src={URL.createObjectURL(selectedFile2)}
+                    src={selectedFile1_2[1] ? URL.createObjectURL(selectedFile1_2[1]) : formDataNID.selectedFile2}
                     style={{ width: "100%", height: "auto" }}
                     className="uploaded-image"
                   />
                   <button
-                    id="upload-ndl"
+                    id="upload-nid"
                     type="button"
                     onClick={() => {
                       handleClick();
@@ -769,11 +991,12 @@ export default function Infomation() {
                   </button>
                   <input
                     id="input-file2"
+                    name="selectedFile2"
                     type="file"
                     style={{ display: "none" }}
                     ref={fileInputRef}
                     accept=".png, .jpg"
-                    onChange={handleFileChange2}
+                    onChange={handleChangeNID}
                     disabled={disableCCCD}
                   />
                 </label>
@@ -782,7 +1005,7 @@ export default function Infomation() {
               <label htmlFor="input-file2" className="info-license-upload">
                 <CameraAltOutlinedIcon fontSize="large" />
                 <button
-                  id="upload-ndl"
+                  id="upload-nid"
                   type="button"
                   onClick={() => {
                     handleClick();
@@ -793,26 +1016,27 @@ export default function Infomation() {
                 </button>
                 <input
                   id="input-file2"
+                  name="selectedFile2"
                   type="file"
                   style={{ display: "none" }}
                   ref={fileInputRef}
                   accept=".png, .jpg"
-                  onChange={handleFileChange2}
+                  onChange={handleChangeNID}
                   disabled={disableCCCD}
                 />
               </label>
             )}
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
 
-      <div className="container">
+      <form className="container" onSubmit={handleSubmitNDL}>
         <div className="title">
           <div>
             <h2 style={{ paddingRight: "8px" }}>Giấy phép lái xe</h2>
             <div style={{ fontSize: "10px", padding: "8px" }}>
-              {userNDLInfo ? (
-                userNDLInfo.isConfirm ? (
+              {formDataNDL ? (
+                formDataNDL.isConfirm ? (
                   <div
                     style={{
                       backgroundColor: "#00FF00",
@@ -864,12 +1088,12 @@ export default function Infomation() {
             </div>
           ) : (
             <div className="btn-container">
-              <div onClick={handleGPLX} style={{ cursor: "pointer" }}>
+              <div onClick={cancelNDLChange} style={{ cursor: "pointer" }}>
                 Hủy
               </div>
-              <div className="edit-btn" onClick={handleGPLX}>
+              <button type="submit" className="edit-btn">
                 Lưu
-              </div>
+              </button>
             </div>
           )}
         </div>
@@ -878,39 +1102,51 @@ export default function Infomation() {
             <h3>Thông tin chung</h3>
             <h4 style={{ color: "#767676" }}>Số GPLX</h4>
             <TextField
-              placeholder={userNDLInfo?.NDL ? userNDLInfo.NDL : "Số GPLX"}
+              name="NDL"
+              placeholder={formDataNDL?.NDL ? formDataNDL.NDL : "Số GPLX"}
               size="small"
               sx={{
                 width: "400px",
               }}
+              value={formDataNDL.NDL || ''}
+              required
               disabled={disableGPLX}
+              onChange={handleChangeNDL}
             />
             <h4 style={{ color: "#767676" }}>Họ và tên</h4>
             <TextField
-              placeholder={userNDLInfo?.name ? userNDLInfo.name : "Họ và tên"}
+              name="name"
+              placeholder={formDataNDL?.name ? formDataNDL.name : "Họ và tên"}
               size="small"
               sx={{
                 width: "400px",
               }}
+              value={formDataNDL.name || ''}
+              required
               disabled={disableGPLX}
+              onChange={handleChangeNDL}
             />
             <h4 style={{ color: "#767676" }}>Ngày sinh</h4>
-            <TextField
-              placeholder={
-                userNDLInfo?.dateOfBirth
-                  ? handleDate(userNDLInfo.dateOfBirth)
-                  : "--/--/----"
-              }
-              size="small"
-              sx={{
-                width: "400px",
-              }}
-              disabled={disableGPLX}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateField
+                name="dateOfBirth"
+                value={dayjs(convertDateFormat(handleDate(formDataNDL.dateOfBirth)))}
+                size="small"
+                sx={{
+                  width: "400px",
+                }}
+                format="DD-MM-YYYY"
+                required
+                disabled={disableGPLX}
+                onChange={(newDate) => {
+                  dayNDL = handleDate(newDate);
+                }}
+              ></DateField>
+            </LocalizationProvider>
           </div>
           <div className="info-license">
             <h3>Hình ảnh</h3>
-            {selectedFile3 ? (
+            {formDataNDL.selectedFile3 ? (
               <div className="img-container">
                 <label
                   htmlFor="input-file3"
@@ -922,12 +1158,12 @@ export default function Infomation() {
                   }}
                 >
                   <img
-                    src={URL.createObjectURL(selectedFile3)}
+                    src={selectedFile3 ? URL.createObjectURL(selectedFile3) : formDataNDL.selectedFile3}
                     style={{ width: "100%", height: "auto" }}
                     className="uploaded-image"
                   />
                   <button
-                    id="upload-ndl"
+                    id="upload-nid"
                     type="button"
                     onClick={() => {
                       handleClick();
@@ -938,11 +1174,13 @@ export default function Infomation() {
                   </button>
                   <input
                     id="input-file3"
+                    name="selectedFile3"
                     type="file"
                     style={{ display: "none" }}
                     ref={fileInputRef}
                     accept=".png, .jpg"
-                    onChange={handleFileChange3}
+                    onChange={handleChangeNDL}
+                    required
                     disabled={disableGPLX}
                   />
                 </label>
@@ -954,7 +1192,7 @@ export default function Infomation() {
                   id="upload-ndl"
                   type="button"
                   onClick={() => {
-                  handleClick();
+                    handleClick();
                   }}
                   style={{ display: "none" }}
                 >
@@ -962,18 +1200,20 @@ export default function Infomation() {
                 </button>
                 <input
                   id="input-file3"
+                  name="selectedFile3"
                   type="file"
                   style={{ display: "none" }}
                   ref={fileInputRef}
                   accept=".png, .jpg"
-                  onChange={handleFileChange3}
+                  onChange={handleChangeNDL}
+                  required
                   disabled={disableGPLX}
                 />
               </label>
             )}
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

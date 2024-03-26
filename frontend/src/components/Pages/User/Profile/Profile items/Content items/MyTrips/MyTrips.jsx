@@ -108,23 +108,29 @@ export default function MyTrips(){
                                 <table style={{width: "100%"}}>
                                     <thead>
                                         <tr>
-                                            <th>Car Name</th>
-                                            <th>Pick Up - Drop Off</th>
-                                            <th>Owner</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th>Is Accepted</th>
+                                            <th></th>
+                                            <th>Tên xe</th>
+                                            <th>Ngày nhận - Ngày trả</th>
+                                            <th>Chủ xe</th>
+                                            <th>Giá</th>
+                                            <th>Trạng thái</th>
+                                            <th>Được chấp nhận</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {currentList.map((currentTrip) => (
                                             <tr key={currentTrip.tripId}>
+                                                <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
+                                                    <div className="img-container" style={{height: "120px", width: "120px", display: "flex", justifyContent: "center", borderRadius: "25px", overflow: "hidden"}}>
+                                                        <img src={currentTrip.imgUrl} style={{ height: "100%", width: "auto", borderRadius: "10px"}}></img>
+                                                    </div>
+                                                </td>
                                                 <td>{currentTrip.carName}</td>
                                                 <td>{`${new Date(currentTrip.pick_up).toLocaleDateString()} - ${new Date(currentTrip.drop_off).toLocaleDateString()}`}</td>
                                                 <td>{currentTrip.owner}</td>
                                                 <td>{currentTrip.total}</td>
                                                 <td>{currentTrip.status}</td>
-                                                <td>{currentTrip.isAccepted ? 'Yes' : 'No'}</td>
+                                                <td>{currentTrip.isAccepted ? 'Được' : 'Không'}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -136,23 +142,29 @@ export default function MyTrips(){
                                 <table style={{width: "100%"}}>
                                     <thead>
                                         <tr>
-                                            <th>Car Name</th>
-                                            <th>Pick Up - Drop Off</th>
-                                            <th>Owner</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th>Is Accepted</th>
+                                            <th></th>
+                                            <th>Tên xe</th>
+                                            <th>Ngày nhận - Ngày trả</th>
+                                            <th>Chủ xe</th>
+                                            <th>Giá</th>
+                                            <th>Trạng thái</th>
+                                            <th>Được chấp nhận</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {historyList.map((historyTrip) => (
                                             <tr key={historyTrip.tripId}>
+                                                <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
+                                                    <div className="img-container" style={{height: "120px", width: "120px", display: "flex", justifyContent: "center", borderRadius: "25px", overflow: "hidden"}}>
+                                                        <img src={historyTrip.imgUrl} style={{ height: "100%", width: "auto", borderRadius: "10px"}}></img>
+                                                    </div>
+                                                </td>
                                                 <td>{historyTrip.carName}</td>
                                                 <td>{`${new Date(historyTrip.pick_up).toLocaleDateString()} - ${new Date(historyTrip.drop_off).toLocaleDateString()}`}</td>
                                                 <td>{historyTrip.owner}</td>
                                                 <td>{historyTrip.total}</td>
                                                 <td>{historyTrip.status}</td>
-                                                <td>{historyTrip.isAccepted ? 'Yes' : 'No'}</td>
+                                                <td>{historyTrip.isAccepted ? 'Được' : 'Không'}</td>
                                             </tr>
                                         ))}
                                     </tbody>

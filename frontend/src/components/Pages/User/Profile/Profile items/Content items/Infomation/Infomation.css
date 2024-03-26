@@ -31,9 +31,12 @@
 
 #info>.container>.title>.edit-btn,
 #info>.container>.title>.btn-container>.edit-btn{    
+    background-color: #fff;
+    border-radius: 5px;
     padding: 10px;
     border: 1px solid #9aff6f;
     cursor: pointer;
+    font-size: 16px;
 }
 
 #info>.container>.title>.btn-container{
@@ -87,11 +90,45 @@
     border-radius: 5px;
 }
 
-#info>.container>.content>.avatar-box>.avatar-container{
+#img-modal{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#info>.container>.content>.avatar-box>.avatar-container,
+#avatar-container{
     height: 150px;
     width: 150px;
+    position: relative;
+    display: inline-block;
     background-color: #c0c0c0;
     border-radius: 50%;
+    overflow: hidden;
+}
+
+#info>.container>.content>.avatar-box>.avatar-container>.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white; 
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#info>.container>.content>.avatar-box>.avatar-container:hover .overlay {
+    display: flex; 
+}
+
+#info>.container>.content>.avatar-box>.avatar-container img,
+#avatar-container img{
+    height: 100%;
+    width: auto;
 }
 
 #info>.container>.content>.info-user{

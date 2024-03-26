@@ -22,3 +22,10 @@
 .bankCode.selected {
     border-color: #08bd21; /* Thay đổi màu viền khi được chọn */
 }
+
+#MyTransaction form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
