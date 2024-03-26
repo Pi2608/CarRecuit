@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
-import Popup from 'reactjs-popup'
+import { Modal } from '@mui/material';
 import axios from 'axios';
 import { useAuth } from '../../../../../../../Context/AuthProvider';
-import "./CarManage.css"
+import "./PendingCarsList.css"
 
-export default function CarManage(){
+export default function PendingCarsList(){
 
     const { auth, id } = useAuth();
     
@@ -74,7 +74,7 @@ export default function CarManage(){
 
                         {carList ? 
                             carList.map((car)=>
-                                <tr key={car.id} style={{cursor: 'pointer'}}>
+                                <tr key={car.id}>
                                     <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
                                     <div className="img-container">
                                         <img src={car.imgUrl} style={{height: "100%", width: "auto", borderRadius: "10px     "}}></img>

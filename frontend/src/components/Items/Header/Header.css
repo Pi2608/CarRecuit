@@ -15,6 +15,15 @@
 
 #header>.header-container>.logo-container{
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#header>.header-container>.logo-container img{
+    height: 64px;
+    width: 64px;
+    border-radius: 50%;
 }
 
 #header>.header-container>.menu-container{

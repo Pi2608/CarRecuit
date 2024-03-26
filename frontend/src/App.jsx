@@ -12,6 +12,7 @@ import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.j
 import Transaction from './components/Pages/User/Profile/Pages/TransactionPage/Transaction.jsx';
 import Trips from './components/Pages/User/Profile/Pages/TravelPage/Trips.jsx';
 import MyCars from './components/Pages/User/Profile/Pages/MyCarsPage/MyCars.jsx';
+import PendingCars from './components/Pages/User/Profile/Pages/PendingCarsPage/PendingCars.jsx';
 import ChangePw from './components/Pages/User/Profile/Pages/ChangePwPage/ChangePw.jsx';
 import CarRegister from './components/Pages/User/Profile/Pages/CarRegister/CarRegister.jsx';
 
@@ -44,6 +45,7 @@ function App(){
               <Route path="user">
                 <Route path="profile" element={<Profile />} />
                 <Route path="mycars" element={<MyCars />} />
+                <Route path="pendingcars" element={<PendingCars />} />
                 <Route path="mytrips" element={<Trips />} />
                 <Route path="resetpw" element={<ChangePw />} />
                 <Route path="transaction" element={<Transaction />} />

@@ -1,0 +1,61 @@
+#carmanage>.container>.head h1{
+    padding : 20px 0px 15px 0;
+}
+
+#carmanage>.container>.head{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 200px;
+}
+
+#carmanage>.container>.head>.rgt-btn{
+    display: flex;
+    height: fit-content;
+    width: fit-content;
+    border: solid 1px #00BF54;
+    padding: 10px;
+    border-radius: 3px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #00BF54;
+    cursor: pointer;
+}
+
+#carmanage>.container>.head>.rgt-btn:hover{
+    background-color: #00BF54;
+    color: white;
+}
+
+#carmanage>.container{
+    min-height: 500px;
+    background: #fff;
+    border-radius: 25px;
+    padding: 0 30px 20px 30px;
+    box-shadow: 0 2px 5px #ccc;
+}
+
+.car-info-container{
+    height: 80%;
+    width: 90%;
+} 
+
+.tbl>.img-container{
+    height: 120px;
+    width: 120px;
+    display: flex;
+    justify-content: center;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+table{
+    border-collapse: collapse;
+}
+    
+th, td{
+    text-align: center;
+    justify-content: center;
+}
+    

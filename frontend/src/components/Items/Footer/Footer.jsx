@@ -1,4 +1,7 @@
 import React from "react";
+import logo from "../../../images/carFlexLogo.jpg"
+import Paypal from "../../../icons/PayPal.jpg"
+import VNPay from "../../../icons/Vietcombankicon.jpg"
 import "./Footer.css";
 
 function Footer() {
@@ -6,6 +9,7 @@ function Footer() {
         <div id="footer">
             <div className="footer-about">
                 <div className="footer-info">
+                    <img src={logo}/>
                     <div className="logo">LOGO</div>
                 </div>
                 <div className="footer-item">
@@ -32,12 +36,16 @@ function Footer() {
                     <div className="item">
                         <p className="main">Phương thức thanh toán</p>
                         <br />
-                        <div className="sub-item">
-                            <p>Chính sách 1</p>
-                            <p>Chính sách 2</p>
-                            <p>Chính sách 3</p>
-                            <p>Chính sách 4</p>
-                        </div>
+                        <table>
+                            <tr className="payment-method">
+                                <td><img src={Paypal}/></td>
+                                <td><p>PayPal</p></td>
+                            </tr>
+                            <tr className="payment-method">
+                                <td><img src={VNPay}/></td>
+                                <td><p>VNPay</p></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>

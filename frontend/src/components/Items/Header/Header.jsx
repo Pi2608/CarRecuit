@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Popup from "reactjs-popup";
 import axios from "axios";
+import logo from "../../../images/carFlexLogo.jpg"
 import "./Header.css";
 
 function Header() {
@@ -42,6 +43,7 @@ function Header() {
         <div id="header">
             <div className="header-container">
                 <div className="logo-container" onClick={()=>navigate("/")}>
+                    <img src={logo}/>
                     <h1>CarFlex</h1>
                 </div>
                 <div className="menu-container">
