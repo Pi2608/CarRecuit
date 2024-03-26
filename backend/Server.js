@@ -15,6 +15,7 @@ const carRouter = require('./Source/Routers/CarRouter')
 const rentRouter = require('./Source/Routers/RentRouter')
 const transactionRouter = require('./Source/Routers/TransactionRouter')
 const voucher = require('./Source/models/Voucher')
+const util = require('./Source/Util/Util')
 
 const firebaseConfig = require('./Source/config/firebaseConfig')
 const paypalConfig = require('./Source/config/paypalConfig');
@@ -48,6 +49,10 @@ rule.tz = 'Asia/Ho_Chi_Minh';
 schedule.scheduleJob(rule,async()=>{
     await voucher.createVoucherAWeek(0.1);
 });
+
+(async ()=>{
+    await util.startServer()
+})()
 
 app.listen(port, ()=>{
     console.log("Server is running on port "+ port)

@@ -35,9 +35,6 @@ const StyledFormControlLabel = styled((props) => <FormControlLabel {...props} />
   }
   
   MyFormControlLabel.propTypes = {
-    /**
-     * The value of the component.
-     */
     value: PropTypes.any,
   };
   
@@ -93,13 +90,11 @@ export default function MyTransaction (){
       getUser()
     }, [userId, amount, selectedBank]);
 
-    // Hàm xử lý khi click vào phần tử bankCode
-
     return(
         <div id="MyTransaction">
             <form onSubmit={handleSubmit}>
                 <div className="paymentMethod">
-                    <h2>Select Transaction Method</h2>
+                    <h2>Xin Hãy Chọn Phương Thức Giao Dịch.</h2>
                     <RadioGroup name="use-radio-group" defaultValue="Paypal" onChange={handleOnChange}>
                         <MyFormControlLabel value="Paypal" label="Paypal" control={<Radio />} />
                         <MyFormControlLabel value="VNPay" label="VNPay" control={<Radio />} />
@@ -126,7 +121,7 @@ export default function MyTransaction (){
                     noValidate
                     autoComplete="off"
                   >
-                    <TextField id="amount" label="Amount" variant="outlined" value={amount} onChange={(e) => setAmount(e.target.value)}/>
+                    <TextField id="amount" label="Amount" size="small" variant="outlined" value={amount} onChange={(e) => setAmount(e.target.value)}/>
                   </Box>
                 </div>
                 <Stack spacing={2} direction="row">

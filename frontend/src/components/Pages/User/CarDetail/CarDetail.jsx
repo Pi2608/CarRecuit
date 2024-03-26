@@ -20,6 +20,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useAuth } from "../../../../Context/AuthProvider";
 import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
+import Modal from '@mui/material/Modal';
 import Popup from "reactjs-popup";
 import axios from "axios";
 import "./CarDetail.css";
@@ -30,6 +32,7 @@ export default function CarDetail(){
 
     const { carId } = useParams();
 
+    const [open, setOpen] = useState(false);
     const [ carImages, setCarImages ] = useState([]);
     const [ userInfo, setUserInfo ] = useState([]);
     const [ feedback, setFeedback ] = useState([]);
@@ -51,6 +54,7 @@ export default function CarDetail(){
     const [ maxDate, setMaxDate ] = useState(new Date())
     const [ voucher, setVoucher ] = useState('')
     const [ wallet, setWallet ] = useState('')
+    const [ filterDateTime,setFilterDateTime ] = useState('');
     const [ date, setDate ] = useState({
         startDate: new Date(),
         endDate: new Date(),
@@ -200,7 +204,10 @@ export default function CarDetail(){
         }
     }
     
-    
+    const handleOpen = () => setOpen(true);
+
+    const handleClose = () => setOpen(false);
+
     useEffect(() => {
         window.scrollTo(0, 0)
     },[])
@@ -213,22 +220,14 @@ export default function CarDetail(){
         fetchData();
         var today = new Date();
         maxDate.setDate(today.getDate() + 30)
-        startDate.setDate(20)
-        startDate.setHours(8, 0, 0, 0)
-        endDate.setDate(22)
-        endDate.setHours(7, 0, 0, 0);
+        startDate.setHours(7, 0, 0, 0)
+        endDate.setDate(today.getDate() + 1)
+        endDate.setHours(8, 0, 0, 0);
+        setTotalDate(calculateTotalDate(endDate, startDate))
+        displayPeriod(startDate, endDate)
     },[])
 
-    useEffect(() => {
-        if (feedback) {
-            console.log(feedback)
-            console.log(feedbackDetail.rating)
-        }
-    }, [feedback, feedbackDetail]);
-
-    // useEffect(()=>{
-    //     console.log(maxDate);
-    // },[maxDate])
+    useEffect(() => {}, [feedback, feedbackDetail]);
 
     useEffect(() => {
         getUserInfo()
@@ -244,7 +243,6 @@ export default function CarDetail(){
             setCarPrice(carInfo.price);
             setInsurancePrice(insuranceCalculate(carInfo.price))
             setTotalPrice(calculateTotalPrice(carInfo.price))
-            setTotalDate(calculateTotalDate(endDate, startDate))
         }
     },[carInfo, carAmenities])
     
@@ -273,6 +271,17 @@ export default function CarDetail(){
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${hours}:${minutes}`;
+    }
+
+    function handleDateTime(d) {
+        const date = new Date(d);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}`;
+        return formattedDateTime;
     }
 
     function insuranceCalculate(input){
@@ -316,8 +325,29 @@ export default function CarDetail(){
 
     function handleChange(ranges){
         setDate(ranges.selection)
+        const startDateTemp = new Date(startDate);
+        const endDateTemp = new Date(endDate);
+        const newStartDate = new Date(ranges.selection.startDate);
+        const newEndDate = new Date(ranges.selection.endDate);
+        startDateTemp.setDate(newStartDate.getDate());
+        startDateTemp.setMonth(newStartDate.getMonth());
+        endDateTemp.setDate(newEndDate.getDate());
+        endDateTemp.setMonth(newEndDate.getMonth());
+        startDate.setDate(startDateTemp.getDate());
+        startDate.setMonth(startDateTemp.getMonth());
+        endDate.setDate(endDateTemp.getDate());
+        endDate.setMonth(endDateTemp.getMonth());
+        displayPeriod(startDate, endDate);
+        setTotalDate(calculateTotalDate(endDate, startDate))
+    }    
+
+    function displayPeriod(startDate, endDate){
+        const tempStartDate = handleDateTime(startDate);
+        const tempEndDate = handleDateTime(endDate);
+        const rs = `${tempStartDate} - ${tempEndDate}`;
+        setFilterDateTime(rs)
     }
-      
+          
     return(
         <div id="car-detail">
             <Header/>
@@ -451,9 +481,7 @@ export default function CarDetail(){
                     </div>
                     <div className="price">
                         <h1>{carInfo.price}K</h1>
-                        <Popup
-                            trigger={
-                                <div className="period">
+                                <div className="period" onClick={handleOpen}>
                                     <div className="book">
                                         <table>
                                             <tr>
@@ -480,48 +508,89 @@ export default function CarDetail(){
                                         </table>
                                     </div>
                                 </div>
-                            }     
-                            contentStyle={{
-                                height: "fit-content",
-                                width: "60%",
-                                backgroundColor: "white",
-                                padding: "1em 2em 1.5em 2em",
-                                borderRadius: "15px"
-                            }}
-                            modal
-                            >
-                                <div id="home-datetime-container">
-                                    <p style={{fontSize: "22px", fontWeight: "500"}}>Thời gian</p>
-                                    <hr style={{width: "100%"}}/>
-                                    <p style={{color: "#ccc"}}>*Giới hạn thời gian thuê xe tối đa 30 ngày. Bạn vui lòng điều chỉnh lại thời gian phù hợp</p>
-                                    <div className="datetime-modify">
-                                    <div className="date-modify">
-                                        <DateRange
-                                            ranges={[date]}
-                                            onChange={handleChange}
-                                            minDate={new Date()}
-                                            maxDate={maxDate}
-                                            months={2}
-                                            direction="horizontal"
-                                            locale={locale}
-                                            color="#5fcf86"
-                                        />
+                                <Modal
+                                    open={open}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <div 
+                                        id="home-datetime-container" 
+                                        style={{
+                                            width: "60%",
+                                            height: "fit-content", 
+                                            padding: "25px", 
+                                            backgroundColor: "#fff", 
+                                            borderRadius: "25px", 
+                                            transform: 'translate(30%, 100px)'
+                                            }}>
+                                        <p style={{fontSize: "22px", fontWeight: "500"}}>Thời gian</p>
+                                        <hr style={{width: "100%"}}/>
+                                        <p style={{color: "#ccc"}}>*Giới hạn thời gian thuê xe tối đa 30 ngày. Bạn vui lòng điều chỉnh lại thời gian phù hợp</p>
+                                        <div className="datetime-modify">
+                                            <div className="date-modify">
+                                                <DateRange
+                                                    ranges={[date]}
+                                                    onChange={handleChange}
+                                                    minDate={new Date()}
+                                                    maxDate={maxDate}
+                                                    months={2}
+                                                    direction="horizontal"
+                                                    locale={locale}
+                                                    color="#5fcf86"
+                                                    rangeColors="#5fcf86, #469963"
+                                                />
+                                            </div>
+                                            <div className="time-modify" style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "space-around"}}>
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <TimePicker
+                                                        label="Controlled picker"
+                                                        views={['hours','minutes']}
+                                                        value={dayjs(startDate)}
+                                                        sx={{
+                                                            width: "40%"
+                                                        }}
+                                                        onChange={(newValue) => {startDate.setTime(newValue), displayPeriod(startDate, endDate), setTotalDate(calculateTotalDate(endDate, startDate)), console.log(startDate)}}
+                                                    />
+                                                </LocalizationProvider>
+                                                <p style={{fontSize: "30px", padding: "0 10px"}}>-</p>
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <TimePicker
+                                                        label="Controlled picker"
+                                                        views={['hours','minutes']}
+                                                        value={dayjs(endDate)}
+                                                        sx={{
+                                                            width: "40%"
+                                                        }}
+                                                        onChange={(newValue) => {endDate.setTime(newValue), displayPeriod(startDate, endDate), setTotalDate(calculateTotalDate(endDate, startDate)), console.log(endDate)}}
+                                                    />
+                                                </LocalizationProvider>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div className="conclude" style={{width: "70%", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                                            <div>
+                                                <p>{filterDateTime ? filterDateTime : "--/--/--- --:-- - --/--/---- --:--"}</p>
+                                                <p>Số ngày thuê: {totalDate} ngày</p>
+                                            </div>
+                                            <div 
+                                                style={{
+                                                    padding: "10px",
+                                                    backgroundColor: "#5fcf86",
+                                                    color: "#fff",
+                                                    borderRadius: "5px",
+                                                    cursor: "pointer"
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.target.style.backgroundColor = "#5fcf86";
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    e.target.style.backgroundColor = "#469963";
+                                                }}
+                                                onClick={handleClose}
+                                            >Tiếp tục</div>
+                                        </div>
                                     </div>
-                                    <div className="time-modify">
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <TimePicker
-                                                label="Controlled picker"
-                                                value={startDate}
-                                                onChange={(newValue) => setStartDate(newValue)}
-                                            />
-                                        </LocalizationProvider>
-                                    </div>
-                                    </div>
-                                    <div className="conclude">
-                                    
-                                    </div>
-                                </div>
-                            </Popup>
+                                </Modal>
                         <br/>
                         <div className="location">
                             <div>Địa điểm giao xe</div>
@@ -589,6 +658,10 @@ export default function CarDetail(){
                                 {close =>
                                     <div id="payment">
                                         <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Xác nhận thanh toán</p>
+                                        <div className="payment-info">
+                                            <p style={{fontSize: "18px", fontWeight: "500", paddingBottom: "20px"}}>Xe {carInfo.name}</p>
+                                            <div></div>
+                                        </div>
                                         <br />
                                         <div className="btn-ctn">
                                             <div 
@@ -614,7 +687,6 @@ export default function CarDetail(){
                                 style={{cursor: "pointer", padding: "8px", backgroundColor: "#5fcf86", borderRadius: "5px", fontWeight: "500", textAlign: "center", color: "#fff"}}
                                 onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
                                 onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
-                                // onClick={() => {console.log("run")}}
                             >Yêu cầu thuê xe</div>
                         }
                     </div>

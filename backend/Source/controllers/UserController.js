@@ -44,7 +44,6 @@ const getUserByEmail = async (req, res) => {
 }
 const getNIDinfoByUserId = async (req, res) => {
     try {
-        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNIDinfoByUserId(userId)
         res.json(response)
@@ -54,7 +53,6 @@ const getNIDinfoByUserId = async (req, res) => {
 }
 const getNDLinfoByUserId = async (req, res) => {
     try {
-        await Uitl.deleteAllImages()
         const userId = req.params.userId
         const response = await User.getNDLinfoByUserId(userId)
         res.json(response)
@@ -148,7 +146,9 @@ const sendConfirmNDL = async (req, res) => {
         const NDL = req.body.NDL
         const name = req.body.name
         const dateOfBirth = req.body.dateOfBirth
+        // console.log(userId, name, dateOfBirth)
         const imagePaths = req.files.map(file => file.path);
+        console.log(imagePaths)
         let imgs = [];
         for (const path of imagePaths) {
             try {

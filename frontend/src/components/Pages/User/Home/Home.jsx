@@ -144,11 +144,8 @@ export default function Home() {
 
   function displayPeriod(){
     const tempCurDate = combineDateTime(startTime, handleDate(currentDateTime));
-    // console.log(tempCurDate)
     const tempNextDate = combineDateTime(endTime, handleDate(nextDateTime));
-    // console.log(tempNextDate)
     const rs = combineDateString(tempCurDate, tempNextDate);
-    // console.log(rs)
     setFilterDateTime(rs)
   }
 
@@ -161,54 +158,36 @@ export default function Home() {
             <form className="search-option">
               <div className="option">
                 <div className="sub-option location">
-                  {/* <Popup
-                    trigger={*/}
-                              <table style={{width: "100%"}}>
-                                <tr style={{color:""}}>
-                                  <td style={{display: "flex", justifyContent: "right"}}><LocationOnIcon style={{height: "20px"}}/></td>
-                                  <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Địa điểm</td>
-                                </tr>
-                                <tr>
-                                  <td></td>
-                                  <td style={{cursor: "pointer", overflow: "hidden"}}>
-                                    <p style={{textAlign: "left", fontWeight: "500", fontSize: "18px"}}>{address ? address : "Hồ Chí Minh"}</p>
-                                  </td>
-                                </tr>
-                              </table>
-                        {/*}  }
-                          contentStyle={{
-                            height: "fit-content", 
-                            width: "60%",
-                            backgroundColor: "white",
-                            padding: "1em 2em 1.5em 2em",
-                            borderRadius: "15px"
-                          }}
-                          modal
-                        >
-                          <div id="home-adr-container">
-                            <p style={{fontSize: "22px", fontWeight: "500"}>Địa điểm</p>
-                            <hr />
-
-                          </div>
-                        </Popup> */}
+                  <table style={{width: "100%"}}>
+                    <tr style={{color:""}}>
+                      <td style={{display: "flex", justifyContent: "right"}}><LocationOnIcon style={{height: "20px"}}/></td>
+                      <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Địa điểm</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td style={{cursor: "pointer", overflow: "hidden"}}>
+                        <p style={{textAlign: "left", fontWeight: "500", fontSize: "18px"}}>Hồ Chí Minh</p>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
                 <div class="vertical-line"></div>
                 <div className="sub-option period">
                   <Popup
                     trigger={
-                            <table style={{width: "100%"}}>
-                              <tr>
-                                <td><CalendarMonthIcon style={{height: "20px"}}/></td>
-                                <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Thời gian thuê</td>
-                              </tr>
-                              <tr>
-                                <td></td>
-                                {/* <td><TextField select fullWidth variant="standard"/></td> */}
-                                <td style={{cursor: "pointer"}}>
-                                  <p style={{textAlign: "left", fontWeight: "500", fontSize: "18px"}}>{filterDateTime}</p>
-                                </td>
-                              </tr>
-                            </table>
+                      <table style={{width: "100%"}}>
+                        <tr>
+                          <td><CalendarMonthIcon style={{height: "20px"}}/></td>
+                          <td style={{textAlign: "left", fontSize: "20px", cursor: "pointer"}}>Thời gian thuê</td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          {/* <td><TextField select fullWidth variant="standard"/></td> */}
+                          <td style={{cursor: "pointer"}}>
+                            <p style={{textAlign: "left", fontWeight: "500", fontSize: "17px"}}>{filterDateTime}</p>
+                          </td>
+                        </tr>
+                      </table>
                     }
                     contentStyle={{
                       height: "fit-content",
@@ -248,8 +227,8 @@ export default function Home() {
                             fontWeight: "bold"
                           }}
                     onClick={()=>navigate("/car/carlist")}>
-                            Tìm xe
-                            </Button>
+                      Tìm xe
+                    </Button>
                 </div>
               </div>
             </form>

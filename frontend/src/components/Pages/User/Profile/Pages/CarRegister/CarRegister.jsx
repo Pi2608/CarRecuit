@@ -190,7 +190,6 @@ export default function CarRegister() {
             for (let i = 0; i < imageFiles.length; i++) {
                 formData.append(`images`, imageFiles[i]);
             }
-
             const response = await axios.post(`http://localhost:4000/car/new/${id}`, formData,{
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -520,24 +519,6 @@ export default function CarRegister() {
                             </div>
                         </label>
                     </div>
-                    {/* <div className="terms-section">
-                        <label>
-                            <p style={{fontWeight: "500", fontSize: "18px"}}>Điều khoản xe</p>
-                            <p>Ghi rõ các yêu cầu để khách có thể thuê xe.</p>
-                            <br />
-                            <div style={{display: "flex",alignItems: "center"}}>
-                                <TextField
-                                    size="small"
-                                    onChange={(e) => setCarDescription(e.target.value)}
-                                    value={carDescription}
-                                    multiline
-                                    fullWidth
-                                    rows={4}
-                                    placeholder="Không sử dụng xe vào mục đích phi pháp. Lái xe cẩn thận, giữ xe sạch sẽ, trả xe đúng giờ."
-                                />
-                            </div>
-                        </label>
-                    </div> */}
                     <br />
                     <div className="images-section">
                         <p style={{fontWeight: "500", fontSize: "18px"}}>Hỉnh ảnh xe</p>
