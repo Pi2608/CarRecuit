@@ -836,7 +836,7 @@ const historyTrip = async(userId)=>{
         INNER JOIN dbo.carType ON car.carTypeId = carType.id
         inner join dbo.rent on rentDetail.rentId = rent.id
         Inner join [dbo].[user] on rent.userId = [dbo].[user].id
-        WHERE rentDetail.drop_off < GETDATE() and rentDetail.isAccepted = 1 and [dbo].[user].id =6`
+        WHERE rentDetail.drop_off < GETDATE() and rentDetail.isAccepted = 1 and [dbo].[user].id =@userId`
         const result1 = await poolConnection.request()
         .input('userId', sql.Int, userId)
         .query(query1)

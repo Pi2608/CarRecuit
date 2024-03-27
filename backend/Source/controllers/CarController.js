@@ -71,7 +71,6 @@ const getCarTypeByTypeId = async (req,res)=>{
 }
 const getAllCarsOfOwner = async(req, res)=>{
     try {
-        await Uitl.deleteAllImages()
         const ownerId = req.params.ownerId
         const response = await car.getAllCarsOfOwner(ownerId)
         res.json(response)

@@ -18,9 +18,9 @@ export default function Sidebar() {
     const { logout } = useAuth();
 
     const handleLogout = () => {
+        navigate("/");
         logout();
         console.log("User logged out");
-        navigate("/");
     };
 
     // const { id, logout } = useAuth();
@@ -113,7 +113,7 @@ export default function Sidebar() {
                     </div>
                 )}
             </Popup>
-            <Popup
+            {/* <Popup
                 trigger={
                     <div className="sidebar-item">
                         <table style={{display: "flex", alignItems: "center"}}>
@@ -144,7 +144,7 @@ export default function Sidebar() {
                     </div>
                 </div>
                 }
-            </Popup>
+            </Popup> */}
         </div>
     )
 }
