@@ -12,6 +12,8 @@ import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.j
 import Transaction from './components/Pages/User/Profile/Pages/TransactionPage/Transaction.jsx';
 import Trips from './components/Pages/User/Profile/Pages/TravelPage/Trips.jsx';
 import MyCars from './components/Pages/User/Profile/Pages/MyCarsPage/MyCars.jsx';
+import PendingCars from './components/Pages/User/Profile/Pages/PendingCarsPage/PendingCars.jsx';
+import UpComing from './components/Pages/User/Profile/Pages/UpComingPage/UpComing.jsx';
 import ChangePw from './components/Pages/User/Profile/Pages/ChangePwPage/ChangePw.jsx';
 import CarRegister from './components/Pages/User/Profile/Pages/CarRegister/CarRegister.jsx';
 
@@ -23,6 +25,14 @@ import StatisticPage from './components/Pages/Admin/Pages/StatisticPage/Statisti
 import ConfirmInfoPage from './components/Pages/Admin/Pages/ConfirmInfoPage/ConfirmInfoPage.jsx';
 import { carInputs, userInputs, voucherInputs } from './components/Pages/Admin/Pages/formSource.js';
 
+const ProtectedRoute = ({ element: Element, auth, roleUserId, ...rest }) => {
+  if (!auth || (auth && roleUserId !== 1)) {
+    // Redirect unauthorized users to Permission Denied page
+    return <Navigate to="/permission-denied" />;
+  }
+  // Render the protected route for authorized users
+  return <Element {...rest} />;
+};
 
 function App(){
   
@@ -43,6 +53,8 @@ function App(){
               <Route path="user">
                 <Route path="profile" element={<Profile />} />
                 <Route path="mycars" element={<MyCars />} />
+                <Route path="pendingcars" element={<PendingCars />} />
+                <Route path="upcomingreq" element={<UpComing />} />
                 <Route path="mytrips" element={<Trips />} />
                 <Route path="resetpw" element={<ChangePw />} />
                 <Route path="transaction" element={<Transaction />} />
@@ -50,6 +62,7 @@ function App(){
               <Route path="car">
                 <Route path="carregister" element={<CarRegister />} />
               </Route>
+              <Route path="admin/*" element={<ErrorPage />} />
             </>
           )}
           {auth && roleUserId !== 1 && (

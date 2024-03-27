@@ -156,7 +156,7 @@ const getRentDetailByRentId = async(req,res)=>{
 
 const currentTrip = async (req, res)=>{
     try {
-        await util.deleteAllImages()
+        // await util.deleteAllImages()
         const userId = req.params.userId
         const response = await rent.currentTrip(userId)
         res.json(response)
@@ -167,7 +167,7 @@ const currentTrip = async (req, res)=>{
 
 const historyTrip = async (req,res)=>{
     try {
-        await util.deleteAllImages()
+        // await util.deleteAllImages()
         const userId = req.params.userId
         const response = await rent.historyTrip(userId)
         res.json(response)
@@ -178,7 +178,7 @@ const historyTrip = async (req,res)=>{
 
 const ownerRentDetailRequest = async(req,res)=>{
     try {
-        await util.deleteAllImages()
+        // await util.deleteAllImages()
         const ownerId = req.params.ownerId
         const response = await rent.ownerRentDetailRequest(ownerId)
         res.json(response)
@@ -189,7 +189,7 @@ const ownerRentDetailRequest = async(req,res)=>{
 
 const ownerRentDetailUpcoming = async(req,res)=>{
     try {
-        await util.deleteAllImages()
+        // await util.deleteAllImages()
         const ownerId = req.params.ownerId
         const response = await rent.ownerRentDetailUpcoming(ownerId)
         res.json(response)

@@ -1,25 +1,25 @@
 import React, { useEffect } from "react";
 import Header from "../../../../../Items/Header/Header";
 import Footer from "../../../../../Items/Footer/Footer";
-import CarManage from "../../Profile items/Content items/MyCars/CarManage";
+import UpComingRequest from "../../Profile items/Content items/UpComingRequest/UpComingRequest";
 import MCSidebar from "../../Profile items/Sidebar/MCSideBar";
-import "./MyCars.css"
+import "./UpComing.css"
 
-export default function MyCars(){
+export default function UpComing(){
 
     useEffect(()=>{
         window.scrollTo(0,0);
     },[]);
 
     return(
-        <div id="mycar">
+        <div id="upcomingcar">
             <Header />
             <div className="body">
                 <div className="sidebar">
                     <MCSidebar />
                 </div>
                 <div className="content">
-                    <CarManage />
+                    <UpComingRequest />
                 </div>
             </div>
             <Footer />

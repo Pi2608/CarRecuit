@@ -1,5 +1,5 @@
 #footer{
-    padding: 5% 10%;
+    padding-top: 50px;
     position: relative;
     bottom: 0px;
     border-top: 1px solid #ccc;
@@ -12,9 +12,18 @@
     font: 16px
 }
 
-/* #footer>.footer-about>.footer-info{
 
-} */
+#footer>.footer-about>.footer-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#footer>.footer-about>.footer-info img{
+    height: 256px;
+    width: 256px;
+    border-radius: 2em;
+}
 
 #footer>.footer-about>.footer-item{
     display: grid;
@@ -25,10 +34,31 @@
 #footer>.footer-about>.footer-item>.item>.main{
     font-size: 1rem;
     font-size: 1.2em;
+    cursor: default;
 }
 
 #footer>.footer-about>.footer-item>.item>.sub-item>p{
     color: #6f6f6f;
     padding-bottom: 1rem;
     font-size: 1.1em;
+    cursor: pointer;
+}
+
+#footer>.footer-about>.footer-item>.item>.sub-item>p:hover{
+    color: #232323;
+}
+
+#footer>.footer-about>.footer-item>.item>table{
+    cursor: default;
+}
+
+#footer>.footer-about>.footer-item>.item>table>.payment-method>td>p{
+    color: #6f6f6f;
+    padding-bottom: 1rem;
+    font-size: 1.1em;
+}
+
+#footer>.footer-about>.footer-item>.item>table>.payment-method>td>img{
+    height: 32px;
+    width: auto;
 }

@@ -141,11 +141,46 @@ export default function Infomation() {
     }
   }
 
+  async function getCarList(){
+    try {
+        const response = await axios.get(`http://localhost:4000/car/owner/${id}`);
+        const carListData = response.data;
+
+        const carDataPromises = carListData.map(async (car) => {
+            try {
+                // Fetch additional data for each car using the carId
+                const additionalDataResponse = await axios.get(`http://localhost:4000/rent/counting/${car.id}`);
+                const additionalData = additionalDataResponse.data;
+
+                // Fetch image
+                const imagePromise = new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = car.imgUrl;
+                    img.onload = () => resolve({ ...car, additionalData, loaded: true });
+                    img.onerror = () => resolve({ ...car, additionalData, loaded: false });
+                });
+
+                const loadedCarListImage = await imagePromise;
+                return loadedCarListImage;
+            } catch (additionalDataError) {
+                console.error(`Error fetching additional data for car ${car.id}: ${additionalDataError.message}`);
+                return { ...car, additionalData: null, loaded: false };
+            }
+        });
+
+        const loadedCarList = await Promise.all(carDataPromises);
+        setCarList(loadedCarList);
+    } catch (error) {
+        console.error("Error fetching car :"+ error.message);
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       await getUserInfo();
       await getUserNid();
-      await getUserNdl()
+      await getUserNdl();
+      await getCarList();
     };
     if (auth) {
     }

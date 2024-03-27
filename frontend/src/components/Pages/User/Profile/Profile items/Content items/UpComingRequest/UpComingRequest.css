@@ -1,8 +1,8 @@
-#carmanage>.container>.head h1{
+.carmanage-upcoming>.container>.head h1{
     padding : 20px 0px 15px 0;
 }
 
-#carmanage>.container>.head{
+.carmanage-upcoming>.container>.head{
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -10,54 +10,31 @@
     padding-right: 200px;
 }
 
-
-#carmanage>.container>.head>.rgt-btn{
-    display: flex;
-    height: fit-content;
-    width: fit-content;
-    border: solid 1px #00BF54;
-    padding: 10px;
-    border-radius: 3px;
-    font-size: 18px;
-    font-weight: 500;
-    color: #00BF54;
-    cursor: pointer;
-}
-
-#carmanage>.container>.head>.rgt-btn:hover{
-    background-color: #00BF54;
-    color: white;
-}
-
-#carmanage>.container>.car-list>table>tr>td{
-    padding: 5px;
-}
-
-#carmanage>.container>.car-list>table>tr>td>.hdl-request-btn{
+.carmanage-upcoming>.container>.car-list>table>tr>td>.hdl-request-btn{
     padding: 0.5em 0.2em;
     border-radius: 10px;
     cursor: pointer;
 }
 
-#carmanage>.container>.car-list>table>tr>td>.yes{
+.carmanage-upcoming>.container>.car-list>table>tr>td>.yes{
     background-color: #5fcf86;
 }
 
-#carmanage>.container>.car-list>table>tr>td>.no{
+.carmanage-upcoming>.container>.car-list>table>tr>td>.no{
     background-color: #ff6666;
 }
 
-#carmanage>.container>.car-list>table>tr>td>.yes:hover{
+.carmanage-upcoming>.container>.car-list>table>tr>td>.yes:hover{
     color: #fff;
     background-color: #469963;
 }
 
-#carmanage>.container>.car-list>table>tr>td>.no:hover{
+.carmanage-upcoming>.container>.car-list>table>tr>td>.no:hover{
     color: #fff;
     background-color: #CF0000;
 }
 
-#carmanage>.container{
+#carmanage-upcoming>.container{
     min-height: 500px;
     background: #fff;
     border-radius: 25px;

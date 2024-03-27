@@ -89,12 +89,6 @@ const LoginForm = () => {
         </div>
         <button type="submit">Đăng nhập</button>
         <p style={{color: "red"}}>{errMsg ? errMsg : ""}</p>
-        <div className="register-link">
-          {/* <p>
-            Bạn chưa là thành viên? <a href="#">Đăng ký</a>
-          </p> */}
-        </div>
-        <Login/>
       </form>
     </div>
   );

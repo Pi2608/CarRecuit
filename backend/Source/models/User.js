@@ -456,12 +456,14 @@ const autoPromotedMembership = async (userId) => {
 
 const getMemberShipUserCurrent = async (userId) => {
     try {
+        console.log(userId)
         let poolConnection = await sql.connect(config)
         const query = 'SELECT * FROM [dbo].[memberShipUser] WHERE userId = @UserId AND id = (SELECT MAX(id) FROM [dbo].[memberShipUser] WHERE userId = @UserId)'
         const result = await poolConnection.request()
             .input('UserId', sql.Int, userId)
             .query(query)
         if (result.recordset.length > 0) {
+            console.log(result.recordset[0])
             return result.recordset[0];
         } else {
             return null;
@@ -473,6 +475,7 @@ const getMemberShipUserCurrent = async (userId) => {
 
 const getMemberShipByUserId = async (userId) => {
     try {
+        console.log(userId)
         let poolConnection = await sql.connect(config)
         const query = `Select * from [dbo].[memberShip] where id =@id`
         const result = await poolConnection.request()
