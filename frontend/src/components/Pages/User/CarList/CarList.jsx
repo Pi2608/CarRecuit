@@ -373,7 +373,7 @@ export default function CarList(){
                                 </div>
                             )}
                         </Popup>
-                        <Popup
+                        {/* <Popup
                             trigger={
                                 <div className="amenity car-brand"><div className="icon">       <LanguageIcon/>                                         </div><p>Hãng xe</p>        </div>
                             }
@@ -386,8 +386,14 @@ export default function CarList(){
                             }}
                             modal
                         >
-
-                        </Popup>
+                            <div id="type-container">
+                                <p style={{fontSize: "22px", fontWeight: "500", paddingBottom: "20px"}}>Chọn hãng xe</p>
+                                <hr style={{width: "100%"}}/>
+                                <br />
+                                
+                                <div className="choose" onClick={close}>Áp dụng</div>
+                            </div>
+                        </Popup> */}
                         <div 
                             className="amenity five-star-owner" 
                             style={(filterOptions.rating) ? {border: "1px solid #5fcf86", backgroundColor: "#C4FFD0"} : {}}
