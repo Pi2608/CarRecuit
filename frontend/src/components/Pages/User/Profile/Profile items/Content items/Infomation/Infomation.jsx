@@ -93,7 +93,6 @@ export default function Infomation() {
       setUserCredit(data.wallet);
       setUserPoint(data.point);
       setUserAvatar(data.imgUrl);
-      console.log('hmm');
     } catch (error) {
       console.error("Error fetching User Info: " + error);
     }
@@ -744,6 +743,9 @@ export default function Infomation() {
               <div
                 className="topup-btn"
                 onClick={() => navigate("/user/transaction")}
+                style={{padding: "10px", backgroundColor: "#5fcf86", color: "#fff", width: "40px", textAlign: "center", borderRadius: "5px", cursor: "pointer"}}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#469963"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#5fcf86"}
               >
                 Nạp
               </div>

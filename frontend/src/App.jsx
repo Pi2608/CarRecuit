@@ -25,14 +25,6 @@ import StatisticPage from './components/Pages/Admin/Pages/StatisticPage/Statisti
 import ConfirmInfoPage from './components/Pages/Admin/Pages/ConfirmInfoPage/ConfirmInfoPage.jsx';
 import { carInputs, userInputs, voucherInputs } from './components/Pages/Admin/Pages/formSource.js';
 
-const ProtectedRoute = ({ element: Element, auth, roleUserId, ...rest }) => {
-  if (!auth || (auth && roleUserId !== 1)) {
-    // Redirect unauthorized users to Permission Denied page
-    return <Navigate to="/permission-denied" />;
-  }
-  // Render the protected route for authorized users
-  return <Element {...rest} />;
-};
 
 function App(){
   
