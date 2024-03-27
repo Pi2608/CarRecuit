@@ -792,7 +792,7 @@ const cancelRentDetailByOwner = async(rentDetailId)=>{
 const currentTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, carId
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, rentDetail.id ,carId
                         FROM dbo.car
                         Inner join dbo.rentDetail on rentDetail.carId = car.id
                         INNER JOIN dbo.carType ON car.carTypeId = carType.id
@@ -830,7 +830,7 @@ const currentTrip = async(userId)=>{
 const historyTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, carId
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, rentDetail.id ,carId
         FROM dbo.car
         Inner join dbo.rentDetail on rentDetail.carId = car.id
         INNER JOIN dbo.carType ON car.carTypeId = carType.id

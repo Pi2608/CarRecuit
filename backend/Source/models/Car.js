@@ -530,6 +530,16 @@ const getCarByLocationAndDate = async (location, dateStart, dateEnd)=>{
                 filrerCarsByLocationAndDate.push(car)
             }
         }
+        for (let car of filrerCarsByLocationAndDate){
+            const query2 = `Select * from dbo.image where id LIKE '%FC%' AND carId = @carId`
+            const result2 = await poolConnection.request()
+            .input('carId', sql.Int, car.id)
+            .query(query2)
+            const img = result2.recordset[0]
+            car.imgUrl = await util.decodeImage(img.url, img.id)
+            const location = await Location.getCarLocation(car.id, 1)
+            car.ldescription = location.city
+        }
         return filrerCarsByLocationAndDate
         
     } catch (error) {

@@ -28,13 +28,19 @@ function App({ google }) {
             const newLocations = [];
             for (const car of cars) {
                 const response = await axios.get(`http://localhost:4000/location/car?carId=${car.id}&typeLocationId=1`)
-                newLocations.push(response.data)
+                const location = response.data
+                location.link = `http://localhost:5173/car/cardetail/${car.id}`
+                newLocations.push(location)
             }
             setLocations(newLocations)
         } catch (error) {
             console.log(error);
         }
     }
+    const handleMarkerClick = (link) => {
+        console.log(location.link)
+        window.location.href = link; // Redirect to the provided link
+    };
 
     useEffect(() => {
         getCarLocation(cars)
@@ -52,7 +58,8 @@ function App({ google }) {
                     {locations.map(location => (
                         <Marker
                             key={location.id}
-                            position={{ lat: location.latitude, lng: location.longitude }}
+                            position={{ lat: location.latitude, lng: location.longitude}}
+                            onClick={() => handleMarkerClick(location.link)} // Redirect on marker click
                         />
                     ))}
                 </Map>
