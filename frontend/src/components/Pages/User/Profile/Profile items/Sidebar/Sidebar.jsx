@@ -20,6 +20,7 @@ export default function Sidebar() {
     const handleLogout = () => {
         logout();
         console.log("User logged out");
+        navigate("/");
     };
 
     // const { id, logout } = useAuth();
@@ -107,7 +108,7 @@ export default function Sidebar() {
                         <br />
                         <div className="btn-ctn">
                             <div className="ccl-btn btn" onClick={close}>Hủy</div>
-                            <div className="apt-btn btn" onClick={() => {handleLogout();navigate("/")}}>Đăng xuất</div>
+                            <div className="apt-btn btn" onClick={() => {handleLogout()}}>Đăng xuất</div>
                         </div>
                     </div>
                 )}
