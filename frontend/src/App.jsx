@@ -38,7 +38,6 @@ function App(){
             <Route path="cardetail/:carId" element={<CarDetail />} />
           </Route>
           <Route path="map" element={<Map />} />
-          {!auth && <Route path="login" element={<LoginForm />} />}
           {auth && roleUserId === 1 && (
             <>
               <Route path="user">
@@ -63,7 +62,6 @@ function App(){
               <Route path="confirm" element={<ConfirmInfoPage />} />
             </Route>
           )}
-          {!auth && <Navigate to="/login" />}
         </Route>
       </Routes>
     </div>
