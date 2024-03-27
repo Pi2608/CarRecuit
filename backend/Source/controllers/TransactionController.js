@@ -21,7 +21,7 @@ const pay = async (req,res)=>{
         },
         "redirect_urls": {
             "return_url": "http://localhost:4000/transaction/PayPal/loadingPayment",
-            "cancel_url": "http://localhost:4000/"
+            "cancel_url": "http://localhost:5173/user/profile"
         },
         "transactions": [{
             "item_list": {
@@ -148,7 +148,7 @@ const vnpay_return = async(req,res,next)=>{
     if(secureHash === signed){
         //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
         user.createTransaction(userId, amount, secureHash, amount, "VNPay")
-        res.json("Success")
+        res.redirect("http://localhost:5173/user/profile")
     } else{
         res.render('success', {code: '97'})
     }
