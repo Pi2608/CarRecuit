@@ -162,6 +162,15 @@ export default function Home() {
     setFilterDateTime(rs)
   }
 
+  async function handleRedict(location, startDate, endDate){
+    const postData = {
+      location: location,
+      dateStart: startDate,
+      dateEnd: endDate
+    }
+    sessionStorage.setItem('items', JSON.stringify(postData))
+  }
+
   return (
     <div id="home">
         <Header/>
@@ -292,7 +301,7 @@ export default function Home() {
                             color: "#00BF54", 
                             fontWeight: "bold"
                           }}
-                    onClick={()=>navigate("/car/carlist")}>
+                    onClick={()=>{handleRedict('Hồ Chí Minh', startDate, endDate) ; navigate("/car/carlist")}}>
                       Tìm xe
                     </Button>
                 </div>

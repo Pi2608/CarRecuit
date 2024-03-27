@@ -44,6 +44,13 @@ export default function CarList(){
         maxPrice: '2000'
     });
 
+    const storedData = sessionStorage.getItem('items');
+    const items = storedData ? JSON.parse(storedData) : null;
+
+    const startDate = items ? items.dateStart : null;
+    const endDate = items ? items.dateEnd : null;
+    const location = items ? items.location : null;
+
     const marks = [
         {
           value: 500,
@@ -196,7 +203,13 @@ export default function CarList(){
 
     const fetchCarList = async () => {
         try {
-            const response = await axios.get('http://localhost:4000/car/');
+            const postData = {
+                location: location,
+                dateStart: startDate,
+                dateEnd: endDate
+              }
+              console.log(location, startDate, endDate)
+            const response = await axios.post('http://localhost:4000/car/filterLocationDate', postData)
             const carListData = response.data;
             // Create an array of promises for each image loading
             const imagePromises = carListData.map((car) => {
@@ -215,6 +228,24 @@ export default function CarList(){
             console.error('Error fetching car list:', error);
         }
     };
+
+    function displayPeriod(startDate, endDate){
+        const tempStartDate = handleDateTime(startDate);
+        const tempEndDate = handleDateTime(endDate);
+        const rs = `${tempStartDate} - ${tempEndDate}`;
+        return rs;
+    }
+
+    function handleDateTime(d) {
+        const date = new Date(d);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}`;
+        return formattedDateTime;
+      }
 
     const fetchCarBrandList = async () => {
         try {
@@ -246,7 +277,7 @@ export default function CarList(){
                 <div className="filter-section">
                     <div className="details">
                         <FmdGoodOutlinedIcon style={{height: "20px", width: "auto"}}/><p>Ho Chi Minh</p>
-                        <CalendarMonthOutlinedIcon style={{height: "20px", width: "auto", paddingLeft: "25px"}}/><p>07:00, 02/02/2024 - 08:00, 03/02/2024</p>
+                        <CalendarMonthOutlinedIcon style={{height: "20px", width: "auto", paddingLeft: "25px"}}/><p>{displayPeriod(startDate, endDate)}</p>
                     </div>
                     <div className="amenities">
                         <div 
@@ -662,7 +693,7 @@ export default function CarList(){
                         ))}
                     </div>
                 </div>
-                <div className="map-btn" onClick={()=>navigate("/")}><MapIcon/>Bản đồ</div>
+                <div className="map-btn" onClick={()=>navigate("/map")}><MapIcon/>Bản đồ</div>
             </div>
             <Footer/>
         </div>
