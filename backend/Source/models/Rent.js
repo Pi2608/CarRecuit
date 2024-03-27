@@ -723,6 +723,7 @@ const cancelRentDetailByUser = async(rentDetailId, userId)=>{
         .input("minusPoint", sql.Int, minusPoint)
         .input("userId", sql.Int, userId)
         .query(query9)
+        console.log('Hi')
         await user.autoPromotedMembership(userId)
         return{
             message: "Hủy đơn thuê thành công"

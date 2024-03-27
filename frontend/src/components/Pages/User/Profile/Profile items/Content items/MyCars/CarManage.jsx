@@ -33,7 +33,8 @@ export default function CarManage(){
                         img.onerror = () => resolve({ ...car, additionalData, loaded: false });
                     });
 
-                    return imagePromise;
+                    const loadedCarListImage = await imagePromise;
+                    return loadedCarListImage;
                 } catch (additionalDataError) {
                     console.error(`Error fetching additional data for car ${car.id}: ${additionalDataError.message}`);
                     return { ...car, additionalData: null, loaded: false };
@@ -47,14 +48,17 @@ export default function CarManage(){
         }
     }
 
-    useEffect(() => {}, [auth]);
-    
     useEffect(() => {
-        if (id) {
-            getCarList();
+        async function fetchData(){
+            await getCarList();
+        }
+        if (auth) {
+            fetchData();
             console.log(carList);
         }
-      },[id])
+    }, [auth]);
+    
+    useEffect(() => {},[id])
 
     return(
         <div id="carmanage">

@@ -30,7 +30,7 @@ export default function MCSidebar(){
                     <td style={{paddingLeft: "4px"}}><p>Danh sách xe đang chờ</p></td>
                 </table>
             </div>
-            <div className="sidebar-item" onClick={() => {}}>
+            <div className="sidebar-item" onClick={() => navigate("/user/upcomingreq")}>
                 <table style={{display: "flex", alignItems: "center"}}>
                     <td style={{position: "relative", top: "2px"}}><PlaylistAddCheckOutlinedIcon style={{height: "24px"}}/></td>
                     <td style={{paddingLeft: "4px"}}><p>Theo dõi yêu cầu</p></td>

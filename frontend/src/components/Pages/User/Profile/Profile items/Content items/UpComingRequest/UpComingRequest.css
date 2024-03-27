@@ -1,0 +1,67 @@
+.carmanage-upcoming>.container>.head h1{
+    padding : 20px 0px 15px 0;
+}
+
+.carmanage-upcoming>.container>.head{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 200px;
+}
+
+.carmanage-upcoming>.container>.car-list>table>tr>td>.hdl-request-btn{
+    padding: 0.5em 0.2em;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.carmanage-upcoming>.container>.car-list>table>tr>td>.yes{
+    background-color: #5fcf86;
+}
+
+.carmanage-upcoming>.container>.car-list>table>tr>td>.no{
+    background-color: #ff6666;
+}
+
+.carmanage-upcoming>.container>.car-list>table>tr>td>.yes:hover{
+    color: #fff;
+    background-color: #469963;
+}
+
+.carmanage-upcoming>.container>.car-list>table>tr>td>.no:hover{
+    color: #fff;
+    background-color: #CF0000;
+}
+
+#carmanage-upcoming>.container{
+    min-height: 500px;
+    background: #fff;
+    border-radius: 25px;
+    padding: 0 30px 20px 30px;
+    box-shadow: 0 2px 5px #ccc;
+}
+
+.car-info-container{
+    height: 80%;
+    width: 90%;
+} 
+
+.tbl>.img-container{
+    height: 120px;
+    width: 120px;
+    display: flex;
+    justify-content: center;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+table{
+    border-collapse: collapse;
+}
+    
+th, td{
+    text-align: center;
+    justify-content: center;
+}
+    

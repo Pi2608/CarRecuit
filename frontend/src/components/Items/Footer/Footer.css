@@ -22,6 +22,7 @@
 #footer>.footer-about>.footer-info img{
     height: 256px;
     width: 256px;
+    border-radius: 2em;
 }
 
 #footer>.footer-about>.footer-item{

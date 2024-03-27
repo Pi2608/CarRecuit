@@ -1,25 +1,25 @@
 import React, { useEffect } from "react";
 import Header from "../../../../../Items/Header/Header";
 import Footer from "../../../../../Items/Footer/Footer";
-import PendingCarsList from "../../Profile items/Content items/PendingCars/PendingCarsList";
+import UpComingRequest from "../../Profile items/Content items/UpComingRequest/UpComingRequest";
 import MCSidebar from "../../Profile items/Sidebar/MCSideBar";
-import "./PendingCars.css"
+import "./UpComing.css"
 
-export default function PendingCars(){
+export default function UpComing(){
 
     useEffect(()=>{
         window.scrollTo(0,0);
     },[]);
 
     return(
-        <div id="pendingcar">
+        <div id="upcomingcar">
             <Header />
             <div className="body">
                 <div className="sidebar">
                     <MCSidebar />
                 </div>
                 <div className="content">
-                    <PendingCarsList />
+                    <UpComingRequest />
                 </div>
             </div>
             <Footer />

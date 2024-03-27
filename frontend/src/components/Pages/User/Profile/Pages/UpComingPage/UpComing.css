@@ -1,4 +1,4 @@
-#pendingcar>.body{
+#upcomingcar>.body{
     min-height: 100vh;
     position: relative;
     display: flex;
@@ -8,7 +8,7 @@
     padding: 75px 80px;   
 }
 
-#pendingcar>.body>.sidebar{
+#upcomingcar>.body>.sidebar{
     position: sticky;
     width: 300px;
     top: 0;
@@ -16,7 +16,7 @@
     background-color: #F6F6F6;
 }
 
-#pendingcar>.body>.content{
+#upcomingcar>.body>.content{
     height: fit-content;
     width: 1110px;
     overflow: visible;

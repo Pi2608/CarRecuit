@@ -78,6 +78,15 @@ export default function MyTrips(){
         }
     }
 
+    async function cancelTrip(rentId){
+        try {
+            const reponse = await axios.get(`http://localhost:4000/rent/cancelByUser/?rentDetailId=${rentId}&userId=${id}`)
+            await getCurrentTrip();
+        } catch (error) {
+            
+        }
+    }
+
     useEffect(()=>{
         async function getData(){
             await getCurrentTrip();
@@ -108,29 +117,27 @@ export default function MyTrips(){
                                 <table style={{width: "100%"}}>
                                     <thead>
                                         <tr>
-                                            <th></th>
-                                            <th>Tên xe</th>
+                                            <th style={{width: "180px"}}>Ảnh</th>
                                             <th>Ngày nhận - Ngày trả</th>
-                                            <th>Chủ xe</th>
                                             <th>Giá</th>
-                                            <th>Trạng thái</th>
                                             <th>Được chấp nhận</th>
+                                            <th style={{width: "110px"}}></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {currentList.map((currentTrip) => (
                                             <tr key={currentTrip.tripId}>
-                                                <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
+                                                <td className='tbl' style={{display: "flex", alignItems: "center", flexDirection: "column"}}>
                                                     <div className="img-container" style={{height: "120px", width: "120px", display: "flex", justifyContent: "center", borderRadius: "25px", overflow: "hidden"}}>
                                                         <img src={currentTrip.imgUrl} style={{ height: "100%", width: "auto", borderRadius: "10px"}}></img>
                                                     </div>
+                                                    <p>{currentTrip.carName}</p>
+                                                    <p>Chủ xe: {currentTrip.owner}</p>
                                                 </td>
-                                                <td>{currentTrip.carName}</td>
                                                 <td>{`${new Date(currentTrip.pick_up).toLocaleDateString()} - ${new Date(currentTrip.drop_off).toLocaleDateString()}`}</td>
-                                                <td>{currentTrip.owner}</td>
-                                                <td>{currentTrip.total}</td>
-                                                <td>{currentTrip.status}</td>
-                                                <td>{currentTrip.isAccepted ? 'Được' : 'Không'}</td>
+                                                <td>{currentTrip.total}K</td>
+                                                <td>{currentTrip.isAccepted !== false ? 'Đã hủy' : currentTrip.isAccepted !== true ? 'Đang đợi' : 'Đã duyệt'}</td>
+                                                <td>{currentTrip.isAccepted !== false ? <div className="cancel-trip" onClick={() => cancelTrip(currentTrip.id)}>Hủy chuyến</div>: ""}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -142,29 +149,23 @@ export default function MyTrips(){
                                 <table style={{width: "100%"}}>
                                     <thead>
                                         <tr>
-                                            <th></th>
-                                            <th>Tên xe</th>
+                                            <th style={{width: "180px"}}>Ảnh</th>
                                             <th>Ngày nhận - Ngày trả</th>
-                                            <th>Chủ xe</th>
                                             <th>Giá</th>
-                                            <th>Trạng thái</th>
-                                            <th>Được chấp nhận</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {historyList.map((historyTrip) => (
                                             <tr key={historyTrip.tripId}>
-                                                <td className='tbl' style={{display: "flex", justifyContent: "center", width: "140px"}}>
+                                                <td className='tbl' style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                                                     <div className="img-container" style={{height: "120px", width: "120px", display: "flex", justifyContent: "center", borderRadius: "25px", overflow: "hidden"}}>
                                                         <img src={historyTrip.imgUrl} style={{ height: "100%", width: "auto", borderRadius: "10px"}}></img>
                                                     </div>
+                                                    <p>{historyTrip.carName}</p>
+                                                    <p>Chủ xe: {historyTrip.owner}</p>
                                                 </td>
-                                                <td>{historyTrip.carName}</td>
                                                 <td>{`${new Date(historyTrip.pick_up).toLocaleDateString()} - ${new Date(historyTrip.drop_off).toLocaleDateString()}`}</td>
-                                                <td>{historyTrip.owner}</td>
-                                                <td>{historyTrip.total}</td>
-                                                <td>{historyTrip.status}</td>
-                                                <td>{historyTrip.isAccepted ? 'Được' : 'Không'}</td>
+                                                <td>{historyTrip.total}K</td>
                                             </tr>
                                         ))}
                                     </tbody>
