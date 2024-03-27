@@ -136,7 +136,7 @@ export default function MyTrips(){
                                                 </td>
                                                 <td>{`${new Date(currentTrip.pick_up).toLocaleDateString()} - ${new Date(currentTrip.drop_off).toLocaleDateString()}`}</td>
                                                 <td>{currentTrip.total}K</td>
-                                                <td>{currentTrip.isAccepted !== false ? 'Đã hủy' : currentTrip.isAccepted !== true ? 'Đang đợi' : 'Đã duyệt'}</td>
+                                                <td>{currentTrip.isAccepted === false ? 'Đã hủy' : currentTrip.isAccepted !== true ? 'Đang đợi' : 'Đã được chấp nhận'}</td>
                                                 <td>{currentTrip.isAccepted !== false ? <div className="cancel-trip" onClick={() => cancelTrip(currentTrip.id)}>Hủy chuyến</div>: ""}</td>
                                             </tr>
                                         ))}

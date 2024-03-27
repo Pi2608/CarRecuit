@@ -279,7 +279,7 @@ export default function CarDetail(){
         if(input){
             let priceString = input;
             let priceInt = parseInt(priceString, 10);
-            let total = (priceInt/10) + priceInt;
+            let total = priceInt*0.98;
             priceString = `${total}`;
             return priceString;
         }
@@ -492,6 +492,7 @@ export default function CarDetail(){
                                     open={open}
                                     aria-labelledby="modal-modal-title"
                                     aria-describedby="modal-modal-description"
+                                    onClose={handleClose}
                                 >
                                     <div 
                                         id="home-datetime-container" 
@@ -583,10 +584,10 @@ export default function CarDetail(){
                                 <p style={{fontWeight: "490"}}>Đơn giá thuê</p>
                                 <p style={{fontWeight: "490"}}>{carInfo.price}K/ngày</p>
                             </div>
-                            <div>
+                            {/* <div>
                                 <p style={{fontWeight: "490"}}>Bảo hiểm thuê xe</p>
                                 <p style={{fontWeight: "490"}}>{insurancePrice}</p>
-                            </div>
+                            </div> */}
                         </div>
                         <hr style={{padding: "0 21px"}}/>
                         <div className="total">
