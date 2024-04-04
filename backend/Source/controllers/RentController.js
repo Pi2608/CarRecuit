@@ -64,6 +64,7 @@ const statisticEarningToday = async (req, res)=>{
 }
 const getRentDetailCurrent = async(req, res)=>{
     try {
+        util.deleteAllImages()
         const userId = req.params.userId
         const response = await rent.getRentDetailCurrent(userId)
         res.json(response)

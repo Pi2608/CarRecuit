@@ -143,7 +143,7 @@ const statisticEarningByMonthYear = async(month, year)=>{
         const query1 = `Select 
                             YEAR(payment.paymentDate) as year,
                             MONTH(payment.paymentDate) as month,
-                            (Sum(rent.total) - (Select 
+                            (Sum(rent.total)-IsNull((Select 
                                                 Sum(refund.total)
                                                 From  dbo.payment
                                                 Inner join dbo.refund
@@ -151,7 +151,7 @@ const statisticEarningByMonthYear = async(month, year)=>{
                                                 where YEAR(payment.paymentDate) = @year AND
                                                         MONTH(payment.paymentDate) = @month
                                                 Group By
-                                                YEAR(payment.paymentDate), MONTH(payment.paymentDate)))*0.2 as earning
+                                                YEAR(payment.paymentDate), MONTH(payment.paymentDate)),0))*0.2 as earning
                         From  dbo.payment
                         Inner join dbo.rent
                         on rent.paymentId = payment.id
@@ -183,17 +183,17 @@ const statisticEarningByDayMonthYear= async(day, month, year)=>{
                                                                         From  dbo.payment
                                                                         Inner join dbo.refund
                                                                         on refund.paymentId = payment.id
-                                                                        where DAY (payment.paymentDate) = 14 AND
-                                                                        YEAR(payment.paymentDate) = 2024 AND
-                                                                                MONTH(payment.paymentDate) = 3
+                                                                        where DAY (payment.paymentDate) = @day AND
+                                                                        YEAR(payment.paymentDate) = @year AND
+                                                                        MONTH(payment.paymentDate) = @month
                                                                         Group By
                                                                         YEAR(payment.paymentDate), MONTH(payment.paymentDate)),0))*0.2 as earning
                             From  dbo.payment
                             Inner join dbo.rent
                             on rent.paymentId = payment.id
-                            where  DAY (payment.paymentDate) = 14 AND
-                            YEAR(payment.paymentDate) = 2024 AND
-                                    MONTH(payment.paymentDate) = 3
+                            where  DAY (payment.paymentDate) = @day AND
+                            YEAR(payment.paymentDate) = @year AND
+                                    MONTH(payment.paymentDate) = @month
                             Group By
                                 YEAR(payment.paymentDate), MONTH(payment.paymentDate), DAY (payment.paymentDate)
                             Order By
@@ -276,12 +276,19 @@ const getRentDetailCurrent = async (userId)=>{
         const rent = await getCurrentRent(userId)
         if(rent != null){
             let poolConnection = await sql.connect(config)
-            const query = `Select * from dbo.rentDetail
-                            where rentId = @rentId`
+            const query = `Select rentDetail.*, (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS name, image.url, image.id as imgId from dbo.rentDetail
+                            Inner join dbo.car on car.id = rentDetail.carId
+                            INNER JOIN dbo.carType ON car.carTypeId = carType.id
+                            Inner join dbo.image on image.carId = car.id
+                            where rentId = @rentId and image.id like '%FC%'`
             const result = await poolConnection.request()
             .input('rentId', sql.Int, rent.id)
             .query(query)
-            return result.recordset
+            const rentDetails = result.recordset
+            for (let rentDetail of rentDetails){
+                rentDetail.url = await Util.decodeImage(rentDetail.url, rentDetail.imgId)
+            }
+            return rentDetails
         }else{
             return []
         }
@@ -332,7 +339,7 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
                 }
             }
             if(rent==null){ // chưa có rent thì tạo mới
-                createRent(userId)
+                await createRent(userId)
                 rent = await getCurrentRent(userId)
             }
 
@@ -397,12 +404,13 @@ const addRentDetail = async (userId, carId, pick_up, drop_off, voucherCode)=>{
             }
         }
     } catch (error) {
-        console.log(error)
+        console.log("Add error: "+ error)
     }
 }
 
 const deleteRentDetail = async(userId, rentDetailId)=>{
     try {
+        console.log(userId, rentDetailId)
         let poolConnection = await sql.connect(config)
         
         const query1 = ` Select * from dbo.rentDetail
@@ -411,8 +419,8 @@ const deleteRentDetail = async(userId, rentDetailId)=>{
         .input("rentDetailId", sql.Int, rentDetailId)
         .query(query1)
         const RentDetail = result.recordset[0]
-        
-        const query2 = `Update dbo.rent set total = total -@rentDetailTotal
+        console.log(RentDetail)
+        const query2 = `Update dbo.rent set total = total - @rentDetailTotal
                         where id =@rentId`
         await poolConnection.request()
         .input("rentDetailTotal", sql.Float, RentDetail.total)
@@ -435,7 +443,7 @@ const deleteRentDetail = async(userId, rentDetailId)=>{
             message: "xóa thành công"
         }
     } catch (error) {
-        console.log(error)
+        console.log("Delete Error"+error)
     }
 }
 
@@ -537,7 +545,7 @@ const confirmPayment = async (userId)=>{
             }
         }
     } catch (error) {
-        console.log(error)
+        console.log("Payment error: "+error)
     }
 }
 const acceptRentDetail = async(rentDetailId)=>{
@@ -792,7 +800,7 @@ const cancelRentDetailByOwner = async(rentDetailId)=>{
 const currentTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, rentDetail.id ,carId
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, (Select name from dbo.[user] where id = car.ownerId) as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, rentDetail.id ,carId
                         FROM dbo.car
                         Inner join dbo.rentDetail on rentDetail.carId = car.id
                         INNER JOIN dbo.carType ON car.carTypeId = carType.id
@@ -830,7 +838,7 @@ const currentTrip = async(userId)=>{
 const historyTrip = async(userId)=>{
     try {
         let poolConnection = await sql.connect(config)
-        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, [dbo].[user].name as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, rentDetail.id ,carId
+        const query1 = `SELECT (carType.name + ' ' + CONVERT(nvarchar(10), car.year)) AS carName, rentDetail.pick_up, rentDetail.drop_off, (Select name from dbo.[user] where id = car.ownerId) as owner, rentDetail.total, rentDetail.status, rentDetail.isAccepted, rentDetail.id ,carId
         FROM dbo.car
         Inner join dbo.rentDetail on rentDetail.carId = car.id
         INNER JOIN dbo.carType ON car.carTypeId = carType.id

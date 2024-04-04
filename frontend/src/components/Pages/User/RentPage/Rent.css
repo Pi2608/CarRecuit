@@ -1,0 +1,75 @@
+#rent-page>.body{
+    height: 100vh;
+    background-color: #F6F6F6;
+    padding: 50px;
+}
+
+#rent-page>.body>.car-list{
+    width: 100%;
+    height: fit-content;
+    background-color: #fff;
+}
+
+#rent-page>.body>.pay-btn{
+    width: fit-content;
+    display: block;
+    padding: 10px;
+    background-color: #5fcf86;
+    cursor: pointer;
+}
+
+#rent-page>.body>.pay-btn:hover{
+    background-color: #469963;
+}
+
+#rent-page .body table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#rent-page .body table thead {
+    background-color: #ddd; /* Light gray background color for table header */
+}
+
+#rent-page .body table th,
+#rent-page .body table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Add bottom border to cells */
+}
+
+#rent-page .body table td>.delete-btn{
+    width: fit-content;
+    padding: 8px 15px;
+    background-color: #ff6666;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#rent-page .body table td>.delete-btn:hover{
+    color: #fff;
+    background-color: #CF0000;
+}
+
+#rent-page .body table tfoot td {
+    font-weight: bold;
+}
+
+#rent-page .body table tbody {
+    background-color: #fff; /* White background color for table body */
+}
+
+#rent-page .body table tfoot td:last-child {
+    color: #5fcf86; /* Color for the "Tổng" text in the footer */
+}
+
+#rent-page .body .pay-btn {
+/* Add your styles for the payment button here */
+    cursor: pointer;
+    background-color: #5fcf86;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px;
+}

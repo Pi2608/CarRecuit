@@ -427,26 +427,29 @@ const autoPromotedMembership = async (userId) => {
     try {
         const userPoint = (await getUserById(userId)).point
         const memberShipId = (await getMemberShipUserCurrent(userId)).memberShipId;
-        const newMemberShipId = memberShipId + 1;
-        let poolConnection = await sql.connect(config)
-        const query1 = 'Select pointRequire From [dbo].[memberShip] where id = @id'
-        const result = await poolConnection.request()
-            .input('id', sql.Int, newMemberShipId)
-            .query(query1)
-        const pointRequire = result.recordset[0].pointRequire
-        if (userPoint >= pointRequire) {
-            const query2 = 'Insert into [dbo].[memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
-            await poolConnection.request()
-                .input('UserId', sql.Int, userId)
-                .input('MemberShipId', sql.Int, newMemberShipId)
-                .input('TimeChanged', sql.DateTime, await util.currentTime())
-                .query(query2)
-            return {
-                message: "cập nhật thành công"
+        console.log("membershipId: "+ memberShipId)
+        if(memberShipId<5){
+            const newMemberShipId = memberShipId + 1;
+            let poolConnection = await sql.connect(config)
+            const query1 = 'Select pointRequire From [dbo].[memberShip] where id = @id'
+            const result = await poolConnection.request()
+                .input('id', sql.Int, newMemberShipId)
+                .query(query1)
+            const pointRequire = result.recordset[0].pointRequire
+            if (userPoint >= pointRequire) {
+                const query2 = 'Insert into [dbo].[memberShipUser] (userId, memberShipId, timeChanged) Values (@UserId, @MemberShipId, @TimeChanged)'
+                await poolConnection.request()
+                    .input('UserId', sql.Int, userId)
+                    .input('MemberShipId', sql.Int, newMemberShipId)
+                    .input('TimeChanged', sql.DateTime, await util.currentTime())
+                    .query(query2)
+                return {
+                    message: "cập nhật thành công"
+                }
             }
-        }
-        return {
-            message: "chưa đủ điểm"
+            return {
+                message: "chưa đủ điểm"
+            }
         }
     } catch (err) {
         console.log(err)
@@ -475,7 +478,6 @@ const getMemberShipUserCurrent = async (userId) => {
 
 const getMemberShipByUserId = async (userId) => {
     try {
-        console.log(userId)
         let poolConnection = await sql.connect(config)
         const query = `Select * from [dbo].[memberShip] where id =@id`
         const result = await poolConnection.request()
