@@ -90,7 +90,7 @@ export default function Infomation() {
       setUserEmail(data.email);
       setUserDob(handleDate(data.dateOfBirth));
       setUserGender(data?.gender || 'Nam');
-      setUserCredit(data.wallet);
+      setUserCredit(Math.round(data.wallet));
       setUserPoint(data.point);
       setUserAvatar(data.imgUrl);
     } catch (error) {
@@ -735,7 +735,7 @@ export default function Infomation() {
               <div className="info-desc-item">
                 <p style={{ fontSize: "0.8em" }}>Ví</p>
                 <p className="main">
-                  {userInfo.wallet ? userInfo.wallet : "0"} K
+                  {userInfo.wallet ? Math.round(userInfo.wallet) : "0"} K
                 </p>
               </div>
             </div>

@@ -92,7 +92,7 @@ export default function CarDetail(){
             const response = await axios.get(`http://localhost:4000/user/${id}`);
             const data = response.data;
             setUserInfo(data)
-            setWallet(data.wallet);
+            setWallet(Math.round(data.wallet));
             return data.id
         } catch (error) {
             console.error("Error fetching User Info: " + error)
@@ -241,9 +241,9 @@ export default function CarDetail(){
         setRentTotal(calculateRentPrice(totalPrice, totalDate))
     },[totalPrice, totalDate])
 
-    useEffect(() => {
-        setWallet(userInfo.wallet)
-    },[userInfo])
+    // useEffect(() => {
+    //     setWallet(userInfo.wallet)
+    // },[userInfo])
     
     function handleDate(d) {
         const date = new Date(d);

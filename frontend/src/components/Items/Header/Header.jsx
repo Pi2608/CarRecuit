@@ -41,7 +41,7 @@ function Header() {
     useEffect(() =>{
         async function fetchData(){
             await getUser();
-            // await getNotifications()
+            await getNotifications()
         }
         fetchData();
     },[id])
@@ -63,43 +63,43 @@ function Header() {
         try {
             const response = await axios.get(`http://localhost:4000/user/notification/${id}`);
             const data = response.data;
-
-            if (response.data.length > 0) {
-                const notiDataPromise = data.map(async (noti) => {
-                    try {
-                        console.log(noti.senderId)
-                        const userResponse = await axios.get(`http://localhost:4000/user/${noti.senderId}`);
-                        const userData = userResponse.data;
+            console.log(data);
+            // if (response.data.length > 0) {
+            //     const notiDataPromise = data.map(async (noti) => {
+            //         try {
+            //             console.log(noti.senderId)
+            //             const userResponse = await axios.get(`http://localhost:4000/user/${noti.senderId}`);
+            //             const userData = userResponse.data;
         
-                        const imagePromise = new Promise((resolve) => {
-                            const img = new Image();
-                            img.src = userData.imgUrl; // Assuming the user's image URL is stored in a property named 'imgUrl'
-                            img.onload = () => resolve(img.src);
-                            img.onerror = () => resolve(null);
-                        });
+            //             const imagePromise = new Promise((resolve) => {
+            //                 const img = new Image();
+            //                 img.src = userData.imgUrl; // Assuming the user's image URL is stored in a property named 'imgUrl'
+            //                 img.onload = () => resolve(img.src);
+            //                 img.onerror = () => resolve(null);
+            //             });
                         
-                        const title = noti.title;
-                        const message = noti.message;
-                        const date = handleDate(noti.dateUp);
-                        const imageUrl = await imagePromise;
+            //             const title = noti.title;
+            //             const message = noti.message;
+            //             const date = handleDate(noti.dateUp);
+            //             const imageUrl = await imagePromise;
         
-                        return {
-                            title : title,
-                            message: message,
-                            dateUp: date,
-                            userImage: imageUrl
-                        };
-                    } catch (error) {
-                        console.error('Error fetching user data:', error);
-                        return null;
-                    }
-                }
-            );
-                const notiData = await Promise.all(notiDataPromise);
-                setNotiList(notiData.filter(noti => noti !== null));
-                // setFeedbackDetail(notiData.filter(noti => noti !== null)[0].feedback);
-                console.log(notiData)
-            }
+            //             return {
+            //                 title : title,
+            //                 message: message,
+            //                 dateUp: date,
+            //                 userImage: imageUrl
+            //             };
+            //         } catch (error) {
+            //             console.error('Error fetching user data:', error);
+            //             return null;
+            //         }
+            //     }
+            // );
+            //     const notiData = await Promise.all(notiDataPromise);
+            //     setNotiList(notiData.filter(noti => noti !== null));
+            //     console.log(notiData)
+            // }
+            setNotiList(data)
         } catch (error) {
             console.error("Error fetching Noti: " + error)
         }
@@ -130,7 +130,7 @@ function Header() {
                                         <div key={noti.id}>
                                             <h5 style={{padding: "15px 20px 5px 20px"}}>{noti.title}</h5>
                                             <p style={{padding: "0 20px"}}>{noti.message}</p>
-                                            <p style={{padding: " 5px 20px 15px 20px "}}>{noti.dateUp}</p>
+                                            <p style={{padding: " 5px 20px 15px 20px "}}>{handleDate(noti.dateUp)}</p>
                                             <hr style={{margin: "0 0 20px 0"}}/>
                                         </div>
                                     )}

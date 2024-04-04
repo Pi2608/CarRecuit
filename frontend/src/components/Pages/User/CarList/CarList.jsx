@@ -710,11 +710,10 @@ export default function CarList() {
                                 </div>
                             </div>
                         </Modal>
-                        <div className="cars-all">
-                            <Stack spacing={2} direction="row">
-                                <Button variant="outlined" onClick={() => { handeGetAllClick() }} style={{color:'black', border: '1px solid black'}}>Xem tất cả</Button>
-                            </Stack>
-                        </div>
+                        <div
+                            className="amenity cars-all"
+                            onClick={() => { handeGetAllClick() }}
+                        ><p>Xem tất cả</p></div>
                     </div>
                 </div>
                 <div className="list-container">

@@ -136,7 +136,8 @@
     display: flex;
     background-color: #fff;
     border-radius: 10px;
-    border: 0.5px solid #b2b2b2
+    border: 0.5px solid #b2b2b2;
+    cursor: default;
 }
 
 #car-detail>.body>.car-info>.price>.period>.book,
@@ -162,6 +163,7 @@
     font-size: 16px;
     line-height: 25px;
     padding: 8px;
+    cursor: default;
 }
 
 #car-detail>.body>.car-info>.price>.location>.address{
