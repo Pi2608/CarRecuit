@@ -1,0 +1,8 @@
+#cart-btn{
+    position: fixed;
+    bottom: 2vh;
+    right: 2vw;
+    background-color: "#fff";
+    padding: 10px;
+    cursor: pointer;
+}

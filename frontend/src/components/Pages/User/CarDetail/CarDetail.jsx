@@ -18,6 +18,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useAuth } from "../../../../Context/AuthProvider";
 import { useParams } from "react-router-dom";
+import CartButon from "../../../Items/Cart/Cart";
 import LoginForm from "../../Login/LoginForm/LoginForm";
 import dayjs from "dayjs";
 import Modal from '@mui/material/Modal';
@@ -30,8 +31,12 @@ export default function CarDetail(){
     const { auth, id } = useAuth();
 
     const { carId } = useParams();
-
+    
+    const today = new Date();
+    
     const [ open, setOpen ] = useState(false);
+    const [ openMsg, setOpenMsg ] = useState(false);
+    const [ msg, setMsg ] = useState("")
     const [ carImages, setCarImages ] = useState([]);
     const [ userInfo, setUserInfo ] = useState([]);
     const [ feedback, setFeedback ] = useState([]);
@@ -116,6 +121,8 @@ export default function CarDetail(){
 
     async function addCar(){
         try {
+            console.log(startDate)
+            console.log(endDate)
             const postData = {
                 pick_up: startDate,
                 drop_off: endDate,
@@ -123,29 +130,13 @@ export default function CarDetail(){
             const response = await axios.post(`http://localhost:4000/rent/addCar?userId=${id}&carId=${carId}`, postData);
             const data = response.data;
             console.log(data);
+            setMsg(data)
+            if (data.message !== null || data.message !== ""){
+                setMsg(data.message);
+            }
+            handleOpenMsg();
         } catch (error) {
             console.error("Error adding car: " + error)
-        }
-    }
-
-    async function undoAddCar(){
-        try {
-            const response = await axios.get(`http://localhost:4000/rent/deleteCar?userId=${id}&carId=${carId}`);
-            const data = response.data;
-            console.log(data);
-        } catch (error) {
-            console.error("Error undo adding car: " + error)
-        }
-    }
-
-    async function sendRentRequest(){
-        try {
-            const response = await axios.get(`http://localhost:4000/rent/confirmPayment/${id}`);
-            const data = response.data;
-            console.log(data);
-            calculatePayment();
-        } catch (error) {
-            console.error("Error payment: " + error)
         }
     }
 
@@ -192,6 +183,20 @@ export default function CarDetail(){
 
     const handleClose = () => setOpen(false);
 
+    const handleOpenMsg = () => {setOpenMsg(true); console.log("open")};
+
+    const handleCloseMsg = () => setOpenMsg(false);
+
+    // const getDates = () => {
+    //     var today = new Date();
+    //     boundDate.setDate(today.getDate() + 4)
+    //     maxDate.setMonth(boundDate.getMonth() + 1)
+    //     startDate.setDate(boundDate.getDate())
+    //     startDate.setHours(7, 0, 0, 0)
+    //     endDate.setDate(today.getDate() + 5)
+    //     endDate.setHours(7, 0, 0, 0);
+    // }
+
     useEffect(() => {
         window.scrollTo(0, 0)
         const fetchData = async () => {
@@ -200,15 +205,18 @@ export default function CarDetail(){
         }
         fetchData();
         var today = new Date();
-        boundDate.setDate(today.getDate() + 3)
+        boundDate.setDate(today.getDate() + 4)
         maxDate.setMonth(boundDate.getMonth() + 1)
-        startDate.setDate(boundDate.getDate() )
+        startDate.setDate(boundDate.getDate())
         startDate.setHours(7, 0, 0, 0)
-        endDate.setDate(boundDate.getDate() + 1)
+        endDate.setDate(startDate.getDate() + 1)
         endDate.setHours(7, 0, 0, 0);
+    },[])
+
+    useEffect(()=>{
         setTotalDate(calculateTotalDate(endDate, startDate))
         displayPeriod(startDate, endDate)
-    },[])
+    },[startDate,endDate])
 
     useEffect(() => {}, [feedback, feedbackDetail]);
 
@@ -319,6 +327,7 @@ export default function CarDetail(){
         endDate.setMonth(endDateTemp.getMonth());
         displayPeriod(startDate, endDate);
         setTotalDate(calculateTotalDate(endDate, startDate))
+        console.log("rung")
     }    
 
     function displayPeriod(startDate, endDate){
@@ -624,7 +633,7 @@ export default function CarDetail(){
                                         onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
                                         onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
                                         // onClick={() => {console.log("run")}}
-                                    >Yêu cầu thuê xe</div>
+                                    >Chọn xe</div>
                                 }
                                 modal
                                 contentStyle={{
@@ -634,7 +643,6 @@ export default function CarDetail(){
                                     height: "fit-content",
                                     width: "fit-content",
                                 }}
-                                onOpen={() => {addCar();console.log("run")}}
                             >
                                 {close =>
                                     <div id="payment">
@@ -646,11 +654,11 @@ export default function CarDetail(){
                                                 className="btn"
                                                 onMouseLeave={(e) => {e.target.style.backgroundColor = "#fff"}}
                                                 onMouseOver={(e) => {e.target.style.backgroundColor = "#ccc"}}
-                                                onClick={() => {undoAddCar();close()}}
+                                                onClick={() => {close()}}
                                             >Hủy</div>
                                             <div 
                                                 className="btn"
-                                                onClick={() => {sendRentRequest(); close()}}
+                                                onClick={() => {addCar(); close()}}
                                                 style={{backgroundColor: "#5fcf86", cursor: "pointer"}}
                                                 onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
                                                 onMouseOver={(e) => {e.target.style.backgroundColor = "#469963", e.target.style.color = "#fff"}}
@@ -667,7 +675,7 @@ export default function CarDetail(){
                                         style={{cursor: "pointer", padding: "8px", backgroundColor: "#5fcf86", borderRadius: "5px", fontWeight: "500", textAlign: "center", color: "#fff"}}
                                         onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
                                         onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
-                                    >Yêu cầu thuê xe</div>
+                                    >Chọn xe</div>
                                 }
                                 position="center"
                                 modal
@@ -678,10 +686,37 @@ export default function CarDetail(){
                                     </div>
                                 )}
                         </Popup>
-                            
                         }
+                        <Modal
+                            open={openMsg}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                            onClose={handleCloseMsg}
+                            style={{display: "flex", justifyContent:"center", paddingTop: "50px"}}
+                        >
+                            <div 
+                                style={{
+                                    backgroundColor: "#fff",
+                                    height: "fit-content",
+                                    padding:"20px",
+                                    fontSize: "26px", 
+                                    borderRadius: "25px"
+                                }}
+                            >
+                                <div style={{margin: "20px"}}>
+                                    {msg}
+                                </div>
+                                <div 
+                                    style={{width:"100%", textAlign:"center", padding:"10px 0", backgroundColor: "#5fcf86", color: "#fff", borderRadius: "15px", cursor: "pointer"}}
+                                    onMouseLeave={(e) => {e.target.style.backgroundColor = "#5fcf86"}}
+                                    onMouseOver={(e) => {e.target.style.backgroundColor = "#469963"; e.target.style.color = "#fff"}}
+                                    onClick={handleCloseMsg}
+                                >Ok</div>
+                            </div>
+                        </Modal>
                     </div>
                 </div>
+                <CartButon/>
             </div>
             <Footer/>
         </div>

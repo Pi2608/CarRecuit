@@ -10,6 +10,7 @@ import CarDetail from './components/Pages/User/CarDetail/CarDetail.jsx';
 import Map from './components/Pages/User/Map/Map.jsx';
 import Profile from "./components/Pages/User/Profile/Pages/ProfilePage/Profile.jsx";
 import Transaction from './components/Pages/User/Profile/Pages/TransactionPage/Transaction.jsx';
+import Rent from './components/Pages/User/RentPage/Rent.jsx';
 import Trips from './components/Pages/User/Profile/Pages/TravelPage/Trips.jsx';
 import MyCars from './components/Pages/User/Profile/Pages/MyCarsPage/MyCars.jsx';
 import PendingCars from './components/Pages/User/Profile/Pages/PendingCarsPage/PendingCars.jsx';
@@ -49,8 +50,9 @@ function App(){
                 <Route path="upcomingreq" element={<UpComing />} />
                 <Route path="mytrips" element={<Trips />} />
                 <Route path="resetpw" element={<ChangePw />} />
-                <Route path="transaction" element={<Transaction />} />
+                <Route path="transaction" element={<Transaction/>}/>
               </Route>
+              <Route path="rent" element={<Rent/>}/>
               <Route path="car">
                 <Route path="carregister" element={<CarRegister />} />
               </Route>

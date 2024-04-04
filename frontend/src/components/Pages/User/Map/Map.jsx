@@ -13,11 +13,23 @@ function App({ google }) {
         getAllCar();
     }, []);
 
-
     async function getAllCar() {
         try {
             const response = await axios.get('http://localhost:4000/car/')
-            setCars(response.data)
+            const carListData = response.data;
+            // Create an array of promises for each image loading
+            const imagePromises = carListData.map((car) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = car.imgUrl;
+                    img.onload = () => resolve({ ...car, loaded: true });
+                });
+            });
+
+            // Wait for all images to be loaded before updating state
+            const loadedCarList = await Promise.all(imagePromises);
+            setCars(loadedCarList)
+            console.log(cars)
         } catch (error) {
             console.log(error)
         }
@@ -30,6 +42,7 @@ function App({ google }) {
                 const response = await axios.get(`http://localhost:4000/location/car?carId=${car.id}&typeLocationId=1`)
                 const location = response.data
                 location.link = `http://localhost:5173/car/cardetail/${car.id}`
+                location.img = car.imgUrl
                 newLocations.push(location)
             }
             setLocations(newLocations)
@@ -37,8 +50,8 @@ function App({ google }) {
             console.log(error);
         }
     }
+
     const handleMarkerClick = (link) => {
-        console.log(location.link)
         window.location.href = link; // Redirect to the provided link
     };
 
@@ -59,8 +72,15 @@ function App({ google }) {
                         <Marker
                             key={location.id}
                             position={{ lat: location.latitude, lng: location.longitude}}
+                            icon={{
+                                url: location.img, // Set the imgUrl as the icon's URL
+                                scaledSize: new google.maps.Size(50, 50), // Adjust the size of the icon
+                                origin: new google.maps.Point(0, 0), // Set origin
+                                anchor: new google.maps.Point(25, 25), // Set anchor
+                            }}
                             onClick={() => handleMarkerClick(location.link)} // Redirect on marker click
-                        />
+                            className="marker-icon"
+                        ></Marker>
                     ))}
                 </Map>
             </div>

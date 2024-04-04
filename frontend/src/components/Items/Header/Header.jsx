@@ -41,7 +41,7 @@ function Header() {
     useEffect(() =>{
         async function fetchData(){
             await getUser();
-            await getNotifications();
+            // await getNotifications()
         }
         fetchData();
     },[id])
@@ -53,6 +53,7 @@ function Header() {
             const response = await axios.get(`http://localhost:4000/user/${id}`)
             const data = response.data;
             setUserInfo(data)
+            console.log(response.data)
         } catch (error) {
             console.error("Error fetching User Info: " + error)
         }
@@ -66,6 +67,7 @@ function Header() {
             if (response.data.length > 0) {
                 const notiDataPromise = data.map(async (noti) => {
                     try {
+                        console.log(noti.senderId)
                         const userResponse = await axios.get(`http://localhost:4000/user/${noti.senderId}`);
                         const userData = userResponse.data;
         

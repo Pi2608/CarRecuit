@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../../Items/Header/Header";
 import Footer from "../../../Items/Footer/Footer";
 import Card from "../../../Items/Card/Card";
+import CartButon from "../../../Items/Cart/Cart.jsx";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Button from '@mui/material/Button';
@@ -18,14 +19,11 @@ import Modal from '@mui/material/Modal';
 import RentImg from "../../../../images/thue_xe_oto_tu_lai_di_du_lich_gia_re.fde3ac82.png"
 import BannerIMG from "../../../../images/Banner.jpg"
 import { useAuth } from '../../../../Context/AuthProvider.jsx';
-// import Cookies from "js-cookie";
 import axios from "axios";
 import "./Home.css"
 import { func } from "prop-types";
 
 export default function Home() {
-
-  const apiKey = "AIzaSyCjiKvKTIr5FA0KkApXb5FyP0WkFUNxiWo"
 
   const navigate = useNavigate();
 
@@ -89,31 +87,12 @@ export default function Home() {
         // Wait for all images to be loaded before updating state
         const loadedCarList = await Promise.all(imagePromises);
         setCarList(loadedCarList);
+        console.log(carList)
     } catch (error) {
         console.error('Error fetching data:', error);
     }
   };
 
-  async function getAddress(){
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        setLocation({ latitude, longitude });
-        try {
-          const response = await axios.get(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
-          );
-          const formattedAddress = response.data.results[0]?.formatted_address;
-          setAddress(formattedAddress);
-        } catch (error) {
-          setError('Error fetching address');
-        }
-      },
-      (err) => {
-        setError(`Error getting location: ${err.message}`);
-      }
-    );
-  }
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -127,22 +106,13 @@ export default function Home() {
     endDate.setDate(boundDate.getDate() + 1)
     endDate.setHours(7, 0, 0, 0);
     displayPeriod(startDate, endDate);
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
-      return;
-    } else {
-      getAddress()
-    }
   },[])
 
   useEffect(() => {}, [auth]);
   
   useEffect(() => {},[id, roleUserId])
   
-  useEffect(() => {
-    console.log(location)
-    console.log(address)
-  },[carList,location,address])
+  useEffect(() => {},[carList,location,address])
 
   function handleDateTime(d) {
     const date = new Date(d);
@@ -337,6 +307,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          <CartButon/>
         </div>
         <Footer/>
     </div>

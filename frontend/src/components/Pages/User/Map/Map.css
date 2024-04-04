@@ -1,3 +1,8 @@
 .Map-container {
     width: 100%;
 }
+
+.marker-icon {
+    border-radius: 50%;
+    border: 2px solid #fff; /* Add border */
+  }
