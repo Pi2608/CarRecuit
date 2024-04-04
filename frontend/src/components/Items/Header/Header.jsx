@@ -43,7 +43,9 @@ function Header() {
             await getUser();
             await getNotifications()
         }
-        fetchData();
+        if(id){
+            fetchData();
+        }
     },[id])
 
     useEffect(() =>{},[userInfo])
@@ -61,6 +63,7 @@ function Header() {
 
     async function getNotifications(){
         try {
+            console.log(id)
             const response = await axios.get(`http://localhost:4000/user/notification/${id}`);
             const data = response.data;
             console.log(data);
